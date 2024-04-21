@@ -1,0 +1,57 @@
+:root{
+    --textColor : rgb(227, 229, 232);
+    --pastText  : rgb(132, 133, 136);
+    --blue      : #43a7d7;
+    --red       : rgb(202 99 109);
+    --gold      : rgb(209 154 102);
+    --green     : rgb(139 212 88);
+    --atomGreen : rgb(150 193 120);
+    --dark      : rgb(32, 33, 36);
+    --purple    : #ad92e5;
+    --goldish   : #ffdb81c4;
+    --facebook-text-color : #e4e6ea;
+    /* #1d1f22; */
+}
+*   { cursor: default; }
+html{ height: 100%;}
+/* DEFAULTS CHANGES */
+frame{ transition: 0.6s; }
+button{background-color: transparent; color: #555;}
+body{
+   font-family: Menlo, monospace;
+   background-color: var(--dark);
+   background-color: hsl(116%, 0, 0);
+   color: var(--textColor);
+   overscroll-behavior-x: none;
+   overscroll-behavior-y: none;
+   padding-bottom: 10%;
+   padding: 0;
+   transition: 0.5s
+}
+input[type=checkbox]{
+  width: 9px;
+  vertical-align: middle;
+  margin-inline: auto;
+  color-scheme: dark;
+}
+a{
+  color: var(--purple);
+  cursor: pointer;
+  text-decoration: none;
+}
+td{
+  vertical-align: top;
+}
+.settings{
+  text-align: center;
+}
+.explainer{
+  padding-left: 10%;
+}
+.end-note{
+  text-align: center;
+  color: grey;
+  margin: 2% 0 2% 0;
+  font-size: 85%;
+  font-style: italic;
+}
