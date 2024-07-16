@@ -13,7 +13,7 @@
     /* #1d1f22; */
 }
 *   { cursor: default; }
-html{ height: 100%;}
+html{ height: 100%; }
 /* DEFAULTS CHANGES */
 frame{ transition: 0.6s; }
 button{background-color: transparent; color: #555;}
@@ -51,9 +51,32 @@ td{
 .end-note{
   text-align: center;
   color: grey;
-  margin: 2% 0 2% 0;
+  margin: 5% 0px 3% 0px;
   font-size: 85%;
-  font-style: italic;
+  letter-spacing: 3px;
+}
+tr:hover{
+  background: mediumaquamarine;
+  color: black;
+}
+.stock-img{
+  width: 50%;
+  transform: rotate3d(81, -15, 17, 71deg);
+  overflow: hidden;
+}
+.stock-img:hover{
+  transform: rotate3d(0, 0, 0, 0deg) scale(1.3);
+  transition: 2s;
+  backdrop-filter: blur(5px);
+  z-index: 2;
+  -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(250, 250, 250, 0.2)));
+}
+.stock-img:not(hover){
+  transition: 1s;
+}
+.flexed{
+  display: inline-flex;
+  justify-content: space-between;
 }
 
 .grid-box{
@@ -66,5 +89,14 @@ td{
   body{
     width: 60%;
     margin: 0 auto;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .flexed {
+    display: block;
+  }
+  .stock-img{
+    width: auto;
   }
 }
