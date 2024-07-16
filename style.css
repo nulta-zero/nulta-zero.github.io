@@ -55,3 +55,16 @@ td{
   font-size: 85%;
   font-style: italic;
 }
+
+.grid-box{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 1vh;
+}
+
+@media screen and (min-width: 900px) {
+  body{
+    width: 60%;
+    margin: 0 auto;
+  }
+}
