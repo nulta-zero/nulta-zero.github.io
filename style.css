@@ -26,7 +26,10 @@ body{
    overscroll-behavior-y: none;
    padding-bottom: 10%;
    padding: 0;
-   transition: 0.5s
+   transition: 0.5s;
+   overflow-x:hidden;
+   background: rgb(40, 40, 40);
+   padding: 10%;
 }
 input[type=checkbox]{
   width: 9px;
@@ -40,7 +43,8 @@ a{
   text-decoration: none;
 }
 td{
-  vertical-align: top;
+  vertical-align: middle;
+  height: 20px;
 }
 .settings{
   text-align: center;
@@ -51,18 +55,31 @@ td{
 .end-note{
   text-align: center;
   color: grey;
-  margin: 5% 0px 3% 0px;
+  margin: 12% 0px 3% 0px;
   font-size: 85%;
   letter-spacing: 3px;
 }
-tr:hover{
-  background: mediumaquamarine;
+.bander{
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  background: gold;
   color: black;
+}
+tr{
+  border-bottom: 1px solid;
+}
+tr:hover{
+  outline: 2px solid mediumaquamarine;
+  border-radius: 3px;
+  box-shadow: 1px 1px 3px black;
+  background: #c0c0c063;
 }
 .stock-img{
   width: 50%;
-  transform: rotate3d(81, -15, 17, 71deg);
+  transform: rotate3d(81, -20, 24, 71deg);
   overflow: hidden;
+  background: #00000078;
 }
 .stock-img:hover{
   transform: rotate3d(0, 0, 0, 0deg) scale(1.3);
@@ -70,6 +87,12 @@ tr:hover{
   backdrop-filter: blur(5px);
   z-index: 2;
   -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(250, 250, 250, 0.2)));
+}
+/* TABLE */
+.projects-list{
+  background: #24222254;
+  border-radius: 10px;
+  table-layout: fixed;
 }
 .stock-img:not(hover){
   transition: 1s;
@@ -85,6 +108,28 @@ tr:hover{
   grid-gap: 1vh;
 }
 
+.huge-back-element{
+  position: absolute;
+  top: 50%;
+  width: 150%;
+  height: 30%;
+  left: -20%;
+  z-index: -1;
+  transform: perspective(599px) rotate(-45deg) scale(2, 1.5) rotateX(20deg);
+  mix-blend-mode: color-dodge;
+}
+.rainbow{
+        background: repeating-linear-gradient(1deg, rgba(255, 154, 0, 1) 5%,
+                                                    rgba(208, 222, 33, 1) 50px, transparent 20px,
+                                                    rgba(79, 220, 74, 1) 50px,  transparent 100px,
+                                                    rgba(63, 218, 216, 1) 50px, transparent 20px,
+                                                    rgba(47, 201, 226, 1) 50px, transparent 20px,
+                                                    rgba(28, 127, 238, 1) 50px, transparent 20%,
+                                                    rgba(95, 21, 242, 1) 20%,   transparent 20px, #9C27B0 71%, transparent 20px, #00BCD4 97%, transparent 32px,
+                                                    rgba(255, 0, 0, 1) 123%,    transparent 40px
+                                              );
+}
+
 @media screen and (min-width: 900px) {
   body{
     width: 60%;
@@ -98,5 +143,8 @@ tr:hover{
   }
   .stock-img{
     width: auto;
+  }
+  td{
+    border-bottom: 2px solid #c0c0c05c;
   }
 }
