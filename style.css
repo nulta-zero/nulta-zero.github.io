@@ -13,14 +13,13 @@
     /* #1d1f22; */
 }
 *   { cursor: default; }
-html{ height: 100%; }
+html{ height: 100%; mix-blend-mode: darken; }
 /* DEFAULTS CHANGES */
 frame{ transition: 0.6s; }
 button{background-color: transparent; color: #555;}
 body{
    font-family: Menlo, monospace;
    background-color: var(--dark);
-   background-color: hsl(116%, 0, 0);
    color: var(--textColor);
    overscroll-behavior-x: none;
    overscroll-behavior-y: none;
@@ -28,7 +27,6 @@ body{
    padding: 0;
    transition: 0.5s;
    overflow-x:hidden;
-   background: rgb(40, 40, 40);
    padding: 10%;
 }
 input[type=checkbox]{
@@ -45,6 +43,10 @@ a{
 td{
   vertical-align: middle;
   height: 20px;
+}
+.about{
+  background: #6478e1;
+  letter-spacing: 3px;
 }
 .settings{
   text-align: center;

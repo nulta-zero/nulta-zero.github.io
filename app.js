@@ -4,7 +4,6 @@ const doc = document,
       aud = qu('.aud-mode'),
       dl = qu('.dl-mode');
 
-
 const $$ = {
     vars : {},
     speakThis : function(rate, word ){ //SPEAKs string/number
@@ -22,12 +21,10 @@ const $$ = {
                     return $$.vars.synth.speak(u);
     },
     darkMode : function(){
-        doc.body.style.backgroundColor = 'rgb(32, 33, 36)';
-        doc.body.style.color = 'rgb(227, 229, 232)';
+        qu('html').style.mixBlendMode = 'darken';
     },
     lightMode : function(){
-        doc.body.style.backgroundColor = 'rgb(227, 229, 232)';
-        doc.body.style.color = 'rgb(32, 33, 36)';
+        qu('html').style.mixBlendMode = 'difference';
     },
 }
 
@@ -42,7 +39,7 @@ const main = function(){
 
   aud.addEventListener('input', e=>{
      let text = qu('.container').innerText;
-         text = text.split('\n').join('!'); //adds pause in speaking when reading next row in table 
+         text = text.split('\n').join('!'); //adds pause in speaking when reading next row in table
      switch(e.target.checked){
        case true :  $$.speakThis(1 ,text); break;
        case false:  if($$.vars.synth == null) return false;
