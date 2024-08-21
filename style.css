@@ -12,22 +12,20 @@
     --facebook-text-color : #e4e6ea;
     /* #1d1f22; */
 }
-*   { cursor: default; }
+*   { cursor: default;  }
 html{ height: 100%; mix-blend-mode: darken; }
 /* DEFAULTS CHANGES */
 frame{ transition: 0.6s; }
 button{background-color: transparent; color: #555;}
 body{
    font-family: Menlo, monospace;
-   background-color: var(--dark);
    color: var(--textColor);
    overscroll-behavior-x: none;
    overscroll-behavior-y: none;
    padding-bottom: 10%;
    padding: 0;
-   transition: 0.5s;
    overflow-x:hidden;
-   padding: 10%;
+   background: var(--dark);
 }
 input[type=checkbox]{
   width: 9px;
@@ -42,7 +40,11 @@ a{
 }
 td{
   vertical-align: middle;
-  height: 20px;
+  height: 3pc;
+}
+.super-container{
+   padding: 10%;
+   /* background: var(--dark); */
 }
 .about{
   background: #6478e1;
@@ -50,9 +52,6 @@ td{
 }
 .settings{
   text-align: center;
-}
-.explainer{
-  padding-left: 10%;
 }
 .end-note{
   text-align: center;
@@ -68,15 +67,11 @@ td{
   background: gold;
   color: black;
 }
+
 tr{
   border-bottom: 1px solid;
 }
-tr:hover{
-  outline: 2px solid mediumaquamarine;
-  border-radius: 3px;
-  box-shadow: 1px 1px 3px black;
-  background: #c0c0c063;
-}
+
 .stock-img{
   width: 50%;
   transform: rotate3d(81, -20, 24, 71deg);
@@ -91,10 +86,26 @@ tr:hover{
   -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(250, 250, 250, 0.2)));
 }
 /* TABLE */
+.projects-head{
+  text-align: center;
+  font-size: small;
+  background: sienna;
+  height: 1pc;
+}
 .projects-list{
   background: #24222254;
   border-radius: 10px;
   table-layout: fixed;
+}
+.lister:hover{
+  outline: 2px solid mediumaquamarine;
+  border-radius: 3px;
+  box-shadow: 1px 1px 3px black;
+  background: #c0c0c063;
+}
+.explainer{
+  padding-left: 10%;
+  background: #a0522d5e;
 }
 .stock-img:not(hover){
   transition: 1s;
@@ -133,7 +144,7 @@ tr:hover{
 }
 
 @media screen and (min-width: 900px) {
-  body{
+  .super-container{
     width: 60%;
     margin: 0 auto;
   }
@@ -148,5 +159,14 @@ tr:hover{
   }
   td{
     border-bottom: 2px solid #c0c0c05c;
+  }
+  .super-container{
+    padding: 0;
+  }
+  .container-intro{
+    padding: 10%;
+  }
+  .settings{
+    margin-top: 10%;
   }
 }
