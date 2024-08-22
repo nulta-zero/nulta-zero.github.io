@@ -2,7 +2,8 @@ const doc = document,
       log = (x)=> console.log(x),
       qu = (x)=> doc.querySelector(x),
       aud = qu('.aud-mode'),
-      dl = qu('.dl-mode');
+      dl = qu('.dl-mode'),
+      mat = qu('.mat-mode');
 
 const $$ = {
     vars : {},
@@ -26,6 +27,10 @@ const $$ = {
     lightMode : function(){
         qu('html').style.mixBlendMode = 'difference';
     },
+    matrix : function(bool){
+         if(bool) qu('.table-holder').classList.add('matrix');
+         else     qu('.table-holder').classList.remove('matrix');
+    }
 }
 
 const main = function(){
@@ -46,6 +51,14 @@ const main = function(){
                     else $$.vars.synth.pause();
        break;
      }
+  });
+
+  mat.addEventListener('input', e=>{
+    let state = e.target.checked;
+    switch(state){
+      case true:  $$.matrix(true);   break;
+      case false: $$.matrix(false);  break;
+    }
   });
 }
 
