@@ -86,9 +86,7 @@ tr{
   -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(250, 250, 250, 0.2)));
 }
 /* TABLE */
-table{
-  /* border-collapse: collapse; */
-}
+table{}
 .table-holder{}
 .matrix{
     overflow: scroll;
@@ -160,6 +158,23 @@ table{
                                                     rgba(95, 21, 242, 1) 20%,   transparent 20px, #9C27B0 71%, transparent 20px, #00BCD4 97%, transparent 32px,
                                                     rgba(255, 0, 0, 1) 123%,    transparent 40px
                                               );
+}
+.vertical-line{
+  position: absolute;
+  top: 0;
+  left: 5%;
+  width: 2px;
+  height: 100%;
+  background: snow;
+  z-index: -1;
+}
+.horizontal-line{
+  position: absolute;
+  top: 12pc;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: snow;
 }
 
 /* HUGE SCREEN */
