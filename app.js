@@ -30,6 +30,13 @@ const $$ = {
     matrix : function(bool){
          if(bool) qu('.table-holder').classList.add('matrix');
          else     qu('.table-holder').classList.remove('matrix');
+    },
+    calculateLargestTitlePos : function(){
+         let ltr = qu('.largest-title').getBoundingClientRect();
+         let horizontalLine = qu('.horizontal-line');
+         let banderX = qu('.bander-x');
+         horizontalLine.style.top = ltr.top + ltr.height + 10 + 'px';
+         banderX.style.top = ltr.top + ltr.height + 20 + 'px';
     }
 }
 
@@ -59,6 +66,11 @@ const main = function(){
       case true:  $$.matrix(true);   break;
       case false: $$.matrix(false);  break;
     }
+  });
+
+  $$.calculateLargestTitlePos();
+  window.addEventListener('resize', e=>{
+      $$.calculateLargestTitlePos();
   });
 }
 
