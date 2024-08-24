@@ -177,7 +177,7 @@ td{
 /* HUGE SCREEN */
 @media screen and (min-width: 900px) {
   .super-container{
-    width: 60%;
+    width: 65vh;
     margin: 0 auto;
   }
 }
