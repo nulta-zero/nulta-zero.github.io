@@ -1,5 +1,6 @@
 const doc = document,
       log = (x)=> console.log(x),
+      dce = (x)=> doc.createElement(x),
       qu = (x)=> doc.querySelector(x),
       aud = qu('.aud-mode'),
       dl = qu('.dl-mode'),
@@ -37,6 +38,37 @@ const $$ = {
          let banderX = qu('.bander-x');
          horizontalLine.style.top = ltr.top + ltr.height + 10 + 'px';
          banderX.style.top = ltr.top + ltr.height + 20 + 'px';
+    },
+    createTRS : function(){
+      let OV = Object.values(DATA);
+      let tbody = qu('.projects-list').querySelector('tbody');
+      for(let i = 0; i<OV.length;i++){
+          let tr = dce('tr');
+          let td1 = dce('td');
+          let td2 = dce('td');
+
+          td1.classList.add('lister');
+          td2.classList.add('explainer');
+          td1.innerText = OV[i].name + ' ';
+          td2.innerText = OV[i].desc;
+
+          if(OV[i].link.length > 0){
+             let a = dce('a');
+                 a.setAttribute('target', '_blank');
+                 a.title = 'Open link in a new tab';
+                 a.innerText = '⌗';
+                 td1.appendChild(a);
+          }
+
+          if(OV[i].super){
+             td1.classList.add('emphasis');
+          }
+
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tbody.appendChild(tr);
+      }
+
     }
 }
 
@@ -66,6 +98,11 @@ const main = function(){
       case true:  $$.matrix(true);   break;
       case false: $$.matrix(false);  break;
     }
+  });
+
+  window.addEventListener('DOMContentLoaded', e=>{
+      $$.calculateLargestTitlePos();
+      $$.createTRS();
   });
 
   $$.calculateLargestTitlePos();
