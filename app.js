@@ -57,6 +57,7 @@ const $$ = {
                  a.setAttribute('target', '_blank');
                  a.title = 'Open link in a new tab';
                  a.innerText = '⌗';
+                 a.href = OV[i].link;
                  td1.appendChild(a);
           }
 
