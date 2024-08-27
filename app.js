@@ -1,13 +1,19 @@
 const doc = document,
       log = (x)=> console.log(x),
       dce = (x)=> doc.createElement(x),
-      qu = (x)=> doc.querySelector(x),
-      aud = qu('.aud-mode'),
-      dl = qu('.dl-mode'),
-      mat = qu('.mat-mode');
+      qu = (x)=> doc.querySelector(x);
 
 const $$ = {
-    vars : {},
+    vars : {
+      program_name : 'PAPER',
+    },
+    query : {},
+    loadQuery : function(){
+            $$.query.aud  = qu('.aud-mode'),
+            $$.query.dl   = qu('.dl-mode'),
+            $$.query.mat  = qu('.mat-mode'),
+            $$.query.lp   = qu('.lp-mode');
+    },
     speakThis : function(rate, word ){ //SPEAKs string/number
                     $$.vars.speakInc+=1;
                     window.speechSynthesis.cancel();
@@ -61,20 +67,85 @@ const $$ = {
                  td1.appendChild(a);
           }
 
-          if(OV[i].super){
-             td1.classList.add('emphasis');
+          if(OV[i].power){
+             td1.classList.add('power');
+          }
+          if(OV[i].name.toUpperCase() == $$.vars.program_name.toUpperCase()){
+             td1.classList.add('available');
           }
 
           tr.appendChild(td1);
           tr.appendChild(td2);
           tbody.appendChild(tr);
       }
+    },
+    fetchData : async function(url) {
+        try {
+          const response = await fetch(url);
+          if(!response.ok) {
+             $$.loadProgram(true, 'dead-page.html');
+            // throw new Error(`Response status: ${response.status}`);
+          }else{
+            $$.loadProgram(true, url);
+          }
+        } catch (error) {
+          //die
+        }
+    },
+    loadProgram : function(state, source){
+      switch(state){
+        case true:
+             let iframe = dce('iframe');
+             iframe.id = 'program-frame';
+             iframe.src = source;
+             iframe.setAttribute('frameborder', 0);
+            qu('.program').appendChild(iframe);
+        break;
+        case false:  if(qu('#program-frame') != null) qu('#program-frame').remove(); break;
+      }
+    },
+    splitScreen : function(state){
+        let splitWindow = qu('.split-window');
+        let window_width = window.innerWidth;
+        let window_height = window.innerHeight;
 
-    }
+        let combos = ['width', 'left', window_width];
+
+        // DETECT TO SPLIT VERTICAL OR HORIZONTAL (smaller screens horizontal, larger vertical)
+        if(window_width > 900)  combos = ['width', 'left', window_width];   // SPLIT HORIZONTAL
+        else                    combos = ['height', 'top', window_height];  // SPLIT VERTICAL
+
+        for(let i = 0; i<splitWindow.children.length; i++){
+          switch(state){
+            case true:
+                 splitWindow.children[i].style.position = 'fixed';
+                 if(combos.includes('width')) splitWindow.children[i].style.height = '-webkit-fill-available';
+                 else                         splitWindow.children[i].style.width  = '-webkit-fill-available';
+                 splitWindow.children[i].style[combos[0]] = combos[2]/2 + 'px';
+                 switch(i){
+                   case 1:
+                       splitWindow.children[i].style[combos[1]] = splitWindow.children[0].getBoundingClientRect()[combos[0]] + 'px';
+                       splitWindow.children[i].style.overflow = 'scroll';
+                        splitWindow.children[i].style[combos[0]] = combos[2]/2-70 + 'px'; //asign right side to somewhat less space -70px
+                   break;
+                 }
+            break;
+            case false:
+                 splitWindow.children[i].style.position = '';
+                 splitWindow.children[i].style.height   = '';
+                 splitWindow.children[i].style.width    = '';
+                 splitWindow.children[i].style.left     = '';
+                 splitWindow.children[i].style.top      = '';
+            break;
+          }
+        }
+    },
 }
 
 const main = function(){
-  dl.addEventListener('input', e=>{
+   $$.loadQuery();
+
+   $$.query.dl.addEventListener('input', e=>{
       let state = e.target.checked;
       switch(state){
         case true:  $$.lightMode(); break;
@@ -82,7 +153,7 @@ const main = function(){
       }
   });
 
-  aud.addEventListener('input', e=>{
+   $$.query.aud.addEventListener('input', e=>{
      let text = qu('.container').innerText;
          text = text.split('\n').join('!'); //adds pause in speaking when reading next row in table
      switch(e.target.checked){
@@ -93,7 +164,7 @@ const main = function(){
      }
   });
 
-  mat.addEventListener('input', e=>{
+   $$.query.mat.addEventListener('input', e=>{
     let state = e.target.checked;
     switch(state){
       case true:  $$.matrix(true);   break;
@@ -101,12 +172,19 @@ const main = function(){
     }
   });
 
+    $$.query.lp.addEventListener('input', e=>{
+      let state = e.target.checked;
+      switch(state){
+        case true:  $$.fetchData('../../'+ $$.vars.program_name);  $$.splitScreen(state);  break;
+        case false: $$.loadProgram(state);         $$.splitScreen(state);  break;
+      }
+  });
+
   window.addEventListener('DOMContentLoaded', e=>{
       $$.calculateLargestTitlePos();
       $$.createTRS();
   });
 
-  $$.calculateLargestTitlePos();
   window.addEventListener('resize', e=>{
       $$.calculateLargestTitlePos();
   });

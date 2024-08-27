@@ -26,6 +26,12 @@ body{
    padding: 0;
    overflow-x:hidden;
    background: var(--dark);
+   margin: 0;
+
+   /* background-image: url(stocks.png);
+   background-repeat: no-repeat;
+   background-size: 90%;
+   background-position: top; */
 }
 input[type=checkbox]{
   width: 9px;
@@ -43,8 +49,17 @@ td{
   vertical-align: middle;
   height: 3pc;
 }
+iframe{
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+}
+.split-window{
+  display: flex;
+}
+.program{}
 .super-container{
-   padding: 10%;
+   padding: 5%;
+   margin: 1%;
 }
 .about{
   background: #6478e1;
@@ -75,7 +90,9 @@ td{
   -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(250, 250, 250, 0.2)));
 }
 /* TABLE */
-.table-holder{}
+.table-holder{
+  overflow: hidden;
+}
 .matrix{
     overflow: scroll;
     text-orientation: upright;
@@ -93,6 +110,9 @@ td{
   border-radius: 10px;
   table-layout: fixed;
 }
+.lister{
+  white-space: nowrap;
+}
 .lister:hover{
   outline: 2px solid mediumaquamarine;
   border-radius: 3px;
@@ -100,18 +120,30 @@ td{
   background: #c0c0c063;
 }
 .explainer{
-  padding-left: 10%;
+  padding-left: 5%;
+  overflow-wrap: anywhere;
   background: #a0522d5e;
 }
-.emphasis{
+.power{
   font-weight: 900;
   color: mediumspringgreen;
   font-size: large;
 }
-.emphasis::before{
+.power::before{
   content: "★";
   font-size: larger;
 }
+
+.available{
+  font-weight: 900;
+  color: deeppink;
+  font-size: large;
+}
+.available::before{
+  content: "✔︎✔︎";
+  font-size: larger;
+}
+
 .stock-img:not(hover){
   transition: 1s;
 }
@@ -173,6 +205,18 @@ td{
   height: 5px;
   background: snow;
 }
+.container-intro{
+  padding: 5vh;
+}
+
+/* DEAD PAGE REF */
+.dead-center{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10vh;
+}
 
 /* HUGE SCREEN */
 @media screen and (min-width: 900px) {
@@ -186,6 +230,9 @@ td{
   .flexed {
     display: block;
   }
+  .split-window{
+    display: block;
+  }
   .stock-img{
     width: auto;
   }
@@ -195,10 +242,15 @@ td{
   .super-container{
     padding: 0;
   }
-  .container-intro{
-    padding: 10%;
-  }
   .settings{
     margin-top: 10%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 1vh;
+    text-align: start;
+    margin-left: 10%;
+  }
+  .explainer{
+    padding-left: 3%;
   }
 }

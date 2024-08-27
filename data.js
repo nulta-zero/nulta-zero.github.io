@@ -17,7 +17,7 @@ DATA = {
   program_4 : {
     name : 'BALKAN_KINGPIN',
     link : '',
-    desc : `Drug lord inspired game, in which you are trying to create and maintain business around selling psychoactive substances`,
+    desc : `Learn how to run and preserve business, with theme of selling psychoactive substances`,
   },
   program_5 : {
     name : 'BUILDER',
@@ -47,7 +47,7 @@ DATA = {
   program_10 : {
     name : 'CHIP_TUNE',
     link : 'https://fb.watch/u1KVvXu8WL/',
-    desc : `Have you ever wondered how 2D characters, letters or simple 2D drawings sounds? Well now you can hear it in this one-of-the-kind chip-tune unique music creation station`,
+    desc : `Draw and create sounds. Hear drawings in this one-of-the-kind chip-tune unique music creation station`,
   },
   program_11 : {
     name : 'CUBE',
@@ -83,7 +83,7 @@ DATA = {
     name : 'ETAR',
     link : '',
     desc : `Super advanced web code-editor built on top of JS. Etar uses PHP to manipulate FileSystem and is capable of running SHELL commands `,
-    super : true,
+    power : true,
   },
   program_18 : {
     name : 'FAVI',
@@ -149,13 +149,13 @@ DATA = {
     name : 'NULTA',
     link : 'https://fb.watch/rAucvZRbE8/',
     desc : `Supreme analytics tool, swiss army knife of data analysis and data visualization`,
-    super : true,
+    power : true,
   },
   program_30 : {
     name : 'PAPER',
     link : 'https://fb.watch/u1KvRWfrBm/',
     desc : `Graphic editor, image creator, idea sketching tool, presentations tool`,
-    super : true,
+    power : true,
   },
   program_31 : {
     name : 'PCELAR',
@@ -191,7 +191,7 @@ DATA = {
     name : 'ROS',
     link : 'https://fb.watch/u1K_fRiUbu/',
     desc : `Ready Operational System [JS-PHP-HTML-CSS] + fileSystem `,
-    super : true,
+    power : true,
   },
   program_38 : {
     name : 'SRP',
@@ -209,7 +209,7 @@ DATA = {
     desc : `SUDOKU game`,
   },
   program_41 : {
-    name : 'SUPER_BLOB',
+    name : 'power_BLOB',
     link : '',
     desc : `Jumping blob, the adventure game`,
   },
@@ -231,7 +231,7 @@ DATA = {
   program_45 : {
     name : 'TRIMER',
     link : '',
-    desc : `Trim and pllay audio, create slow tunes`,
+    desc : `Trim and play audio, create slow tunes`,
   },
   program_46 : {
     name : 'VID',
