@@ -209,7 +209,7 @@ DATA = {
     desc : `SUDOKU game`,
   },
   program_41 : {
-    name : 'power_BLOB',
+    name : 'SUPER_BLOB',
     link : '',
     desc : `Jumping blob, the adventure game`,
   },
