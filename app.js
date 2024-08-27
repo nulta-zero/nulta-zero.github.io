@@ -175,7 +175,7 @@ const main = function(){
     $$.query.lp.addEventListener('input', e=>{
       let state = e.target.checked;
       switch(state){
-        case true:  $$.fetchData('../../'+ $$.vars.program_name);  $$.splitScreen(state);  break;
+        case true:  $$.fetchData('../'+ $$.vars.program_name);  $$.splitScreen(state);  break;
         case false: $$.loadProgram(state);         $$.splitScreen(state);  break;
       }
   });
