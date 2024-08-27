@@ -1,0 +1,45 @@
+html { height: 100%; cursor: default; font-family: Arial;}
+body{ padding: 0; margin: 0; background: #141313;  min-height: 100%;}
+td{
+  color: black; background: orange; outline: none; text-align:center;
+  border: none; padding: 0; margin: 0; font-size: 30px;
+  touch-action: manipulation;
+}
+td:hover{box-shadow: inset 0 0 3px 0px black;}
+td:active{color: #999; transition: 150ms;}
+::selection{background: transparent;}
+.calc-table{width: 100%; background: #ffa500d1;
+  /* -webkit-fill-available;  */
+  animation: slideFromBottom; animation-duration: .5s;}
+.output{
+    background: #141313;  outline:0;  color: #fff;  display: flex;
+    border: 1px solid #141313;   overflow: scroll;  vertical-align: middle;
+    font-size: 88px;  position: absolute;   left: 0; border: 0;   z-index:1;
+    border-bottom: 3px solid #2a2727;
+  }
+.output:hover{box-shadow: none;}
+.dead{background: #141313; border: 1px solid #141313; outline:0; color: #fff;z-index: -1;}
+.dead:hover{box-shadow: none;}
+.historyBtn{ color: white; z-index: 5; position: absolute; top: 15%; right: 28%;font-size: 85%;}
+.historyBtn:hover{color:grey;}
+.history-holder{animation: slideFromRight; animation-duration: .5s; overflow-y: scroll;}
+.hist-calc{font-size: 250%; color: white;}
+.hist-calc:hover{ color: silver;}
+.carryBtn{color: white; z-index: 5; position: absolute;; top: 15%; left: 3%; font-size: 85%;}
+.carryBtn:hover{color:grey;}
+.on{color:deepskyblue;}
+#pop{
+  position: fixed;
+  top: 3px;
+  right: 3px;
+  background: #0000009a;
+  color: white;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 1px 5px;
+  animation: slideFromRight 1s;
+}
+
+@media(max-width: 511px){
+  .carryBtn{ left: 3%; }
+}
