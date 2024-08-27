@@ -1,5 +1,5 @@
 const doc = document, body = doc.body, log =(...x)=> console.log(x), qu = (Q)=> doc.querySelector(Q); //HELPERS
- 
+
 const CALC = {
   vars : {
         OOS_W : 200,
@@ -8,7 +8,7 @@ const CALC = {
         HISTORY : [],
         CELL : {
           width  : window.innerWidth / 4,
-          height : window.innerHeight / 5,
+          height : window.innerHeight / 5.1,
         },
         COMP : {
           A : 0,
@@ -66,7 +66,7 @@ const CALC = {
      },
   //PERFORM DOT COMPUATION
   dotComp : function() { if(CALC.query.output.innerText.includes('.') == false) CALC.query.output.innerText += '.'; },
-  //RESET 
+  //RESET
   ACreset : function() { return CALC.query.output.innerText = '', CALC.vars.COMP.A = 0, CALC.vars.COMP.B = 0, CALC.vars.COMP.operation = ""},
   //CREATE CLICKABLE TD NUMBERS
   createAllTDS : function(){
@@ -75,28 +75,28 @@ const CALC = {
                            4, 5, 6   , "/",
                            1, 2, 3   , "*",
                          "C", 0 ,"." , "=" ];
- 
+
           for(let i = 0; i < 5; i++){
             let TR = dce("tr"); //CREATE ROW
- 
+
             let index;  let max;
             (i > 0) ? index = (4*i) : index = i;
             (i > 0) ? max = 4 : max = 2;
             if(i != 0){
               TR.classList.add('sliders'); //ADD CLASS FOR SLIDING
               }
- 
+
             for(let j = index; j < (index + 4); j++){
               let TD = dce('td'); //CREATE TD
                   TD.setAttribute("inputmode", "none");
- 
+
                 if(cells[j] == '~' && j > 1) TD.classList.add('output');   // OUTPUT AREA  TD.setAttribute('contenteditable', true)
                 else if(j > 2)  TD.innerText = cells[j], TD.setAttribute('val', cells[j]), CALC.newValueEvent(TD);           //CLICKABLES
                 else   TD.classList.add('dead');                                               //JUST FOR DESIGN PURPOSES DEAD CELLS
- 
+
                 //SIZE
                 TD.style.width = CALC.vars.CELL.width  + 'px';   TD.style.width = (CALC.vars.CELL.width * 2.99) + 'px';  TD.style.height = CALC.vars.CELL.height  + 'px';
- 
+
                 //APPEND PART
                 TR.appendChild(TD);
                 }
@@ -111,7 +111,7 @@ const CALC = {
    },
    resizeNums : function(){
          CALC.vars.CELL.width = window.innerWidth / 4;
-         CALC.vars.CELL.height = window.innerHeight / 5;
+         CALC.vars.CELL.height = window.innerHeight / 5.1;
          qu('.output').style.fontSize = (CALC.vars.CELL.height - (CALC.vars.CELL.height / 3)) + 'px';
    },
    addElement : function(type, innerText, className, defaultsTo, appendTo){
@@ -130,6 +130,8 @@ const CALC = {
                CALC.showMe(CALC.query.sliders[i], 'none'), CALC.showMe(CALC.query.H_holder,'block');
              }
           }
+          if(CALC.query.sliders[0].style.display == 'none') qu('[val="+"]').style.display = 'none';
+          else                                              qu('[val="+"]').style.display = 'table-cell';
    },
    //TURN ON CARRY
    switchCARRY :  function(){
@@ -139,40 +141,40 @@ const CALC = {
         CALC.vars.CARRY = true,    CALC.query.carryBtn.classList.add('on')
      }
    },
- 
- 
+
+
 };  //END OF CALC OBJECT
- 
+
 const main = ()=>{
   CALC.createAllTDS();
   CALC.resizeNums();
- 
-  CALC.addElement('span', 'history', 'historyBtn','block', '.container');
-  CALC.addElement('span', 'ca', 'carryBtn','block', '.container');
+
+  CALC.addElement('span', 'history', 'historyBtn','block', '.span-holder');
+  CALC.addElement('span', 'ca', 'carryBtn','block', '.span-holder');
   CALC.addElement('div', '', 'history-holder', 'none', '.container');
   CALC.addElement('ul', '', 'history-list', 'block', '.history-holder' );
- 
+
   qu('.output').setAttribute("inputmode", "none");
- 
+
   (detect_device() == 'mobile') ? CALC.vars.G1 = 'touchstart' : CALC.vars.G1 = 'mousedown'; //CHECK EVENT TRIGER
- 
+
   qu('.history-holder').style.maxHeight = (CALC.vars.CELL.height * 4) + 'px';
   qu('.carryBtn').classList.add('on');
   qu('.carryBtn').title="Carry calculation";
- 
+
   //ADJUST SIZE OF CELL AS WELL AS FONT SIZE IN OUTPUT AREA
   window.addEventListener('resize', ()=>{
      CALC.query.output.style.width = (CALC.vars.CELL.width * 2.99) + 'px';
-     CALC.query.output.style.height = CALC.vars.CELL.height  + 'px';
+     CALC.query.output.style.height = CALC.vars.CELL.height + 0.1  + 'px';
      CALC.goThroughAll();
      CALC.resizeNums();
    });
   //NO RIGHT CLICK IN CALC
   window.addEventListener('contextmenu', e => e.preventDefault() );
- 
+
   qu('.historyBtn').addEventListener(CALC.vars.G1, CALC.slidersSlide );
   qu('.carryBtn').addEventListener(CALC.vars.G1, CALC.switchCARRY );
- 
+
   qu('.output').addEventListener(CALC.vars.G1, (e)=>{
     e.preventDefault();
     switch(e.keyCode){
@@ -181,7 +183,7 @@ const main = ()=>{
   });
   //DBL CLICK COPIES RESULT
   qu('.output').addEventListener('dblclick', (e)=>{
-     if(qu('.output').getAttribute('full-result') == null) return false; //SAFE 
+     if(qu('.output').getAttribute('full-result') == null) return false; //SAFE
      qu('.output').innerText = parseFloat( qu('.output').getAttribute('full-result'));
      if(navigator.clipboard) { navigator.clipboard.writeText(parseFloat( qu('.output').innerText)); //COPY TO clipboard
                                popover('copied');
@@ -189,6 +191,5 @@ const main = ()=>{
   });
   CALC.collectQuery();
 }
- 
+
 main();
- 
