@@ -5,7 +5,7 @@ const doc = document,
 
 const $$ = {
     vars : {
-      program_name : '',
+      program_name : 'CALCULATOR',
     },
     query : {},
     loadQuery : function(){
