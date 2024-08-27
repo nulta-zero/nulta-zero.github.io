@@ -46,6 +46,11 @@ const CALC = {
          (CALC.vars.COMP.operation == "") ? CALC.vars.COMP.A = parseFloat(CALC.query.output.innerText) : CALC.vars.COMP.B = parseFloat(CALC.query.output.innerText);
          CALC.query.output.innerText = '';
   },
+  // ALTERNATIVE TO toFixed
+  toFixed : function(num, decimals) {
+     const factor = Math.pow(10, decimals);
+     return Math.round(num * factor) / factor;
+   },
   //CARRY RESULT OR RESET ON EVERY =
   resetOrCarry : function(){ return (CALC.vars.CARRY == true) ? CALC.vars.COMP.A = CALC.vars.HISTORY[CALC.vars.HISTORY.length -1] : false; }, //CARRY LAST CALC.calculation
   //PERFORM CALCULATION
@@ -59,7 +64,7 @@ const CALC = {
             case "*":  res= CALC.vars.COMP.A * CALC.vars.COMP.B;  break;
           }
           // let deciamls = CALC.vars.COMP.A.toString().split('.')[1].length;   //NOT USED FOR NOW
-          CALC.query.output.innerText = parseFloat(res.toFixed(3));           //RESULT
+          CALC.query.output.innerText = CALC.toFixed(res, 5);           //RESULT
           CALC.query.output.setAttribute('full-result', res);                 //REMMEMBER FULL RESULT AS ATTRIBUTE
           CALC.vars.HISTORY.push(res);                  //TO HISTORY
           CALC.addElement('li', res, 'hist-calc', 'block', '.history-list' );
