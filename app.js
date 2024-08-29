@@ -6,6 +6,7 @@ const doc = document,
 const $$ = {
     vars : {
       program_name : 'CALCULATOR',
+      abc   : ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'],
     },
     query : {},
     loadQuery : function(){
@@ -44,6 +45,7 @@ const $$ = {
          let banderX = qu('.bander-x');
          horizontalLine.style.top = ltr.top + ltr.height + 10 + 'px';
          banderX.style.top = ltr.top + ltr.height + 20 + 'px';
+         // if(qu('.abc-holder') != null) qu('.abc-holder').style.top = ltr.top + ltr.height - 10 + 'px';
     },
     createTRS : function(){
       let OV = Object.values(DATA);
@@ -140,6 +142,20 @@ const $$ = {
           }
         }
     },
+    createPoints : function(max, className, abc){
+       let pointsHolder = dce('div');
+           pointsHolder.classList.add(className);
+       for(let i = 0; i< max; i++){
+           let point = dce('div');
+             point.classList.add('points');
+             switch(abc){
+               case true:   point.innerText = $$.vars.abc[i]; break;
+               default :    point.innerText = i;   break;
+             }
+         pointsHolder.appendChild(point);
+       }
+      qu('.super-container').appendChild(pointsHolder);
+    },
 }
 
 const main = function(){
@@ -184,6 +200,8 @@ const main = function(){
   window.addEventListener('DOMContentLoaded', e=>{
       $$.calculateLargestTitlePos();
       $$.createTRS();
+      $$.createPoints( 30, 'points-holder' );
+      // $$.createPoints( $$.vars.abc.length-1, 'abc-holder', true );
   });
 
   window.addEventListener('resize', e=>{

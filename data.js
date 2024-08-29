@@ -199,9 +199,9 @@ DATA = {
     desc : `SEO toolkit `,
   },
   program_39 : {
-    name : 'STRATEG',
+    name : 'PIXEL',
     link : 'https://fb.watch/u1KC5OCCG1/',
-    desc : `Build colorful grid patterns, animations, drawings etc `,
+    desc : `Create pixel art, animations and more`,
   },
   program_40 : {
     name : 'SUDOKU',
