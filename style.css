@@ -53,6 +53,9 @@ iframe{
   width: -webkit-fill-available;
   height: -webkit-fill-available;
 }
+hr{
+  border: 1.3px solid #7572711f;
+}
 .split-window{
   display: flex;
 }
@@ -102,7 +105,8 @@ iframe{
 .projects-head{
   text-align: center;
   font-size: small;
-  background: sienna;
+  /* background: sienna; */
+  background: #7572711f;
   height: 1pc;
 }
 .projects-list{
@@ -122,7 +126,11 @@ iframe{
 .explainer{
   padding-left: 5%;
   overflow-wrap: anywhere;
-  background: #a0522d5e;
+  border-left: 2px solid #7572711f;
+  color: #808080;
+  letter-spacing: 2px;
+  font-size: smaller;
+  /* background: #a0522d5e; */
 }
 .power{
   font-weight: 900;
@@ -252,6 +260,7 @@ iframe{
   z-index: -1;
 }
 
+
 /* HUGE SCREEN */
 @media screen and (min-width: 900px) {
   .super-container{
@@ -271,7 +280,7 @@ iframe{
     width: auto;
   }
   td{
-    border-bottom: 2px solid #c0c0c05c;
+    border-bottom: 2px solid #7572711f;
   }
   .super-container{
     padding: 0;

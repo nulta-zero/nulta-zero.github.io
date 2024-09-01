@@ -199,9 +199,9 @@ DATA = {
     desc : `SEO toolkit `,
   },
   program_39 : {
-    name : 'PIXEL',
+    name : 'ANIMIX',
     link : 'https://fb.watch/u1KC5OCCG1/',
-    desc : `Create pixel art, animations and more`,
+    desc : `Pixel animation editor, pixel art editor and more`,
   },
   program_40 : {
     name : 'SUDOKU',
