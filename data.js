@@ -1,7 +1,7 @@
 DATA = {
   program_0 : {
     name : 'ANIMIX',
-    link : 'https://fb.watch/u1KC5OCCG1/',
+    link : 'https://fb.watch/upFTjF6R1I/',
     desc : `Pixel animation editor, pixel art editor and more`,
   },
   program_1 : {
