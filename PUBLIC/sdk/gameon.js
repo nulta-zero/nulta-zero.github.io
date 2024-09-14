@@ -994,7 +994,7 @@ const detect_device = function(){    //NEW
               else                    current = 'desktop';
         }else{
           //BACKUP CHECK
-            let N = navigator.userAgentData;
+            let N = navigator.userAgentData || navigator.userAgent;
             if(N.includes(devices[0]) || N.includes(devices[1]) || N.includes(devices[2]) ||
                N.includes(devices[3]) || N.includes(devices[4]) || N.includes(devices[5]) || N.includes(devices[6]) ){
                  current = 'mobile';
