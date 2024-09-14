@@ -59,7 +59,9 @@ hr{
 .split-window{
   display: flex;
 }
-.program{}
+.program{
+  transform: translate3d(0,0,0);     /*SAFARI FIX*/
+}
 .super-container{
    padding: 5%;
    margin: 1%;

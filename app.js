@@ -126,8 +126,8 @@ const $$ = {
                  splitWindow.children[i].style[combos[0]] = combos[2]/2 + 'px';
                  switch(i){
                    case 1:
-                       splitWindow.children[i].style[combos[1]] = splitWindow.children[0].getBoundingClientRect()[combos[0]] + 'px';
-                       splitWindow.children[i].style.overflow = 'scroll';
+                        splitWindow.children[i].style[combos[1]] = splitWindow.children[0].getBoundingClientRect()[combos[0]] + 'px';
+                        splitWindow.children[i].style.overflow = 'scroll';
                         splitWindow.children[i].style[combos[0]] = combos[2]/2-70 + 'px'; //asign right side to somewhat less space -70px
                    break;
                  }
