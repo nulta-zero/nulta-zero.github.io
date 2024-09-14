@@ -72,6 +72,8 @@ hr{
 }
 .settings{
   text-align: center;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
 }
 .end-note{
   text-align: center;
