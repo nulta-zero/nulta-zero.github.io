@@ -264,6 +264,12 @@ hr{
   z-index: -1;
 }
 
+.research-area{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: baseline;
+}
+
 
 /* HUGE SCREEN */
 @media screen and (min-width: 900px) {
