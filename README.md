@@ -1,3 +1,3 @@
 
-<h1><u> I create</u>: </h1>
-<h2> Petar {Nulta} Sladojević    ,2024' </h2>
+<h1 class="largest-title"> [Petar ({Nulta}) Sladojević] </h1>
+<h3> Sophisticated JS tool creator, Business Manager </h3>
