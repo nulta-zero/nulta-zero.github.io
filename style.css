@@ -69,6 +69,8 @@ hr{
 .about{
   background: #6478e1;
   letter-spacing: 3px;
+  border-radius: 5px;
+  padding: 1%;
 }
 .settings{
   text-align: center;
@@ -188,17 +190,19 @@ hr{
 /* BACKGROUND ELEMENTS X,Y ,axis */
 .bander-y{
   position: absolute;
-  top: 0%;
+  top: 0.5%;
   left: 6%;
   background: gold;
   color: black;
+  border-radius: 10%;
 }
 .bander-x{
   position: absolute;
   top: 20%;
-  right: 0%;
+  right: 4%;
   background: gold;
   color: black;
+  border-radius: 10%;
 }
 .vertical-line{
   position: absolute;
@@ -214,8 +218,8 @@ hr{
   top: 12pc;
   left: 0;
   width: 100%;
-  height: 5px;
-  background: snow;
+  height: 3px;
+  background: linear-gradient(38deg, #6478e1 27%, transparent);
 }
 .container-intro{
   padding: 5vh;
