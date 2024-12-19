@@ -158,7 +158,7 @@ DATA = {
   },
   program_31 : {
     name : 'PAPER',
-    link : 'https://fb.watch/u1KvRWfrBm/',
+    link : 'https://drive.google.com/file/d/1PJ7i8pPYU9laYd86CeCraCB2AwkVpfrF/view?usp=sharing',
     desc : `Graphic editor, image creator, idea sketching tool, presentations tool`,
     power : true,
   },
@@ -174,7 +174,7 @@ DATA = {
   },
   program_34 : {
     name : 'PINBALL',
-    link : 'https://www.linkedin.com/pulse/fliper-petar-sladojevi%25C4%2587/?trackingId=dfDy1whNHdU%2FYq4ouk%2BJKQ%3D%3D',
+    link : 'https://docs.google.com/presentation/d/e/2PACX-1vTsVdOkX-hc7zuHZojxgRxc19tcs2KE_XHnDSmRmDgBdGPV0P1wRew59eeA5tsj6z5UBkEUk7VHOlqD/pub?start=false&loop=false&delayms=3000',
     desc : `Legendary Pinball machine now in digital version`,
   },
   program_35 : {
