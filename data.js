@@ -122,7 +122,7 @@ DATA = {
   },
   program_24 : {
     name : 'HUNT',
-    link : 'https://www.linkedin.com/posts/petar-sladojevi%C4%87-5b7847237_raytracing-3d-quake-activity-6928769006476644352-2ACb?utm_source=share&utm_medium=member_desktop',
+    link : 'https://www.facebook.com/nulta.io/videos/185311370221164',
     desc : `Raycasting first-person 3D game arena, build walls, attack and defend yourself`,
   },
   program_25 : {
@@ -137,7 +137,7 @@ DATA = {
   },
   program_27 : {
     name : 'KOMBATORS',
-    link : 'https://www.linkedin.com/posts/petar-sladojevi%C4%87-5b7847237_fighting-kombators-mk-activity-6929478899714138112--bOm?utm_source=share&utm_medium=member_desktop',
+    link : 'https://docs.google.com/presentation/d/e/2PACX-1vT_i1wsqD-84uHTGeGx9at-cMGlZ4XZdmr2VM0T_HIRLVvuFuTj6qiUDuwVFTT6k5CwurqVxm3WNybq/pub?start=false&loop=false&delayms=10000',
     desc : `Fighting game`,
   },
   program_28 : {
