@@ -98,6 +98,12 @@ hr{
   z-index: 2;
   -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(250, 250, 250, 0.2)));
 }
+.dark-heading{
+  background: #e4e5e887;
+  color: #202124;
+  border-radius: 6px;
+  padding: 0 5px;
+}
 /* TABLE */
 .table-holder{
   overflow: hidden;

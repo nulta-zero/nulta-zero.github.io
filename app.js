@@ -43,7 +43,7 @@ const $$ = {
          let ltr = qu('.largest-title').getBoundingClientRect();
          let horizontalLine = qu('.horizontal-line');
          let banderX = qu('.bander-x');
-         horizontalLine.style.top = ltr.top + ltr.height + 10 + 'px';
+         horizontalLine.style.top = ltr.top + ltr.height + ltr.height / 5 + 'px';
          banderX.style.top = ltr.top + ltr.height + 20 + 'px';
          // if(qu('.abc-holder') != null) qu('.abc-holder').style.top = ltr.top + ltr.height - 10 + 'px';
     },
@@ -194,7 +194,7 @@ const main = function(){
         case true:  $$.fetchData('../../'+ $$.vars.program_name);  $$.splitScreen(state);  break;
         case false: $$.loadProgram(state);                         $$.splitScreen(state);  break;
       }
-      setTimeout( $$.calculateLargestTitlePos, 0.2 * 1000);
+      setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
   });
 
   window.addEventListener('DOMContentLoaded', e=>{
