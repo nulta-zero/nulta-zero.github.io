@@ -200,7 +200,7 @@ const main = function(){
   window.addEventListener('DOMContentLoaded', e=>{
       $$.calculateLargestTitlePos();
       $$.createTRS();
-      $$.createPoints( 30, 'points-holder' );
+      $$.createPoints( 38, 'points-holder' );
       // $$.createPoints( $$.vars.abc.length-1, 'abc-holder', true );
   });
 

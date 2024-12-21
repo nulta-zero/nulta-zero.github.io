@@ -81,6 +81,9 @@ hr{
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 }
+.settings > label{
+  color: #545859;
+}
 .end-note{
   text-align: center;
   color: grey;
@@ -149,7 +152,7 @@ hr{
 }
 .power{
   font-weight: 900;
-  color: mediumspringgreen;
+  color: #2ce5e5;
   font-size: large;
 }
 .power::before{
@@ -232,6 +235,11 @@ hr{
 }
 .container-intro{
   padding: 5vh;
+}
+.legend-container{
+  font-size: 90%;
+  border-left: 2px solid #2b2b2d;
+  padding: 0 2%;
 }
 
 /* DEAD PAGE REF */
