@@ -36,8 +36,8 @@ const $$ = {
         qu('html').style.mixBlendMode = 'difference';
     },
     matrix : function(bool){
-         if(bool) qu('.table-holder').classList.add('matrix');
-         else     qu('.table-holder').classList.remove('matrix');
+         if(bool) qu('.super-container').classList.add('matrix');
+         else     qu('.super-container').classList.remove('matrix');
     },
     calculateLargestTitlePos : function(){
          let ltr = qu('.largest-title').getBoundingClientRect();

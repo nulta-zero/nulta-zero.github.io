@@ -137,10 +137,7 @@ hr{
   white-space: nowrap;
 }
 .lister:hover{
-  outline: 2px solid mediumaquamarine;
-  border-radius: 3px;
-  box-shadow: 1px 1px 3px black;
-  background: #c0c0c063;
+  border-right: 2px solid #33353bad;
 }
 .explainer{
   padding-left: 5%;
