@@ -1,0 +1,8 @@
+https://nulta-zero.github.io/index.html
+https://nulta-zero.github.io/app.js
+https://nulta-zero.github.io/data.js
+https://nulta-zero.github.io/style.css
+https://nulta-zero.github.io/dead-page.html
+https://nulta-zero.github.io/icon.png
+https://nulta-zero.github.io/icon.svg
+https://nulta-zero.github.io/stocks.png
