@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nulta-zero.github.io/sitemap.txt
