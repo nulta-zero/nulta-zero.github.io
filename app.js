@@ -14,6 +14,7 @@ const $$ = {
             $$.query.dl   = qu('.dl-mode'),
             $$.query.mat  = qu('.mat-mode'),
             $$.query.lp   = qu('.lp-mode');
+            $$.query.wr  = qu('.wr-mode');
     },
     speakThis : function(rate, word ){ //SPEAKs string/number
                     $$.vars.speakInc+=1;
@@ -156,6 +157,69 @@ const $$ = {
        }
       qu('.super-container').appendChild(pointsHolder);
     },
+    exporter : function(content){
+                  //INIT LINK TO DOWNLOAD
+                  const init_link_download = function(content){
+                     const a_link = dce('a');
+                     const file = new Blob([content], {type: 'text/plain'});
+                     a_link.href = URL.createObjectURL(file);
+                     name = 'my-pad-file'; //NAME THE EXPORTED FILE
+                     a_link.download = name;
+                     a_link.hidden = true;
+                     a_link.id = 'secondWindow';
+                     doc.body.appendChild(a_link); //ADD LINK TO BODY
+                     const SW = doc.getElementById('secondWindow');
+
+                    setTimeout( t=>{ SW.click(); SW.remove(); },0.25 * 1000); //CLICK AND REMOVE
+                   }
+
+                   init_link_download(content);
+     },
+    createPad : function(){
+         let pad = dce('div');
+             pad.classList.add('pad');
+         let pad_notes = dce('div');
+             pad_notes.classList.add('pad-notes');
+             pad_notes.setAttribute('contenteditable', true);
+             pad.appendChild(pad_notes);
+         let bar = dce('div');
+             bar.classList.add('pad-bar');
+
+
+         //PAD INPUTS
+         let full_width = dce('input');
+             full_width.value = '⤢';
+             full_width.classList.add('simple-btn');
+             full_width.type = 'button';
+             full_width.title = "FULL-SCREEN";
+
+             full_width.addEventListener('click', e=>{
+                  if(pad.clientWidth < window.innerWidth){
+                     pad.style.width = '99%';
+                     pad.style.height = 'calc(100% - 40px)';
+                  }else{
+                     pad.style.width = '20vw';
+                     pad.style.height = '45vh';
+                  }
+             });
+          let export_btn = dce('input');
+              export_btn.value = '⏍';
+              export_btn.classList.add('simple-btn');
+              export_btn.type = 'button';
+              export_btn.title = "EXPORT AS TXT";
+
+              export_btn.addEventListener('click', e=>{
+                  $$.exporter(qu('.pad-notes').innerText);
+              });
+
+              pad.appendChild(pad_notes);
+
+              bar.appendChild(full_width);
+              bar.appendChild(export_btn);
+              pad.appendChild(bar);
+
+         doc.body.appendChild(pad);
+    },
 }
 
 const main = function(){
@@ -196,6 +260,15 @@ const main = function(){
       }
       setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
   });
+
+  $$.query.wr.addEventListener('input', e=>{
+    let state = e.target.checked;
+    switch(state){
+      case true:  $$.createPad();        break;
+      case false: qu('.pad').remove();   break;
+    }
+    setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
+});
 
   window.addEventListener('DOMContentLoaded', e=>{
       $$.calculateLargestTitlePos();

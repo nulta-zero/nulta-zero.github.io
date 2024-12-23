@@ -79,7 +79,7 @@ hr{
 .settings{
   text-align: center;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 .settings > label{
   color: #545859;
@@ -161,11 +161,11 @@ hr{
 
 .available{
   font-weight: 900;
-  color: deeppink;
+  color: #e98b9d;
   font-size: large;
 }
 .available::before{
-  content: "✔︎✔︎";
+  content: "✔︎";
   font-size: larger;
 }
 
@@ -290,6 +290,45 @@ hr{
   align-items: baseline;
   padding: 2% 0;
 }
+.dark-span{
+  color: #3a3b40;
+}
+.pad{
+  position: absolute;
+  top: 0%;
+  right: 0%;
+  border-left: 2px solid #2b2b2d;
+  width: 20vw;
+  height: 45vh;
+  padding: 25px 10px 10px 10px;
+  background: #202124;
+  transition: 1s;
+}
+.pad-notes{
+  height: calc(100% - 30px);
+  outline: none;
+  padding: 10px;
+}
+.pad::before{
+  content: "Pad";
+  height: 20px;
+  color: #3a3b40;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  text-align: center;
+  background: #494a4d17;
+}
+.simple-btn{
+  background: transparent;
+  color: var(--pastText);
+  outline: none;
+  border: none;
+}
+.simple-btn:hover{
+  color: snow;
+}
 footer{
   padding: 2% 0;
 }
@@ -342,5 +381,8 @@ body::-webkit-scrollbar-thumb {
   }
   .explainer{
     padding-left: 3%;
+  }
+  .pad{
+    width: 89%;
   }
 }
