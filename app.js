@@ -178,7 +178,7 @@ const $$ = {
     createPad : function(){
          let pad = dce('div');
              pad.classList.add('pad');
-         let pad_notes = dce('div');
+         let pad_notes = dce('textarea');
              pad_notes.classList.add('pad-notes');
              pad_notes.setAttribute('contenteditable', true);
              pad.appendChild(pad_notes);

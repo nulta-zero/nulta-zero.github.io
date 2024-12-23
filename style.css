@@ -308,6 +308,12 @@ hr{
   height: calc(100% - 30px);
   outline: none;
   padding: 10px;
+  background: transparent;
+  outline: none;
+  border: none;
+  color: inherit;
+  resize: none;
+  width: 100%;
 }
 .pad::before{
   content: "Pad";
