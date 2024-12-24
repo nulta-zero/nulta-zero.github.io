@@ -79,7 +79,7 @@ hr{
 .settings{
   text-align: center;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 .settings > label{
   color: #545859;
@@ -389,6 +389,6 @@ body::-webkit-scrollbar-thumb {
     padding-left: 3%;
   }
   .pad{
-    width: 89%;
+    width: 95%;
   }
 }

@@ -194,13 +194,26 @@ const $$ = {
              full_width.title = "FULL-SCREEN";
 
              full_width.addEventListener('click', e=>{
+               if(navigator.userAgent.search('iPhone') > -1){
+                  // MOBILE PHONES
                   if(pad.clientWidth > window.innerWidth / 3 ){
                     pad.style.width = '20vw';
-                    pad.style.height = '45vh';
+                    pad.style.height = '45%';
                   }else{
-                    pad.style.width =  (qu('.program').clientWidth < 1) ? '99%' : '48%';
-                    pad.style.height = 'calc(100% - 40px)';
+                    pad.style.width =  '95%';
+                    pad.style.height = '45%';
                   }
+                  return true;
+               }
+
+                // USUAL DESKTOP BEHAVIOR
+                if(pad.clientWidth > window.innerWidth / 3 ){
+                  pad.style.width = '20vw';
+                  pad.style.height = '45vh';
+                }else{
+                  pad.style.width =  (qu('.program').clientWidth < 1) ? '99%' : (window.innerWidth - qu('.program').clientWidth) - 22.5 + 'px';
+                  pad.style.height = 'calc(100% - 40px)';
+                }
              });
           let export_btn = dce('input');
               export_btn.value = '⏍';
