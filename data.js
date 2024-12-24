@@ -17,32 +17,33 @@ DATA = {
   program_3 : {
     name : 'ART',
     link : 'https://fb.watch/u1KXh6iDXs/',
-    desc : `Full graphical editor for artist's`,
+    desc : `Artist's toolbox and graphical editor`,
+    power : true,
   },
   program_4 : {
     name : 'BALKAN_KINGPIN',
     link : '',
-    desc : `Learn how to run and preserve business, with theme of selling psychoactive substances`,
+    desc : `Learn business rules in this strategic game, with theme of selling psychoactive substances`,
   },
   program_5 : {
     name : 'BUILDER',
     link : '',
-    desc : `Drag and Drop website builder, similiar to google sites, wix`,
+    desc : `Drag and drop website builder, similiar to google sites, wix`,
   },
   program_6 : {
     name : 'C-VIRUS',
     link : '',
-    desc : `Pseudo first-shooter post-apocalyptic, maze navigating, items collecting game`,
+    desc : `Pseudo FPS post-apocalyptic, maze navigating, items collecting game`,
   },
   program_7 : {
     name : 'CALCULATOR',
     link : '',
-    desc : `Exact replica of Apple calculator`,
+    desc : `Replica of famous Apple calculator`,
   },
   program_8 : {
     name : 'CAMERA',
     link : 'https://fb.watch/u1L5hxe5Rj/',
-    desc : `Burst Bubbles in camera movement tracking program`,
+    desc : `Camera movement tracking program, burst bubbles simulation`,
   },
   program_9 : {
     name : 'CHESS',
@@ -52,7 +53,7 @@ DATA = {
   program_10 : {
     name : 'CHIP_TUNE',
     link : 'https://fb.watch/u1KVvXu8WL/',
-    desc : `Draw and create sounds. Hear drawings in this one-of-the-kind chip-tune unique music creation station`,
+    desc : `Draw sounds. Hear drawings in this one-of-the-kind chip-tune unique music creation station`,
   },
   program_11 : {
     name : 'CUBE',
@@ -87,33 +88,33 @@ DATA = {
   program_17 : {
     name : 'ETAR',
     link : '',
-    desc : `Super advanced web code-editor built on top of JS. Etar uses PHP to manipulate FileSystem and is capable of running SHELL commands `,
+    desc : `Supreme code-editor built on top of JS. Etar uses PHP to manipulate FileSystem and is capable of running SHELL commands`,
     power : true,
   },
   program_18 : {
     name : 'FAVI',
     link : '',
-    desc : `Fastest full favicon generator `,
+    desc : `Fastest favicon generator`,
   },
   program_19 : {
     name : 'FROGGY_LEAP',
     link : 'https://fb.watch/rAurJEg6Cw/',
-    desc : `Legendary frog jumping game, unique new twist... `,
+    desc : `Legendary frog jumping game, unique new twist...`,
   },
   program_20 : {
     name : 'GENETICS',
     link : '',
-    desc : `Post-Genetics course inspired tool for playing around with evolution theory (advanced marketing technique example)`,
+    desc : `Tool for playing around with evolution theory (advanced marketing technique example)`,
   },
   program_21 : {
     name : 'GERMAN',
     link : '',
-    desc : `Learn German langauge (business strategy example)`,
+    desc : `German langauge learning app (business strategy example)`,
   },
   program_22 : {
     name : 'GRAPH',
     link : 'https://fb.watch/u1KtdaQq7c/',
-    desc : `Create Graph connections and represent diagrams for video recordings/presentations...`,
+    desc : `Create diagrams as graph connections, roadmap presentations`,
   },
   program_23 : {
     name : 'GUITAR',
@@ -123,7 +124,7 @@ DATA = {
   program_24 : {
     name : 'HUNT',
     link : 'https://www.facebook.com/nulta.io/videos/185311370221164',
-    desc : `Raycasting first-person 3D game arena, build walls, attack and defend yourself`,
+    desc : `First-person 3D adventure arena game, build walls, survive...`,
   },
   program_25 : {
     name : 'IM',
@@ -133,22 +134,22 @@ DATA = {
   program_26 : {
     name : 'INTELEKT',
     link : '',
-    desc : `General knowledge testing game  (automate online screening)`,
+    desc : `General knowledge quiz game`,
   },
   program_27 : {
     name : 'KOMBATORS',
     link : 'https://docs.google.com/presentation/d/e/2PACX-1vT_i1wsqD-84uHTGeGx9at-cMGlZ4XZdmr2VM0T_HIRLVvuFuTj6qiUDuwVFTT6k5CwurqVxm3WNybq/pub?start=false&loop=false&delayms=10000',
-    desc : `Fighting game`,
+    desc : `Fighting retro game`,
   },
   program_28 : {
     name : 'LIMBO_GC',
     link : '',
-    desc : `Adult dating CMS [JS-PHP-HTML-CSS] (content-management-system)`,
+    desc : `Dating CMS [JS-PHP-HTML-CSS] (content-management-system)`,
   },
   program_29 : {
     name : 'NINJA_ESCAPE',
     link : 'https://fb.watch/rAUoMBtkav/',
-    desc : `Flappy bird inspired game with Ninja-theme`,
+    desc : `Flappy bird inspired game (Ninja-theme)`,
   },
   program_30 : {
     name : 'NULTA',
@@ -170,7 +171,7 @@ DATA = {
   program_33 : {
     name : 'PIANO',
     link : '',
-    desc : `Play Piano simulator`,
+    desc : `Piano simulator`,
   },
   program_34 : {
     name : 'PINBALL',
@@ -190,18 +191,18 @@ DATA = {
   program_37 : {
     name : 'RIDER',
     link : '',
-    desc : `Bike Racing game`,
+    desc : `Bike racing game`,
   },
   program_38 : {
     name : 'ROS',
     link : 'https://fb.watch/u1K_fRiUbu/',
-    desc : `Ready Operational System [JS-PHP-HTML-CSS] + fileSystem `,
+    desc : `Ready Operational System, entire desktop fileSystem environment for web [JS-PHP-HTML-CSS]`,
     power : true,
   },
   program_39 : {
     name : 'SRP',
     link : '',
-    desc : `SEO toolkit `,
+    desc : `SEO advanced toolkit`,
   },
   program_40 : {
     name : 'SUDOKU',
@@ -211,7 +212,7 @@ DATA = {
   program_41 : {
     name : 'SUPER_BLOB',
     link : '',
-    desc : `Jumping blob, the adventure game`,
+    desc : `Jumping blob, the platform adventure game`,
   },
   program_42 : {
     name : 'SURF',

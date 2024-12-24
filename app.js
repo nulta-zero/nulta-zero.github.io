@@ -194,12 +194,12 @@ const $$ = {
              full_width.title = "FULL-SCREEN";
 
              full_width.addEventListener('click', e=>{
-                  if(pad.clientWidth < window.innerWidth){
-                     pad.style.width = '99%';
-                     pad.style.height = 'calc(100% - 40px)';
+                  if(pad.clientWidth > window.innerWidth / 3 ){
+                    pad.style.width = '20vw';
+                    pad.style.height = '45vh';
                   }else{
-                     pad.style.width = '20vw';
-                     pad.style.height = '45vh';
+                    pad.style.width =  (qu('.program').clientWidth < 1) ? '99%' : '48%';
+                    pad.style.height = 'calc(100% - 40px)';
                   }
              });
           let export_btn = dce('input');
