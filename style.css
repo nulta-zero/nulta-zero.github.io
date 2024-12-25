@@ -79,9 +79,9 @@ hr{
 .settings{
   text-align: center;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
-.settings > label{
+.settings > div > label{
   color: #545859;
 }
 .end-note{
@@ -176,11 +176,17 @@ hr{
   display: inline-flex;
   justify-content: space-between;
 }
-
 .grid-box{
   display: grid;
+}
+.grid-legend-box > p{
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-gap: 1vh;
+}
+.grid-more-box{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 2vh;
 }
 .rainbow{
   background: repeating-linear-gradient(1deg, rgba(255, 154, 0, 1) 5%, #9C27B0 50%,

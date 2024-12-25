@@ -1,7 +1,8 @@
 const doc = document,
       log = (x)=> console.log(x),
       dce = (x)=> doc.createElement(x),
-      qu = (x)=> doc.querySelector(x);
+      qu = (x)=> doc.querySelector(x),
+      quAll = (x)=> doc.querySelectorAll(x);
 
 const $$ = {
     vars : {
@@ -13,8 +14,7 @@ const $$ = {
             $$.query.aud  = qu('.aud-mode'),
             $$.query.dl   = qu('.dl-mode'),
             $$.query.mat  = qu('.mat-mode'),
-            $$.query.lp   = qu('.lp-mode');
-            $$.query.wr  = qu('.wr-mode');
+            $$.query.wr   = qu('.wr-mode');
     },
     speakThis : function(rate, word ){ //SPEAKs string/number
                     $$.vars.speakInc+=1;
@@ -75,6 +75,7 @@ const $$ = {
           }
           if(OV[i].name.toUpperCase() == $$.vars.program_name.toUpperCase()){
              td1.classList.add('available');
+             td1.title = "[tap to run / tap to cancel]";
           }
 
           tr.appendChild(td1);
@@ -265,15 +266,6 @@ const main = function(){
     }
   });
 
-    $$.query.lp.addEventListener('input', e=>{
-      let state = e.target.checked;
-      switch(state){
-        case true:  $$.fetchData('../../'+ $$.vars.program_name);  $$.splitScreen(state);  break;
-        case false: $$.loadProgram(state);                         $$.splitScreen(state);  break;
-      }
-      setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
-  });
-
   $$.query.wr.addEventListener('input', e=>{
     let state = e.target.checked;
     switch(state){
@@ -282,6 +274,20 @@ const main = function(){
     }
     setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
 });
+
+  window.addEventListener('click', e=>{
+     let programState = qu('.program').contains(qu('#program-frame'));
+     switch(e.target.classList[0]){
+       case 'lister':
+             switch(e.target.classList[1]){
+               case 'available':
+                    (programState == false) ? ($$.fetchData('../../'+ $$.vars.program_name), $$.splitScreen(true)) : ($$.loadProgram(false), $$.splitScreen(false));
+               break;
+                   $$.calculateLargestTitlePos();
+             }
+       break;
+     }
+  });
 
   window.addEventListener('DOMContentLoaded', e=>{
       $$.calculateLargestTitlePos();

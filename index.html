@@ -17,11 +17,10 @@
   <div class="program"></div>
   <div class="super-container">
   <div class="settings">
-    <label>Dark/light <input class="dl-mode" type="checkbox" value="" name="" /></label>
-    <label>Read text  <input class="aud-mode" type="checkbox" value="" name="" /></label>
-    <label>Vertical text <input class="mat-mode" type="checkbox" value="" name="" /></label>
-    <label>Write  <input class="wr-mode" type="checkbox" value="" name="" /></label>
-    <label>Load program  <input class="lp-mode" type="checkbox" value="" name="" /></label>
+    <div><label>Dark/light <input class="dl-mode" type="checkbox" value="" name="switch" /></label></div>
+    <div><label>Read text  <input class="aud-mode" type="checkbox" value="" name="switch" /></label></div>
+    <div><label>Vertical text <input class="mat-mode" type="checkbox" value="" name="switch" /></label></div>
+    <div><label>Write  <input class="wr-mode" type="checkbox" value="" name="switch" /></label></div>
   </div>
   <div>
     <div class="bander-y"> [y] </div>
@@ -65,7 +64,11 @@
   <div class="table-holder">
     <div class="legend-container">
       <p><u>Legend</u>: </p>
-      <p class="grid-box"> Links<span style="color:mediumpurple;font-size:large;">⌗</span>  Power program<span class="power"> </span> Available program<span class="available"></span></p>
+      <div class="grid-legend-box">
+         <p>Links<span style="color:mediumpurple;font-size:large;">⌗</span></p>
+         <p>Power program<span class="power"> </span></p>
+         <p>Available program<span class="available"></span> <span class="dark-span">(tap to activate)</span></p>
+      </div>
     </div>
       <table class="projects-list">
         <thead> <tr class="projects-head"> <td>Project-name</td>  <td>Project-description</td> </tr> </thead>
@@ -82,8 +85,8 @@
     <hr />
     <footer>
       <div class="contact">
-        <p>Social:</p>
-        <div class="grid-box">
+        <p>More:</p>
+        <div class="grid-more-box">
           <div> <a href="https://www.facebook.com/nulta.io/" target="_blank">Facebook page</a> </div>
           <div> <a href="" target="_blank">:::</a> </div>
           <div> <a href="https://docs.google.com/presentation/d/e/2PACX-1vQNPj3wWkqCxg6uPdvqbems275IBOQzMl8idVCUoVP6HyUI8XB_cSHesAL4STgPGOwXJ1bm5hQpJ_EQ/pub?start=false&loop=false&delayms=60000" target="_blank" title="Programs portfolio">Programs(portfolio)</a> </div>
