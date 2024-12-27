@@ -6,7 +6,8 @@ const doc = document,
 
 const $$ = {
     vars : {
-      program_name : 'CALCULATOR',
+      availables : ['CALCULATOR', 'VIEWPORT'],
+      // program_name : 'CALCULATOR',
       abc   : ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'],
     },
     query : {},
@@ -60,6 +61,7 @@ const $$ = {
           td2.classList.add('explainer');
           td1.innerText = OV[i].name + ' ';
           td2.innerText = OV[i].desc;
+          td1.setAttribute('program-name', OV[i].name);
 
           if(OV[i].link.length > 0){
              let a = dce('a');
@@ -73,7 +75,7 @@ const $$ = {
           if(OV[i].power){
              td1.classList.add('power');
           }
-          if(OV[i].name.toUpperCase() == $$.vars.program_name.toUpperCase()){
+          if( $$.vars.availables.includes( OV[i].name.toUpperCase()) ){
              td1.classList.add('available');
              td1.title = "[tap to run / tap to cancel]";
           }
@@ -281,7 +283,7 @@ const main = function(){
        case 'lister':
              switch(e.target.classList[1]){
                case 'available':
-                    (programState == false) ? ($$.fetchData('../../'+ $$.vars.program_name), $$.splitScreen(true)) : ($$.loadProgram(false), $$.splitScreen(false));
+                    (programState == false) ? ($$.fetchData('../../'+ e.target.getAttribute('program-name') ), $$.splitScreen(true)) : ($$.loadProgram(false), $$.splitScreen(false));
                break;
                    $$.calculateLargestTitlePos();
              }

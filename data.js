@@ -184,9 +184,9 @@ DATA = {
     desc : `Pong Game`,
   },
   program_36 : {
-    name : 'PREGLED',
+    name : 'VIEWPORT',
     link : '',
-    desc : `Simple image viewer`,
+    desc : `Quick image viewer/editor`,
   },
   program_37 : {
     name : 'RIDER',
