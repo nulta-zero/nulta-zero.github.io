@@ -7,9 +7,15 @@ const doc = document,
 //CREATE PREVIEW CANVAS
 const $$ = {
   vars : {
+    DEEP_ZOOM : {
+      state : false,
+      ammount : 1,
+      translatedToX : 0,
+      translatedToY : 0,
+    },
     ZOOM_LEV : 1,
     ROT      : 0,
-    DRAW_COLOR_ARR : ['rgb(136 136 136)', 'black', 'white', 'red', 'gold', 'deepskyblue', 'limegreen', 'brown', 'mediumpurple'],
+    DRAW_COLOR_ARR : ['custom'],
 
     DRAW_SIZE : 3,
     DRAW_COLOR : 'rgb(136 136 136)',
@@ -36,14 +42,12 @@ const $$ = {
   collectQuery : function(){
                  $$.query = {
                     container    : qu('.container'),
-                    settings     : qu('.settings'),
                     img_export   : qu('.img-export'),
                     img_rotate   : qu('.img-rotate'),
                     open_file    : qu('.open'),
                     undo         : qu('.undo'),
                     croper       : qu('.croper'),
                     wh           : qu('.w-h'),
-                    maxSize      : qu('.max-size'),
                     collageWindow: qu('.collage-window'),
                     cph          : qu('.collage-preview-holder'),
                  }
@@ -99,7 +103,7 @@ const $$ = {
                      $$.query.container.style.width = $$.vars.IMG_FILE.naturalWidth + 'px';
                      $$.query.container.style.height = $$.vars.IMG_FILE.naturalHeight + 'px';
 
-                     $$.query.wh.innerText = `[w:${$$.query.canvas.width} x h:${$$.query.canvas.height}]`;
+                     $$.query.wh.innerText = `[↔︎:${$$.query.canvas.width}  ↕︎:${$$.query.canvas.height}]`;
                      $$.vars.CANVAS_HAS_IMAGE = true;
                   break;
                   case 'collage':   $$.toCollage(X);   break
@@ -113,8 +117,8 @@ const $$ = {
                  let _type= file.name;
 
                  //LOAD BY TYPE
-                 if(_type.search(/[.png|.jpg|.jpeg|.ico]/) > -1)  setTimeout( ()=> { $$.asThis(that.result, $$.vars.ISCOLLAGE); }, 1 * 1000);
-                 else                                        console.log(false);
+                 if(_type.search(/[.png|.jpg|.jpeg|.ico]/) > -1)  setTimeout( t=> { $$.asThis(that.result, $$.vars.ISCOLLAGE); }, 1 * 1000);
+                 else                                             console.log('Program failed at loading image');
 
                  $$.saveCanvasImage();
 
@@ -133,10 +137,11 @@ const $$ = {
                            };
   },
   //QUICK DROP OF ELEMENT TO GET DATA ON QUICKMENU[RIGHT MOUSE CLICK]
-  quickDropHandler : function(ev) {
-                        ev.preventDefault();
-                        let newFile = ev.dataTransfer.files[0]; //FILE;
+  quickDropHandler : function(e) {
+                        e.preventDefault();
+                        let newFile = e.dataTransfer.files[0]; //FILE;
                         let reader = new FileReader();
+                        e.target.parentElement.classList.remove('net');
 
                         if(newFile) $$.whenLoaded(reader, newFile);
   },
@@ -159,10 +164,8 @@ const $$ = {
   },
   //********************************************************
   quickDragOverHandler : (ev) => { ev.preventDefault(); },
-  //********************************************************
-  quickDragEnter : (ev) => { $$.query.container.style.border = "1px solid grey"; },
-  //********************************************************
-  quickDragLeave : (ev) => { $$.query.container.style.border = "none"; },
+  quickDragEnter : async e => { if(e.target.parentElement.classList.contains('container')) e.target.parentElement.classList.add('net')},
+  quickDragLeave : e => {  $$.query.container.classList.remove('net') },
   //ADD PIXELATION EFFECT TO BETTER SEE ZOOMED IMAGE
   pixelate : function(state){
               (state == true) ? $$.query.canvas.style.imageRendering = "pixelated"
@@ -212,10 +215,24 @@ const $$ = {
                             data[i + 1] = 255 - data[i + 1]; // G
                             data[i + 2] = 255 - data[i + 2]; // B
                         }
-                 break;
+                break;
+                case 'fade-out':
+                        for (let i = 0; i < data.length; i += 4) {
+                            data[i+3] = data[i+3] * (0.9);
+                        }
+                break;
+                case 'ghosting':
+                      for (var i = 0; i < data.length; i += 4) {
+                          data[i]     = data[i]; // R
+                          data[i + 1] = data[i]; // G
+                          data[i + 2] = data[i]; // B
+                          data[i + 3] = data[i]; // A
+                      }
+                break;
               }
               ctx.putImageData(theImage, 0,0);
-            },
+              $$.saveCanvasImage();
+  },
   //# TRANSFORM ANY IMAGE ON CANVAS
   transImage : function(it, image, x, y, w, h, [a,b,c,d,e,f]){
               it.save();
@@ -236,10 +253,11 @@ const $$ = {
   //ASSIGN ACTIVE SETTINGS OBJECT
   assignActive : function(e, disableAll){
                     //ADD ACTIVE SETTINGS REFERNCE
-                   for(let i =0; i < $$.query.settings.childElementCount; i++ ){
-                       $$.query.settings.children[i].classList.remove('active');
+                   let menu = qu('.menu');
+                   for(let i = 0; i < menu.children.length; i++ ){
+                       menu.children[i].classList.remove('active');
                    }
-                   if(e.target.parentElement.classList.contains('settings') && disableAll != 'disable-all' ){
+                   if(e.target.parentElement.classList.contains('menu') && disableAll != 'disable-all' ){
                       e.target.classList.add('active');
                    }
                 },
@@ -355,7 +373,16 @@ const $$ = {
                 let div = dce('div');
                     div.classList.add(`color`,`clicker`);
                     div.title = 'CHANGE COLOR FOR PENCIL';
-                    div.setAttribute('data', colors[i]);
+                    if(colors[i] == 'custom'){
+                      div.classList.add('rainbow');
+                      div.addEventListener('click', e=>{
+                          let picker = qu('#color-picker');
+                          picker.click();
+                      });
+                      // div.appendChild(input);
+                    }else{
+                     div.setAttribute('data', colors[i]);
+                    }
                     div.style.background = colors[i];
                     holder.appendChild(div);
             }
@@ -428,6 +455,8 @@ const main = function(){
           case 'to-clear'      :  $$.vars.MODE = 'clear';        break;
           case 'to-grayscale'  :  $$.imageMutation('grayscale'); break;
           case 'to-invert'     :  $$.imageMutation('invert');    break;
+          case 'to-fade-out'   :  $$.imageMutation('fade-out');  break;
+          case 'to-ghosting'   :  $$.imageMutation('ghosting');  break;
           case 'to-flip'       :  $$.imageFlip();                break;
           case 'eraser'        :  $$.vars.MODE = 'eraser';       break;
           case 'draw'          :  $$.vars.MODE = 'draw';         break;
@@ -455,18 +484,18 @@ const main = function(){
             $$.query.canvas.height = $$.query.container.clientHeight;
       });
 
-      window.addEventListener('keydown', (e)=>{
+      window.addEventListener('keydown', e =>{
             let C = $$.query.container;
             C.keys = (C.keys || [] );
             C.keys[e.keyCode] = (e.type == "keydown");
-
+            let prevent = (e)=> e.preventDefault();
 
            if(C.keys && C.keys[27] ) $$.safeAbort(e); //SAFE ABORT
 
-           if(C.keys && C.keys[187] )                          { $$.vars.DRAW_SIZE+=1; $$.popover($$.vars.DRAW_SIZE, 2500);  }  //+
-           if(C.keys && C.keys[189] && $$.vars.DRAW_SIZE > 1 ) { $$.vars.DRAW_SIZE-=1; $$.popover($$.vars.DRAW_SIZE, 2500);  }  //-
+           if(C.keys && C.keys[93] && C.keys[187] ) { prevent(e); $$.vars.DRAW_SIZE+=1; $$.popover($$.vars.DRAW_SIZE, 2500);  }  //+
+           else if(C.keys && C.keys[93] && C.keys[189] ) { prevent(e); $$.vars.DRAW_SIZE-=1; $$.popover($$.vars.DRAW_SIZE, 2500);  }  //-
 
-           if(e.key == '§') { popover(`HELP:<br>[ } ]: draw color<br>[ - ]: draw/eraser minus<br>[ + ]: draw/eraser plus<br>[⌘ + U]: UNDO `, 10000); }  // {
+           if(e.key == '§') { $$.popover(`HELP:<br>[ } ]: draw/eraser minus<br>[ + ]: draw/eraser plus<br>[⌘ + U]: UNDO `, 10000); }  // {
            // if(C.keys && C.keys[221]) { $$.changeDrawColor(); }
 
            if(C.keys && C.keys[91] && C.keys[85] ){
@@ -492,13 +521,60 @@ const main = function(){
             $$.query.croper.style.display = 'none';  //HIDE CROPER
             $$.pixelate(true);
 
-             if($$.vars.ZOOM_LEV < .5) { $$.vars.ZOOM_LEV = 0.5; return false; }
+            let movingElement = $$.query.container;   //container | canvas
+            let deep = $$.vars.DEEP_ZOOM;
+            let moveForce = 1;
 
-             if(e.deltaY < 0)  $$.query.container.style.transform = `translate(${$$.vars.translatedToX}px, ${$$.vars.translatedToY}px)  scale(${$$.vars.ZOOM_LEV+=.01})`;            //translate(${e.clientX}px, ${e.clientY}px)
-             else              $$.query.container.style.transform = `translate(${$$.vars.translatedToX}px, ${$$.vars.translatedToY}px)  scale(${$$.vars.ZOOM_LEV-=.01})`;
+            let zoomPower = .10;
+            let zoomMax = 60;
 
-            if($$.vars.ZOOM_LEV < 3) { $$.query.container.style.transformOrigin = e.offsetX+'px'+' '+ e.offsetY+'px'; }
-            if($$.vars.ZOOM_LEV < 1 ){ $$.vars.translatedToX = 1, $$.vars.translatedToY = 1} //RESET
+            (deep.ammount > zoomMax/3 ) ? zoomPower = .5 : zoomPower = .15;
+
+            //ADJUST ZOOM POWER WHEN STARING ZOOM AND WHEN ALLREADY DEEP INTO PAPER ZOOM
+            if(e.wheelDeltaY == 133)        ($$.vars.DEEP_ZOOM.ammount < zoomMax) ? $$.vars.DEEP_ZOOM.ammount += zoomPower : $$.vars.DEEP_ZOOM.ammount = zoomMax;
+            else if(e.wheelDeltaY == -133)  ($$.vars.DEEP_ZOOM.ammount > 1) ? $$.vars.DEEP_ZOOM.ammount -= zoomPower : $$.vars.DEEP_ZOOM.ammount = 1;   //stronger zoom out
+
+            let translatedX = Math.round(e.offsetX);  //PAN X COR
+            let translatedY = Math.round(e.offsetY);  //PAN Y COR
+
+            //ZOOM STARING focus a point
+            if( e.wheelDeltaY == 133 && deep.ammount < 3){
+              movingElement.style.transformOrigin = `0 0`;
+              movingElement.style.transformOrigin = `${translatedX}px ${translatedY}px`;
+              deep.new_origin_x = translatedX;
+              deep.new_origin_y = translatedY;
+            //ZOOM CONTINUES  (keep the focus point)
+            }else if(e.wheelDeltaY == 133 && deep.ammount > 3){
+               movingElement.style.transformOrigin = `${deep.new_origin_x}px ${deep.new_origin_y}px`;
+            //ZOOMING OUT BUT still deep into paper zoomed
+            }else if(e.wheelDeltaY == -133 && deep.ammount > 3){
+               movingElement.style.transformOrigin = `${deep.new_origin_x}px ${deep.new_origin_y}px`;
+            //FULLY ZOOMED OUT
+            }else if(e.wheelDeltaY == -133 && deep.ammount < 3){
+              movingElement.style.transformOrigin = `0 0`;
+              movingElement.style.transformOrigin = `${translatedX}px ${translatedY}px`;
+              deep.new_origin_x = translatedX;
+              deep.new_origin_y = translatedY;
+            }
+
+            if(e.wheelDeltaY == 133 || e.wheelDeltaY == -133){
+               movingElement.style.transform = `translate(${deep.translatedToX}px, ${deep.translatedToY}px) scale(${$$.vars.DEEP_ZOOM.ammount})`;
+            }
+
+            (deep.ammount <= 1) ? moveForce = 3 : moveForce = 5;  //MOVE FORCE RISES AS WE ZOOM INTO PAPER
+
+            //PAN PART WORKS EXTRA
+            if(e.wheelDeltaX < -6 && e.wheelDeltaY > - 130){
+               movingElement.style.transform = `translate(${deep.translatedToX -= moveForce}px, ${deep.translatedToY}px) scale(${deep.ammount})`;  //PAN TO LEFT
+            }else if(e.wheelDeltaX > 6 && e.wheelDeltaY < 130){
+               movingElement.style.transform = `translate(${deep.translatedToX += moveForce}px, ${deep.translatedToY}px) scale(${deep.ammount})`;   //PAN TO RIGHT
+            }
+
+            if(e.wheelDeltaY < -6 && e.wheelDeltaY > - 130){
+              movingElement.style.transform = `translate(${deep.translatedToX}px, ${deep.translatedToY -=moveForce}px) scale(${deep.ammount})`; //PAN UP
+            }else if(e.wheelDeltaY > 6 && e.wheelDeltaY < 130){
+              movingElement.style.transform = `translate(${deep.translatedToX}px, ${deep.translatedToY +=moveForce}px) scale(${deep.ammount})`; //PAN DOWN
+            }
           }
       }, {passive: false} );
 
@@ -510,7 +586,7 @@ const main = function(){
           if($$.vars.previousVersions.length > 1) {
              $$.getPreviousVersion();
              $$.redrawCanvasImage();
-           }else return false;
+          }else return false;
       });
 
       window.addEventListener('mousemove', e =>{
@@ -630,6 +706,10 @@ const main = function(){
             $$.query.canvas.height = b;
 
             if($$.vars.previousVersions.length >= 1) $$.redrawCanvasImage();
+        });
+
+        qu('#color-picker').addEventListener('input', e=>{
+           $$.vars.DRAW_COLOR = e.target.value;
         });
 }
 

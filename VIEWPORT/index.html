@@ -12,34 +12,37 @@
 </head>
 <body class='no-overflow-app no-selection'>
   <div class="menu">
-      <form class='form'>
         <!-- RELOAD , OPEN  -->
         <input type="button" class='reload clicker' value="⏻"     title="RELOAD PROGRAM"/>
         <input type="button" class='open clicker'   value="▼"     title="OPEN IMAGE"/>
         <input type="button" class='undo clicker'   value="⏎"     title="UNDO"/>
         <input type="button" inputmode='none' class='img-collage clicker'  title="IMG-COLLAGE:[create collage of 2 images]" value="⎕⎕" />
         <!-- HIDDEN READER OF FILE -->
-        <input type="file" id="readFile" hidden='true' accept="image/*" />
+      <form class='form'>
+        <input type="file"  id="readFile" hidden='true' accept="image/*" />
+        <input type="color" id="color-picker" hidden='true'  />
       </form>
       <!-- ADDITIONAL CONTROLS -->
-      <div class="settings">
+      <!-- <div class="settings"> -->
         <input type="button" inputmode='none' class='img-rotate clicker'   title="ROTATE"             value="🅡" />
         <input type="button" inputmode='none' class='to-clear clicker'     title="SMART-CLEAR"        value="⨂" />
         <input type="button" inputmode='none' class='to-grayscale clicker' title="GRAYSCALE"          value="Ⓖ" />
         <input type="button" inputmode='none' class='to-invert clicker'    title="INVERT"             value="◑" />
+        <input type="button" inputmode='none' class='to-fade-out clicker'  title="FADE-OUT"           value="𝌋" />
+        <input type="button" inputmode='none' class='to-ghosting clicker'  title="GHOSTING"           value="Gh" />
         <input type="button" inputmode='none' class='to-flip clicker'      title="FLIP"               value="⍃⍄" />
-        <div class="colors-holder"></div>
         <input type="button" inputmode='none' class='eraser clicker'       title="ERASER  size:keys: (- +)" value="E" />
         <input type="button" inputmode='none' class='draw clicker'         title="DRAW    size:keys: (- +)" value="✎" />
         <input type="button" inputmode='none' class='watermark clicker'    title="WATERMARK"          value="ø" />
         <!-- EXPORT -->
         <input type="button" inputmode='none' class='img-export clicker'   title="EXPORT"             value="⏍" />
-      </div>
+      <!-- </div> -->
+      <div class="colors-holder"></div>
   </div>
   <!-- MAIN WORKING AREA -->
   <div class="container" ondrop="$$.quickDropHandler(event)" ondragover="$$.quickDragOverHandler(event)" ondragleave="$$.quickDragLeave(event)" ondragenter="$$.quickDragEnter(event)">
     <div class="croper"></div>
-    <div class="w-h"></div>
+
   </div>
   <!-- MORE -->
   <div class="collage-window grid">
@@ -52,7 +55,10 @@
               <input type="button" inputmode='none' class='collage-draw button' title="COLLAGE-DRAW"  value="draw" />
               <input type="button" inputmode='none' class='collage-clear button' title="COLLAGE-CLEAR"  value="clear" />
          </div>
-    </div>
+  </div>
+  <div class="rest">
+       <div class="w-h"></div>
+  </div>
   <!-- APP -->
   <script src="program.js"></script>
 </body>
