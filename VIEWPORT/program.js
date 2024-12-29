@@ -13,6 +13,7 @@ const $$ = {
       translatedToX : 0,
       translatedToY : 0,
     },
+    MOUSE_IS_DOWN : false,
     ZOOM_LEV : 1,
     ROT      : 0,
     DRAW_COLOR_ARR : ['custom'],
@@ -90,11 +91,15 @@ const $$ = {
       it.restore();
   },
   //SHOW AS THIS
-  asThis : function(X, mode){
-             $$.vars.IMG_FILE.src = '';
-             $$.vars.IMG_FILE.src = X;
+  asThis : function(data, mode){
+             $$.vars.IMG_FILE.src = '';  //RESET OLD
+             let image = new Image();
+                 image.src = data;
 
-             setTimeout( ()=>{
+             image.addEventListener('load' , e=>{
+                 //ASSIGN NEW;
+                 $$.vars.IMG_FILE.src = data;
+
                switch(mode){
                  default :
                      $$.query.canvas.width = $$.vars.IMG_FILE.naturalWidth;
@@ -105,11 +110,11 @@ const $$ = {
 
                      $$.query.wh.innerText = `[↔︎:${$$.query.canvas.width}  ↕︎:${$$.query.canvas.height}]`;
                      $$.vars.CANVAS_HAS_IMAGE = true;
+                     $$.saveCanvasImage();
                   break;
-                  case 'collage':   $$.toCollage(X);   break
+                  case 'collage':   $$.toCollage(data);   break
                }
-              }, 0.5 * 1000);
-
+             });
           },
   whenLoaded : function(that, file, paps){
                 //APPEND
@@ -120,12 +125,10 @@ const $$ = {
                  if(_type.search(/[.png|.jpg|.jpeg|.ico]/) > -1)  setTimeout( t=> { $$.asThis(that.result, $$.vars.ISCOLLAGE); }, 1 * 1000);
                  else                                             console.log('Program failed at loading image');
 
-                 $$.saveCanvasImage();
-
                  if(paps != null)  paps.value = ""; //CLEAN AFTER YOURSELF
                });
                  //READ
-                 if(file) { that.readAsDataURL(file);  $$.query.container.style.border = "none";  }//RESET BORDER WHEN LOADED  //ONCE IN, REVEAL IT
+                 if(file) { that.readAsDataURL(file); } //RESET BORDER WHEN LOADED  //ONCE IN, REVEAL IT
   },
   //READ UPLOADED FILE
   readUploadedFile : function(){
@@ -288,7 +291,8 @@ const $$ = {
              },
   //# REMOVE LAST ITEM FROM ARRAY
   getPreviousVersion : function(){
-                ($$.vars.previousVersions.length > 0) ? ctx.putImageData($$.vars.previousVersions.pop(), 0, 0) : '';
+                $$.vars.previousVersions.pop();
+                ($$.vars.previousVersions.length >= 1) ? ctx.putImageData( $$.vars.previousVersions[$$.vars.previousVersions.length-1], 0, 0) : '';
               },
   //# REDRAW CANVAS
   redrawCanvasImage : function(){
@@ -470,6 +474,11 @@ const main = function(){
                 $$.vars.DRAW_COLOR = e.target.getAttribute('data');
                 qu('.draw').style.color = e.target.getAttribute('data');
           break;
+          case 'undo':
+                   $$.getPreviousVersion();
+                   // $$.redrawCanvasImage();
+                   // log(11);
+          break;
 
           case 'to-crop'       :  $$.vars.MODE = 'crop';         break;
           case 'to-clear'      :  $$.vars.MODE = 'clear';        break;
@@ -492,21 +501,19 @@ const main = function(){
                           (M.style.display == 'block') ? M.style.display = 'none' : M.style.display = 'block';
           default: return false;  break;
         }
-
         $$.assignActive(e);
       } , true);
-
       //WHEN APP LOADS DO THIS
       window.addEventListener('DOMContentLoaded', ()=> {
             Object.freeze($$);
             // CANVAS IS EQUAL AS CONTAINER [FOR IMIDDIATE QUICK DRAW]
-            $$.query.container.style.width  = window.innerWidth  - 35 + 'px';
-            $$.query.container.style.height = window.innerHeight - 75 + 'px';
+            $$.query.container.style.width  = window.innerWidth / 2 + 'px';
+            $$.query.container.style.height = window.innerHeight - window.innerHeight/10 + 'px';
 
             $$.query.canvas.width  = $$.query.container.clientWidth;
             $$.query.canvas.height = $$.query.container.clientHeight;
       });
-
+      // KEYDOWN
       window.addEventListener('keydown', e =>{
             let C = $$.query.container;
             C.keys = (C.keys || [] );
@@ -523,12 +530,12 @@ const main = function(){
               }else return false;
             }  // ⌘ + U   =( UNDO )
       });
+      // KEYUP
       window.addEventListener('keyup', e => {
            let C = $$.query.container;
            if(!C.keys) return false; //SAFE
            C.keys[e.keyCode] = (e.type == "keydown");
       });
-
       //ZOOM IN/OUT
       $$.query.canvas.addEventListener('wheel', e =>{
           if($$.query.canvas != null){
@@ -596,17 +603,16 @@ const main = function(){
           }
       }, {passive: false} );
 
+      $$.query.canvas.addEventListener('mouseout', e=>{
+          $$.vars.DRAWING = false;
+      });
+      $$.query.canvas.addEventListener('mouseover', e=>{
+         if($$.vars.MOUSE_IS_DOWN) $$.vars.DRAWING = true;
+      });
+
       //RESET CONTAINER TO CENTAR
       window.document.body.addEventListener('dblclick', e => {
         if(e.target.nodeName == 'BODY') $$.safeAbort(e);
-      });
-
-      //PHYSICAL UNDO
-      $$.query.undo.addEventListener('click', e =>{
-          if($$.vars.previousVersions.length > 1) {
-             $$.getPreviousVersion();
-             $$.redrawCanvasImage();
-          }else return false;
       });
 
       window.addEventListener('mousemove', e =>{
@@ -658,7 +664,22 @@ const main = function(){
                    $$.vars.mousedown.x = e.offsetX, $$.vars.mousedown.y = e.offsetY; //RESET TO NEW MOUSEDOWN ALL THE TIME
                 }
           break;
+          case 'clear':
+               if($$.vars.MOUSE_IS_DOWN){   //SOLE VISUAL REASON FOR IT
+                let deltaX = e.offsetX - $$.vars.mousedown.x;
+                let deltaY = e.offsetY - $$.vars.mousedown.y;
+                let normalizedX = Math.log2( Math.abs(deltaX)+1 );
+                let normalizedY = Math.log2( Math.abs(deltaY)+1 );
+                // log(normalizedX, normalizedY);
+                let largerOffset  = bigger(normalizedX)(normalizedY);
+                $$.popover(`delta: ${largerOffset.toFixed(1)}`);
+              }
+          break;
         }
+      });
+
+      window.addEventListener('mouseup', e=>{
+          $$.vars.MOUSE_IS_DOWN = false;
       });
 
       $$.query.canvas.addEventListener('mouseup', e =>{
