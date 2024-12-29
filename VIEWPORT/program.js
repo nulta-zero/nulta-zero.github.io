@@ -190,7 +190,7 @@ const $$ = {
 
               switch(usecase){
                 case 'grayscale':
-                      for (var i = 0; i < data.length; i += 4) {
+                      for(let i = 0; i < data.length; i += 4) {
                           const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
                           data[i]     = avg; // R
                           data[i + 1] = avg; // G
@@ -199,7 +199,7 @@ const $$ = {
                 break;
                 case 'clearing':
                       if(arr == null) return false;  //PASS ARRAY AS VALUES to TARGET
-                      for (var i = 0; i < data.length; i += 4) {
+                      for(let i = 0; i < data.length; i += 4) {
                           // const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
                           if(
                              data[i]  > arr[0] - offset && data[i] < arr[0] + offset &&   // R
@@ -210,24 +210,35 @@ const $$ = {
                       }
                 break;
                 case 'invert':
-                        for (let i = 0; i < data.length; i += 4) {
-                            data[i]     = 255 - data[i];     // R
-                            data[i + 1] = 255 - data[i + 1]; // G
-                            data[i + 2] = 255 - data[i + 2]; // B
-                        }
+                      for(let i = 0; i < data.length; i += 4) {
+                          data[i]     = 255 - data[i];     // R
+                          data[i + 1] = 255 - data[i + 1]; // G
+                          data[i + 2] = 255 - data[i + 2]; // B
+                      }
                 break;
                 case 'fade-out':
-                        for (let i = 0; i < data.length; i += 4) {
-                            data[i+3] = data[i+3] * (0.9);
-                        }
+                      for(let i = 0; i < data.length; i += 4) {
+                          data[i+3] = data[i+3] * (0.9);
+                      }
                 break;
                 case 'ghosting':
-                      for (var i = 0; i < data.length; i += 4) {
+                      for(let i = 0; i < data.length; i += 4) {
                           data[i]     = data[i]; // R
                           data[i + 1] = data[i]; // G
                           data[i + 2] = data[i]; // B
                           data[i + 3] = data[i]; // A
                       }
+                break;
+                case 'blur':
+                      for(let i = 0; i < data.length; i += 4) {
+                          const avg1 = (data[i] + data[i + 4] + data[i - 4]) / 3;
+                          const avg2 = (data[i+1] + data[(i+1) + 4] + data[ (i+1) - 4]) / 3;
+                          const avg3 = (data[i+2] + data[(i+2) + 4] + data[ (i+2) - 4]) / 3;
+                          data[i]     = avg1; // R
+                          data[i + 1] = avg2; // G
+                          data[i + 2] = avg3; // B
+                      }
+
                 break;
               }
               ctx.putImageData(theImage, 0,0);
@@ -246,13 +257,22 @@ const $$ = {
   },
   //FLIP IMAGE
   imageFlip : function(){
-              $$.clear_canvas(ctx);
-              if($$.vars.FLIPED) $$.transImage(ctx, $$.vars.IMG_FILE, 0 , 0, $$.vars.IMG_FILE.width, $$.vars.IMG_FILE.height, [1,0,0,1,0,0] );   //RETURN TO DEFAULT
-              else       $$.transImage(ctx, $$.vars.IMG_FILE, 0 , 0, $$.vars.IMG_FILE.width, $$.vars.IMG_FILE.height, [-1,0,0,1,0,0] );        //FLIP
+              const dataX = $$.query.canvas.toDataURL("image/"+$$.vars.chosenKind, 1.0);
+              let IMGX = new Image();                       //CREATE NEW IMAGE
+                  IMGX.src = dataX;
+
+                  IMGX.onload = ()=>{
+                      $$.clear_canvas(ctx);
+                      if($$.vars.FLIPED) $$.transImage(ctx, IMGX, 0 , 0,  IMGX.width,  IMGX.height, [1,0,0,1,0,0] );   //RETURN TO DEFAULT             //$$.vars.IMG_FILE
+                      else               $$.transImage(ctx, IMGX, 0 , 0,  IMGX.width,  IMGX.height, [-1,0,0,1,0,0] );        //FLIP
+                  }
   },
   //ASSIGN ACTIVE SETTINGS OBJECT
   assignActive : function(e, disableAll){
                     //ADD ACTIVE SETTINGS REFERNCE
+                   let skippable = ['minus', 'plus'];
+                   if(skippable.includes(e.target.classList[0] )) return false;
+
                    let menu = qu('.menu');
                    for(let i = 0; i < menu.children.length; i++ ){
                        menu.children[i].classList.remove('active');
@@ -457,9 +477,12 @@ const main = function(){
           case 'to-invert'     :  $$.imageMutation('invert');    break;
           case 'to-fade-out'   :  $$.imageMutation('fade-out');  break;
           case 'to-ghosting'   :  $$.imageMutation('ghosting');  break;
+          case 'to-blur'       :  $$.imageMutation('blur');      break;
           case 'to-flip'       :  $$.imageFlip();                break;
           case 'eraser'        :  $$.vars.MODE = 'eraser';       break;
           case 'draw'          :  $$.vars.MODE = 'draw';         break;
+          case 'minus'         :  if($$.vars.DRAW_SIZE > 1) $$.vars.DRAW_SIZE-=1; $$.popover($$.vars.DRAW_SIZE, 2500); break;
+          case 'plus'          :  $$.vars.DRAW_SIZE+=1; $$.popover($$.vars.DRAW_SIZE, 2500); break;
           case 'img-collage'   :  $$.vars.ISCOLLAGE = 'collage';  $$.show_this($$.query.collageWindow, 'block');  break;
           case 'collage-radios':  $$.vars.collageSetup = e.target.value;     break;
           case 'collage-draw'  :  $$.drawCollage($$.vars.collageSetup); break;
@@ -491,12 +514,7 @@ const main = function(){
             let prevent = (e)=> e.preventDefault();
 
            if(C.keys && C.keys[27] ) $$.safeAbort(e); //SAFE ABORT
-
-           if(C.keys && C.keys[93] && C.keys[187] ) { prevent(e); $$.vars.DRAW_SIZE+=1; $$.popover($$.vars.DRAW_SIZE, 2500);  }  //+
-           else if(C.keys && C.keys[93] && C.keys[189] ) { prevent(e); $$.vars.DRAW_SIZE-=1; $$.popover($$.vars.DRAW_SIZE, 2500);  }  //-
-
-           if(e.key == '§') { $$.popover(`HELP:<br>[ } ]: draw/eraser minus<br>[ + ]: draw/eraser plus<br>[⌘ + U]: UNDO `, 10000); }  // {
-           // if(C.keys && C.keys[221]) { $$.changeDrawColor(); }
+           if(e.key == '§') { $$.popover(`HELP:<br>[⌘ + U]: UNDO `, 10000); }
 
            if(C.keys && C.keys[91] && C.keys[85] ){
              if($$.vars.previousVersions.length > 1) {
@@ -504,7 +522,6 @@ const main = function(){
                 $$.redrawCanvasImage();
               }else return false;
             }  // ⌘ + U   =( UNDO )
-
       });
       window.addEventListener('keyup', e => {
            let C = $$.query.container;
@@ -515,8 +532,7 @@ const main = function(){
       //ZOOM IN/OUT
       $$.query.canvas.addEventListener('wheel', e =>{
           if($$.query.canvas != null){
-            if(e.deltaY % 1 == 0) return false;         //THERE IS DIFF BETWEEN PINCH AND TWO FINGER SCROLL -> ACCEPT ONLY PINCH-IN & PINCH-OUT
-            else                  e.preventDefault();
+             e.preventDefault();
 
             $$.query.croper.style.display = 'none';  //HIDE CROPER
             $$.pixelate(true);
@@ -528,58 +544,62 @@ const main = function(){
             let zoomPower = .10;
             let zoomMax = 60;
 
+            let browserLimiter = 120;  //changes from 120 to 133 depending on browser
+
             (deep.ammount > zoomMax/3 ) ? zoomPower = .5 : zoomPower = .15;
 
             //ADJUST ZOOM POWER WHEN STARING ZOOM AND WHEN ALLREADY DEEP INTO PAPER ZOOM
-            if(e.wheelDeltaY == 133)        ($$.vars.DEEP_ZOOM.ammount < zoomMax) ? $$.vars.DEEP_ZOOM.ammount += zoomPower : $$.vars.DEEP_ZOOM.ammount = zoomMax;
-            else if(e.wheelDeltaY == -133)  ($$.vars.DEEP_ZOOM.ammount > 1) ? $$.vars.DEEP_ZOOM.ammount -= zoomPower : $$.vars.DEEP_ZOOM.ammount = 1;   //stronger zoom out
+            if(e.wheelDeltaY == browserLimiter)        ($$.vars.DEEP_ZOOM.ammount < zoomMax) ? $$.vars.DEEP_ZOOM.ammount += zoomPower : $$.vars.DEEP_ZOOM.ammount = zoomMax;
+            else if(e.wheelDeltaY == -browserLimiter)  ($$.vars.DEEP_ZOOM.ammount > 1) ? $$.vars.DEEP_ZOOM.ammount -= zoomPower : $$.vars.DEEP_ZOOM.ammount = 1;   //stronger zoom out
 
             let translatedX = Math.round(e.offsetX);  //PAN X COR
             let translatedY = Math.round(e.offsetY);  //PAN Y COR
 
             //ZOOM STARING focus a point
-            if( e.wheelDeltaY == 133 && deep.ammount < 3){
+            if( e.wheelDeltaY == browserLimiter && deep.ammount < 3){
               movingElement.style.transformOrigin = `0 0`;
               movingElement.style.transformOrigin = `${translatedX}px ${translatedY}px`;
               deep.new_origin_x = translatedX;
               deep.new_origin_y = translatedY;
             //ZOOM CONTINUES  (keep the focus point)
-            }else if(e.wheelDeltaY == 133 && deep.ammount > 3){
+            }else if(e.wheelDeltaY == browserLimiter && deep.ammount > 3){
                movingElement.style.transformOrigin = `${deep.new_origin_x}px ${deep.new_origin_y}px`;
             //ZOOMING OUT BUT still deep into paper zoomed
-            }else if(e.wheelDeltaY == -133 && deep.ammount > 3){
+            }else if(e.wheelDeltaY == -browserLimiter && deep.ammount > 3){
                movingElement.style.transformOrigin = `${deep.new_origin_x}px ${deep.new_origin_y}px`;
             //FULLY ZOOMED OUT
-            }else if(e.wheelDeltaY == -133 && deep.ammount < 3){
+            }else if(e.wheelDeltaY == -browserLimiter && deep.ammount < 3){
               movingElement.style.transformOrigin = `0 0`;
               movingElement.style.transformOrigin = `${translatedX}px ${translatedY}px`;
               deep.new_origin_x = translatedX;
               deep.new_origin_y = translatedY;
             }
 
-            if(e.wheelDeltaY == 133 || e.wheelDeltaY == -133){
+            if(e.wheelDeltaY == browserLimiter || e.wheelDeltaY == -browserLimiter){
                movingElement.style.transform = `translate(${deep.translatedToX}px, ${deep.translatedToY}px) scale(${$$.vars.DEEP_ZOOM.ammount})`;
             }
 
             (deep.ammount <= 1) ? moveForce = 3 : moveForce = 5;  //MOVE FORCE RISES AS WE ZOOM INTO PAPER
 
             //PAN PART WORKS EXTRA
-            if(e.wheelDeltaX < -6 && e.wheelDeltaY > - 130){
+            if(e.wheelDeltaX < -6 && e.wheelDeltaY > - browserLimiter){
                movingElement.style.transform = `translate(${deep.translatedToX -= moveForce}px, ${deep.translatedToY}px) scale(${deep.ammount})`;  //PAN TO LEFT
-            }else if(e.wheelDeltaX > 6 && e.wheelDeltaY < 130){
+            }else if(e.wheelDeltaX > 6 && e.wheelDeltaY < browserLimiter){
                movingElement.style.transform = `translate(${deep.translatedToX += moveForce}px, ${deep.translatedToY}px) scale(${deep.ammount})`;   //PAN TO RIGHT
             }
 
-            if(e.wheelDeltaY < -6 && e.wheelDeltaY > - 130){
+            if(e.wheelDeltaY < -6 && e.wheelDeltaY > - browserLimiter){
               movingElement.style.transform = `translate(${deep.translatedToX}px, ${deep.translatedToY -=moveForce}px) scale(${deep.ammount})`; //PAN UP
-            }else if(e.wheelDeltaY > 6 && e.wheelDeltaY < 130){
+            }else if(e.wheelDeltaY > 6 && e.wheelDeltaY < browserLimiter){
               movingElement.style.transform = `translate(${deep.translatedToX}px, ${deep.translatedToY +=moveForce}px) scale(${deep.ammount})`; //PAN DOWN
             }
           }
       }, {passive: false} );
 
       //RESET CONTAINER TO CENTAR
-      window.document.body.addEventListener('dblclick', e => $$.safeAbort(e) );
+      window.document.body.addEventListener('dblclick', e => {
+        if(e.target.nodeName == 'BODY') $$.safeAbort(e);
+      });
 
       //PHYSICAL UNDO
       $$.query.undo.addEventListener('click', e =>{
