@@ -241,7 +241,28 @@ const $$ = {
                           data[i + 1] = avg2; // G
                           data[i + 2] = avg3; // B
                       }
-
+                break;
+                case 'cartoonize':
+                      for(let i = 0; i < data.length; i += 4) {
+                          const strong1 = Math.max(...[ data[i], data[i + 4], data[i - 4] ]);
+                          const strong2 = Math.max(...[ data[i+1] , data[(i+1) + 4] , data[ (i+1) - 4] ]);
+                          const strong3 = Math.max(...[ data[i+2] , data[(i+2) + 4] , data[ (i+2) - 4] ]);
+                          let avg = Math.min(...[strong1 , strong2 , strong3 ]);
+                          if(data[i] > avg ){
+                             data[i]     = strong1; // R
+                             data[i + 1] = strong2; // G
+                             data[i + 2] = strong3; // B
+                          }
+                      }
+                break;
+                case 'noise':
+                       for(let i = 0; i < data.length; i += 4) {
+                           let a = (data[i- Math.round(Math.random() * i)]);
+                           let rand = Math.random();
+                           if(rand > 0.75)     data[i] = a;
+                           else if(rand < 0.2) data[i+1] = a;
+                           else                data[i+2] = a;
+                       }
                 break;
               }
               ctx.putImageData(theImage, 0,0);
@@ -273,8 +294,8 @@ const $$ = {
   //ASSIGN ACTIVE SETTINGS OBJECT
   assignActive : function(e, disableAll){
                     //ADD ACTIVE SETTINGS REFERNCE
-                   let skippable = ['minus', 'plus'];
-                   if(skippable.includes(e.target.classList[0] )) return false;
+                   // let skippable = [];
+                   // if(skippable.includes(e.target.classList[0] )) return false;
 
                    let menu = qu('.menu');
                    for(let i = 0; i < menu.children.length; i++ ){
@@ -444,9 +465,9 @@ const main = function(){
                      a_link.id = 'linker';
                  doc.body.appendChild(a_link);
                 //CLICK IT VIRTUALLY
-                setTimeout( ()=> qu('#linker').click(), 0.25 * 1000);
+                setTimeout( t=> qu('#linker').click(), 0.25 * 1000);
                 //CLEAN AFTER YOURSELF
-                setTimeout( ()=> qu('#linker').remove() , 1.5 * 1000);
+                setTimeout( t=> qu('#linker').remove() , 1.5 * 1000);
           break;
           case 'open':
                 qu('#readFile').click();
@@ -477,7 +498,6 @@ const main = function(){
           case 'undo':
                    $$.getPreviousVersion();
                    // $$.redrawCanvasImage();
-                   // log(11);
           break;
 
           case 'to-crop'       :  $$.vars.MODE = 'crop';         break;
@@ -487,15 +507,15 @@ const main = function(){
           case 'to-fade-out'   :  $$.imageMutation('fade-out');  break;
           case 'to-ghosting'   :  $$.imageMutation('ghosting');  break;
           case 'to-blur'       :  $$.imageMutation('blur');      break;
+          case 'to-cartoonize' :  $$.imageMutation('cartoonize'); break;
+          case 'to-noise'      :  $$.imageMutation('noise');     break;
           case 'to-flip'       :  $$.imageFlip();                break;
           case 'eraser'        :  $$.vars.MODE = 'eraser';       break;
           case 'draw'          :  $$.vars.MODE = 'draw';         break;
-          case 'minus'         :  if($$.vars.DRAW_SIZE > 1) $$.vars.DRAW_SIZE-=1; $$.popover($$.vars.DRAW_SIZE, 2500); break;
-          case 'plus'          :  $$.vars.DRAW_SIZE+=1; $$.popover($$.vars.DRAW_SIZE, 2500); break;
           case 'img-collage'   :  $$.vars.ISCOLLAGE = 'collage';  $$.show_this($$.query.collageWindow, 'block');  break;
-          case 'collage-radios':  $$.vars.collageSetup = e.target.value;     break;
-          case 'collage-draw'  :  $$.drawCollage($$.vars.collageSetup); break;
-          case 'collage-clear' :  $$.toCollage('clear');                     break;
+          case 'collage-radios':  $$.vars.collageSetup = e.target.value;  break;
+          case 'collage-draw'  :  $$.drawCollage($$.vars.collageSetup);   break;
+          case 'collage-clear' :  $$.toCollage('clear');                  break;
           case 'watermark'     :  $$.madeOn(ctx, $$.query.canvas.width, $$.query.canvas.height);     break;
           case '--icon':  let M = qu('.mother-adjuster');
                           (M.style.display == 'block') ? M.style.display = 'none' : M.style.display = 'block';
@@ -547,9 +567,8 @@ const main = function(){
             let movingElement = $$.query.container;   //container | canvas
             let deep = $$.vars.DEEP_ZOOM;
             let moveForce = 1;
-
-            let zoomPower = .10;
-            let zoomMax = 60;
+            let zoomPower = 0.10;
+            let zoomMax   = 60;
 
             let browserLimiter = 120;  //changes from 120 to 133 depending on browser
 
@@ -682,6 +701,10 @@ const main = function(){
           $$.vars.MOUSE_IS_DOWN = false;
       });
 
+     qu('.size-changer').addEventListener('change', e=>{
+        if($$.vars.DRAW_SIZE > 1) $$.vars.DRAW_SIZE = parseInt(e.target.value);
+     });
+
       $$.query.canvas.addEventListener('mouseup', e =>{
             $$.vars.MOUSE_IS_DOWN = false;
             $$.saveCanvasImage(); //AUTO SAVE IMAGE
@@ -731,9 +754,11 @@ const main = function(){
             }
         });
 
+        // window.addEventListener('focus', e=>{
+        //  (doc.visibilityState == 'visible') ? log(123) : '';
+        // });
+
         window.addEventListener('resize', e =>{
-            //EXXPORTED IMG WILL ALWAYS BE SAME AS CANVAS, RESIZED CANVAS GIVESS YOU SMALLER IMAGE FRAME
-            // if(parseFloat(qu('.mother-height').value) > 0) return false;  //EXPORT SHOWS LITTLE BOX IN BOTTOM AND MESSES RESIZE f. SO IF YOU FIXED THE HEIGHT , DONT CHANGE ELSE AUTO CHANGE
             let a, b;
             a = window.innerWidth - 35;
             b = window.innerHeight - 75;
@@ -743,7 +768,7 @@ const main = function(){
             qu('.container').style.width  = a + 'px';
             qu('.container').style.height = b + 'px';
 
-            $$.query.canvas.width = a;
+            $$.query.canvas.width  = a;
             $$.query.canvas.height = b;
 
             if($$.vars.previousVersions.length >= 1) $$.redrawCanvasImage();

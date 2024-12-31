@@ -94,13 +94,13 @@ input{
   max-width: 25%;
   max-height: 25%;
   border-radius: 5px;
-  /* box-shadow: 0 2px 6px black; */
+  user-select: none;
 }
+.size-changer{
+  width: 50px;
+}
+
 .colors-holder{
-  /* display: flex; */
-  /* align-items: center; */
-  /* gap: 5px; */
-  /* padding: 0px 2%; */
   align-self: center;
 }
 .colors-holder > div{
