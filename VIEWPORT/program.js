@@ -527,8 +527,15 @@ const main = function(){
       window.addEventListener('DOMContentLoaded', ()=> {
             Object.freeze($$);
             // CANVAS IS EQUAL AS CONTAINER [FOR IMIDDIATE QUICK DRAW]
-            $$.query.container.style.width  = window.innerWidth / 2 + 'px';
-            $$.query.container.style.height = window.innerHeight - window.innerHeight/10 + 'px';
+
+            let containerWidth = $$.query.container.clientWidth;
+
+            if(containerWidth <= 700){
+               $$.query.container.style.width = containerWidth - (containerWidth /10) + 'px';
+            }else{
+               $$.query.container.style.width = window.innerWidth / 2 + 'px';
+            }
+            $$.query.container.style.height = window.innerHeight - (window.innerHeight/10) + 'px';
 
             $$.query.canvas.width  = $$.query.container.clientWidth;
             $$.query.canvas.height = $$.query.container.clientHeight;
