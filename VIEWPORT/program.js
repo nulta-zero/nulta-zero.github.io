@@ -105,8 +105,29 @@ const $$ = {
                      $$.query.canvas.width = $$.vars.IMG_FILE.naturalWidth;
                      $$.query.canvas.height = $$.vars.IMG_FILE.naturalHeight;
                      ctx.drawImage($$.vars.IMG_FILE, 0, 0, $$.vars.IMG_FILE.naturalWidth,  $$.vars.IMG_FILE.naturalHeight);
-                     $$.query.container.style.width = $$.vars.IMG_FILE.naturalWidth + 'px';
-                     $$.query.container.style.height = $$.vars.IMG_FILE.naturalHeight + 'px';
+
+                     let w = $$.vars.IMG_FILE.naturalWidth;
+                     let h = $$.vars.IMG_FILE.naturalHeight;
+
+                     $$.query.container.style.width  = w + 'px';
+                     $$.query.container.style.height = h + 'px';
+
+                     $$.query.container.style.maxWidth  = (bigger(w)(h) / (w + h) * 100) + 'vw';
+                     $$.query.container.style.maxHeight = 100 + 'vh';
+
+
+                     // max-width: 60vw;
+// max-height: 100vh;
+
+
+                     // if(w < $$.query.container.clientWidth){
+                     //    $$.query.container.style.width  = w + 'px';
+                     //    $$.query.container.style.height = h + 'px';
+                     // }else{
+                     //    // $$.query.container.style.width  = (bigger(w)(h) / (w + h) * 100) + '%';
+                     //    // $$.query.container.style.height = '';
+                     //    // $$.query.container.style.height = (w / (w + h) * 100) + '%';
+                     // }
 
                      $$.query.wh.innerText = `[↔︎:${$$.query.canvas.width}  ↕︎:${$$.query.canvas.height}]`;
                      $$.vars.CANVAS_HAS_IMAGE = true;
@@ -116,6 +137,33 @@ const $$ = {
                }
              });
           },
+  draw_rect : function(it, x,y,width,height,color ){
+            //DRAW RECTANGLE ON CANVAS
+            it.beginPath();
+            if(typeof color == 'undefined'){
+                 //DO NOTHING
+                 it.strokeStyle = 'brown';
+                 it.strokeRect(x, y, width, height);
+            }else{
+               it.fillStyle = color;
+               it.fillRect(x, y, width, height);
+               it.stroke();
+               // it.font = "15px Arial";  //TESTING TEXT
+               // it.fillText(text, x, y);
+            }
+  },
+  addBackgroundToImage : function(){
+      // $$.saveCanvasImage();
+      let image = new Image();
+      let data = $$.query.canvas.toDataURL('image/png', 1);
+          image.src = data;
+      let canvas = $$.query.canvas;
+
+          image.addEventListener('load', e=>{
+              $$.draw_rect(ctx, 0, 0, canvas.width, canvas.height, $$.vars.DRAW_COLOR );
+              ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          });
+  },
   whenLoaded : function(that, file, paps){
                 //APPEND
                that.addEventListener('load', ()=>{
@@ -264,9 +312,22 @@ const $$ = {
                            else                data[i+2] = a;
                        }
                 break;
+                case 'glow':
+                     for(let z = 0; z < 50; z++){
+                       for(let i = 0; i < data.length; i += 4) {
+                           if(data[i] < 25) data[i] = (data[i-8] + data[i+8]) * 0.5;
+                           if(data[i+1] < 25) data[i+1] = (data[i+1-8] + data[i+1+8]) * 0.5;
+                           if(data[i+2] < 25) data[i+2] = (data[i+2-8] + data[i+2+8]) * 0.5;
+                       }
+                       // if(z == 50-1){
+                       //   log('done');
+                       // }
+                     }
+                break;
               }
               ctx.putImageData(theImage, 0,0);
               $$.saveCanvasImage();
+              $$.popover(usecase.toUpperCase() + ' ✔︎✔︎', 3000);
   },
   //# TRANSFORM ANY IMAGE ON CANVAS
   transImage : function(it, image, x, y, w, h, [a,b,c,d,e,f]){
@@ -322,8 +383,8 @@ const $$ = {
             },
   //CANVAS SIZE ADJUST
   adjustCanvas : function(){
-                let W = parseFloat(qu('.mother-width').value);
-                let H = parseFloat(qu('.mother-height').value);
+                let W = window.innerWidth; //parseFloat(qu('.mother-width').value);
+                let H = window.innerHeight;//parseFloat(qu('.mother-height').value);
 
                 let nw = $$.vars.IMG_FILE.naturalWidth || parseFloat($$.query.container.style.width);
                 let nh = $$.vars.IMG_FILE.naturalHeight || parseFloat($$.query.container.style.height);
@@ -509,7 +570,9 @@ const main = function(){
           case 'to-blur'       :  $$.imageMutation('blur');      break;
           case 'to-cartoonize' :  $$.imageMutation('cartoonize'); break;
           case 'to-noise'      :  $$.imageMutation('noise');     break;
+          case 'to-glow'       :  $$.imageMutation('glow');      break;
           case 'to-flip'       :  $$.imageFlip();                break;
+          case 'add-background':  $$.addBackgroundToImage();     break;
           case 'eraser'        :  $$.vars.MODE = 'eraser';       break;
           case 'draw'          :  $$.vars.MODE = 'draw';         break;
           case 'img-collage'   :  $$.vars.ISCOLLAGE = 'collage';  $$.show_this($$.query.collageWindow, 'block');  break;
@@ -577,13 +640,14 @@ const main = function(){
             let zoomPower = 0.10;
             let zoomMax   = 60;
 
-            let browserLimiter = 120;  //changes from 120 to 133 depending on browser
+            let browserLimiter = 133;  //changes from 120 to 133 depending on browser
 
             (deep.ammount > zoomMax/3 ) ? zoomPower = .5 : zoomPower = .15;
 
+
             //ADJUST ZOOM POWER WHEN STARING ZOOM AND WHEN ALLREADY DEEP INTO PAPER ZOOM
-            if(e.wheelDeltaY == browserLimiter)        ($$.vars.DEEP_ZOOM.ammount < zoomMax) ? $$.vars.DEEP_ZOOM.ammount += zoomPower : $$.vars.DEEP_ZOOM.ammount = zoomMax;
-            else if(e.wheelDeltaY == -browserLimiter)  ($$.vars.DEEP_ZOOM.ammount > 1) ? $$.vars.DEEP_ZOOM.ammount -= zoomPower : $$.vars.DEEP_ZOOM.ammount = 1;   //stronger zoom out
+            if(e.wheelDeltaY == 133)       {  ($$.vars.DEEP_ZOOM.ammount < zoomMax) ? $$.vars.DEEP_ZOOM.ammount += zoomPower : $$.vars.DEEP_ZOOM.ammount = zoomMax; }
+            else if(e.wheelDeltaY == -133) {  ($$.vars.DEEP_ZOOM.ammount > 1) ? $$.vars.DEEP_ZOOM.ammount -= zoomPower : $$.vars.DEEP_ZOOM.ammount = 1;   } //stronger zoom out
 
             let translatedX = Math.round(e.offsetX);  //PAN X COR
             let translatedY = Math.round(e.offsetY);  //PAN Y COR
@@ -615,13 +679,13 @@ const main = function(){
             (deep.ammount <= 1) ? moveForce = 3 : moveForce = 5;  //MOVE FORCE RISES AS WE ZOOM INTO PAPER
 
             //PAN PART WORKS EXTRA
-            if(e.wheelDeltaX < -6 && e.wheelDeltaY > - browserLimiter){
+            if(e.wheelDeltaX < -6 && e.wheelDeltaY > -browserLimiter){
                movingElement.style.transform = `translate(${deep.translatedToX -= moveForce}px, ${deep.translatedToY}px) scale(${deep.ammount})`;  //PAN TO LEFT
             }else if(e.wheelDeltaX > 6 && e.wheelDeltaY < browserLimiter){
                movingElement.style.transform = `translate(${deep.translatedToX += moveForce}px, ${deep.translatedToY}px) scale(${deep.ammount})`;   //PAN TO RIGHT
             }
 
-            if(e.wheelDeltaY < -6 && e.wheelDeltaY > - browserLimiter){
+            if(e.wheelDeltaY < -6 && e.wheelDeltaY > -browserLimiter){
               movingElement.style.transform = `translate(${deep.translatedToX}px, ${deep.translatedToY -=moveForce}px) scale(${deep.ammount})`; //PAN UP
             }else if(e.wheelDeltaY > 6 && e.wheelDeltaY < browserLimiter){
               movingElement.style.transform = `translate(${deep.translatedToX}px, ${deep.translatedToY +=moveForce}px) scale(${deep.ammount})`; //PAN DOWN

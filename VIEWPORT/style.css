@@ -11,6 +11,7 @@ body{
   min-height: 100%;
   font-family: Lucida grande;
   margin: 0;
+  cursor: default;
 }
 input{
   color-scheme: dark;
@@ -21,6 +22,7 @@ input{
   outline: none;
   vertical-align: middle;
   margin-right: 2px;
+  cursor: default;
 }
 .clicker{
   color: var(--textColor);
@@ -154,13 +156,16 @@ input{
   position: fixed;
   top: 1%;
   right: 1%;
-  background: var(--dark);
+  background: #0000008f;
   color: var(--textColor);
-  padding: 1px 3px;
+  padding: 1vw 3vw;
+  outline: 2px solid #fdfdfd24;
+  border-radius: 10px;
   font-family: Menlo, monospace;
   font-size: 13px;
-  border-radius: 3px;
+  border-radius: 7px;
   display: flex;
+  z-index: 100;
 }
 /* SMALL ICON */
 .--icon:hover{
