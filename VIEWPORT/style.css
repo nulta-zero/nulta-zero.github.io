@@ -2,6 +2,15 @@
   --hoverColor: #f36f6533;
   --dark : #202124;
   --textColor : #e3e5e8;
+  --darkText : #525356;
+  --lightText : #e4e5e869;
+  /* PASTEL COLORS */
+  --mint : #98fbcb;
+  --mauve : #e0afff;
+  --babyBlue   : #8fd9fb;
+  --magicMint  : #AAF0D1;
+  --periwinkle : #ccccff;
+  --lavander   : #d3d3ff;
 }
 html{ min-height: 100%; background: var(--dark); }
 body{
@@ -23,6 +32,10 @@ input{
   vertical-align: middle;
   margin-right: 2px;
   cursor: default;
+}
+::selection{
+  background: #cfc09d;
+  color: black;
 }
 .clicker{
   color: var(--textColor);
@@ -49,6 +62,7 @@ input{
   border-bottom-left-radius: 7px;
   border-bottom-right-radius: 7px;
   padding: 0 7px 0 11px;
+  user-select: none;
 }
 .container{
   display: flex;
@@ -77,7 +91,7 @@ input{
   width: 100%;
   z-index: 1;
 }
-.croper{
+.recter{
   background: transparent;
   outline: 2px solid;
   position: absolute;
@@ -88,6 +102,47 @@ input{
   z-index: 2;
   pointer-events: none;
 }
+.croper{
+  background: transparent;
+  outline: 5px dashed indianred;
+  position: absolute;
+  z-index: 2;
+  border-radius: 5px;
+  background: #00000038;
+  background-image: linear-gradient(#000 3px, #fff0 0%), linear-gradient(to right, #000 3px, #fff0 0%);
+  background-size: 34% 34%;
+  background-position: -3px -2px;
+  outline: 3px solid #2c2929;
+}
+
+/* RESIZABLE ELEMENT */
+.resizable-bottom{
+  border-bottom: 5px ridge springgreen!important;
+  cursor: ns-resize;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.resizable-right{
+  border-right: 5px ridge springgreen!important;
+  cursor: ew-resize;
+  border-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.resizable-left{
+  border-left: 5px ridge springgreen!important;
+  cursor: ew-resize;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  /* transition: 0.25s; */
+}
+.resizable-top{
+  border-top: 5px ridge springgreen!important;
+  cursor: ns-resize;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 .previewer{
   position: fixed;
   left: 2%;
@@ -101,14 +156,10 @@ input{
 .size-changer{
   width: 50px;
 }
-
-.colors-holder{
+.-color{
   align-self: center;
-}
-.colors-holder > div{
-  width: 15px;
+  width: 20px;
   height: 15px;
-  border-radius: 100px;
 }
 .signature{
   color: #00000012;
@@ -134,7 +185,7 @@ input{
   display: flex;
   justify-content: end;
   margin: 0 -5px;
-  color: #535457;
+  color: var(--lightText);
 }
 .w-h{
   font-size: 12px;
@@ -166,6 +217,48 @@ input{
   border-radius: 7px;
   display: flex;
   z-index: 100;
+}
+.console-holder{
+  position: fixed;
+  left: 0;
+  top : 0;
+  font-size: 11px;
+  max-width: 15vw;
+
+}
+.console-menu{
+  /* background: #2f3f61;   /*Very nice dark blue *\/ */
+  /* background: #6579a51f; */
+}
+.console-menu > input{
+  color: var(--lightText);
+}
+.automation-order{
+  padding: 5px 10px;
+  overflow-y: scroll;
+  max-height: 10%;
+  background: #00000038;
+  color: var(--lightText);
+}
+.automation-order::before{
+  content: "Saved:";
+  color: var(--darkText);
+}
+.console{
+  padding: 5px 10px;
+  overflow-y: scroll;
+  max-height: 90%;
+  background: #00000038;
+}
+.console::before{
+  content: "History:"
+}
+.filter-kill{
+  float: right;
+  margin-left: 20px;
+}
+.filter-kill:hover{
+  color: var(--lightText);
 }
 /* SMALL ICON */
 .--icon:hover{
@@ -213,9 +306,13 @@ input{
   .container{ width: -webkit-fill-available; overflow-x: scroll;}
   .menu{
     flex-wrap: wrap;
-    justify-content: left;
+    justify-content: right;
     margin: 10px;
     gap: 5px;
+    max-width: 80%;
+    float: right;
+    border-radius: 10px;
+    outline: 3px solid var(--lavander);
   }
   .settings > input{ background: transparent;}
   .main-canvas{
@@ -225,6 +322,9 @@ input{
   .colors-holder{
     display: grid;
     grid-template-columns: repeat(9, 1fr);
+  }
+  .console-holder{
+    background: var(--dark);
   }
 }
 /* MICRO view */

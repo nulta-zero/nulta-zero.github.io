@@ -29,15 +29,24 @@ const $$ = {
     ISCOLLAGE : 'default',   /// default  || collage
     collage   : { A : null, B : null },
     mousedown : { x : 0,    y : 0    },
-    CROP_DIM : {},  //HOLD CROP DATA
+    croper_object  : {
+      x : null,
+      y : null,
+      w : null,
+      h : null,
+      model  : null,
+      border : null,
+    },
     translatedToX : 1,
     translatedToY : 1,
     chosenKind : 'png',
     savedImageData : '',
     previousVersions : [], //HOLD DATA ABOUT SAVED IMAGE
     collageSetup : 'left-right',
-        initalW : qu('.container').clientWidth,
-        initalH : qu('.container').clientHeight,
+    initalW : qu('.container').clientWidth,
+    initalH : qu('.container').clientHeight,
+    inventory : {},
+    Ai : { automatation : null },
   },
   query : {},
   collectQuery : function(){
@@ -51,8 +60,27 @@ const $$ = {
                     wh           : qu('.w-h'),
                     collageWindow: qu('.collage-window'),
                     cph          : qu('.collage-preview-holder'),
+                    console      : qu('.console'),
                  }
-             },
+  },
+  // WHAT OD WE HAVE AVAILABLE
+  inventoryListing : function(){
+      let menu = qu('.menu');
+
+      for(let i = 0; i< menu.children.length;i++){
+          let branch = menu.children[i];
+          let branch_name = branch.classList[0];
+          $$.vars.inventory[branch_name] = [];
+
+           for(let j = 0; j<branch.children.length;j++){
+               let sub_branch = branch.children[j];
+               if(sub_branch.nodeName != 'INPUT') continue;
+               let sub_branch_name = sub_branch.classList[0];
+               if(branch_name == 'form') sub_branch_name = sub_branch.id;
+               $$.vars.inventory[branch_name].push(sub_branch_name);
+           }
+      }
+  },
   _inject : function(that, start, array ){  //NOT USED
              if(Array.isArray(that) == false) return false; //SAFE
                 for(let i= 0; i< array.length;i++){
@@ -115,20 +143,6 @@ const $$ = {
                      $$.query.container.style.maxWidth  = (bigger(w)(h) / (w + h) * 100) + 'vw';
                      $$.query.container.style.maxHeight = 100 + 'vh';
 
-
-                     // max-width: 60vw;
-// max-height: 100vh;
-
-
-                     // if(w < $$.query.container.clientWidth){
-                     //    $$.query.container.style.width  = w + 'px';
-                     //    $$.query.container.style.height = h + 'px';
-                     // }else{
-                     //    // $$.query.container.style.width  = (bigger(w)(h) / (w + h) * 100) + '%';
-                     //    // $$.query.container.style.height = '';
-                     //    // $$.query.container.style.height = (w / (w + h) * 100) + '%';
-                     // }
-
                      $$.query.wh.innerText = `[↔︎:${$$.query.canvas.width}  ↕︎:${$$.query.canvas.height}]`;
                      $$.vars.CANVAS_HAS_IMAGE = true;
                      $$.saveCanvasImage();
@@ -141,9 +155,9 @@ const $$ = {
             //DRAW RECTANGLE ON CANVAS
             it.beginPath();
             if(typeof color == 'undefined'){
-                 //DO NOTHING
-                 it.strokeStyle = 'brown';
-                 it.strokeRect(x, y, width, height);
+               //DO NOTHING
+               it.strokeStyle = 'brown';
+               it.strokeRect(x, y, width, height);
             }else{
                it.fillStyle = color;
                it.fillRect(x, y, width, height);
@@ -191,6 +205,13 @@ const $$ = {
   quickDropHandler : function(e) {
                         e.preventDefault();
                         let newFile = e.dataTransfer.files[0]; //FILE;
+                        if(newFile == null ) return false;
+
+                        if (newFile.type.search(/image\//) < 0 ) {
+                           e.target.parentElement.classList.remove('net');
+                           return $$.popover('Not valid image');
+                        }
+
                         let reader = new FileReader();
                         e.target.parentElement.classList.remove('net');
 
@@ -198,14 +219,16 @@ const $$ = {
   },
   //# GRAB CTX for previewer
   grab_ctx : function(x, y , w,  h ){
-                   $$.query.previewer.width = $$.vars.CROP_DIM.w, $$.query.previewer.height = $$.vars.CROP_DIM.h;
+                   let croper = qu('.croper').getBoundingClientRect();
+                   $$.query.previewer.width  =  w;//Math.abs(croper.x - croper.w);
+                   $$.query.previewer.height =  h;//Math.abs(croper.y - croper.h);
 
                    let dataX = $$.query.canvas.toDataURL('image/png', 1); //GRAB ENTIRE CANVAS
                    let IMGX = new Image();                       //CREATE NEW IMAGE
                        IMGX.src = dataX;                         //ASSAIGN  DATA TO IT
-                       window.pctx.clearRect(0, 0, $$.query.previewer.width, $$.query.previewer.height); //CLEAR OLD
 
-                    window.pctx.drawImage( IMGX , x, y, w, h,   0, 0, $$.query.previewer.width , $$.query.previewer.height  ); //DRAW CROPPED IMAGE ON mCtx
+                   window.pctx.clearRect(0, 0, $$.query.previewer.width, $$.query.previewer.height); //CLEAR OLD
+                   window.pctx.drawImage( IMGX , x-w, y, w, h,   0, 0, $$.query.previewer.width , $$.query.previewer.height  ); //DRAW CROPPED IMAGE ON mCtx
   },
   //FETCH THIS WHEN PASSED TO YOU JUST LINK
   fetchThis : function(link){
@@ -214,8 +237,21 @@ const $$ = {
                 }else return false;
   },
   //********************************************************
-  quickDragOverHandler : (ev) => { ev.preventDefault(); },
-  quickDragEnter : async e => { if(e.target.parentElement.classList.contains('container')) e.target.parentElement.classList.add('net')},
+  quickDragOverHandler : (e) => { e.preventDefault(); },
+  quickDragEnter : async e => {
+      e.preventDefault();
+      e.stopPropagation();
+      // if (!e.dataTransfer.types.includes('Files')) {
+      //     // Ignore internal drag events
+      //     e.preventDefault();
+      //     e.stopPropagation();
+      //     return false;
+      // }
+
+      if(e.fromElement && e.fromElement.classList[0] != 'croper' && e.fromElement.nodeName == 'BODY'){
+         if(e.target.parentElement.classList.contains('container')) { e.target.parentElement.classList.add('net');  }
+     }
+  },
   quickDragLeave : e => {  $$.query.container.classList.remove('net') },
   //ADD PIXELATION EFFECT TO BETTER SEE ZOOMED IMAGE
   pixelate : function(state){
@@ -353,19 +389,62 @@ const $$ = {
                   }
   },
   //ASSIGN ACTIVE SETTINGS OBJECT
-  assignActive : function(e, disableAll){
-                    //ADD ACTIVE SETTINGS REFERNCE
-                   // let skippable = [];
-                   // if(skippable.includes(e.target.classList[0] )) return false;
+  assignActive : function(e){
+                    let tools = qu('.tools');
+                    for(let i = 0; i < tools.children.length; i++ ){
+                        tools.children[i].classList.remove('active');
+                    }
+                    if(e.target.parentElement.classList.contains('tools')){
+                       e.target.classList.add('active');
+                    }
+                    if(e.target.parentElement.classList.contains('filters')){
+                       $$.addToConsole(e);
+                    }
+  },
+  saveToLocal   : (name, data)=> localStorage.setItem(name, data),
+  pullFromLocal : (name)=> localStorage.getItem(name),
+  checkLocal    : (name)=> (localStorage.getItem(name) != null) ? localStorage.getItem(name) : '',
 
-                   let menu = qu('.menu');
-                   for(let i = 0; i < menu.children.length; i++ ){
-                       menu.children[i].classList.remove('active');
-                   }
-                   if(e.target.parentElement.classList.contains('menu') && disableAll != 'disable-all' ){
-                      e.target.classList.add('active');
-                   }
-                },
+  assignLocal : function(){
+            let automationData = $$.checkLocal('viewport-console');
+            if( automationData != null && automationData.search('::') > -1 ) {     //SOMETHING EXISTS SO RETURN IT IN HISTORY
+               if( automationData.length > 0) {
+                  $$.vars.Ai.automatation = automationData;
+                  qu('.automation-order').innerText = '\n'+$$.vars.Ai.automatation;
+                }
+              }
+  },
+  //KEEP TRACK ON HISTORY FILTERS APPLIED
+  addToConsole : function(e){
+      let possible_filter_name = e.target.classList[0];
+      if($$.vars.inventory.filters.includes(possible_filter_name)) {
+        let div = dce('DIV');
+            div.innerText = `${e.target.value + ' :: ' + e.target.title}`;
+        let spanKill = dce('span');
+             spanKill.innerText = '[x]';
+             spanKill.classList.add('filter-kill');
+             div.appendChild(spanKill);
+        qu('.console').appendChild(div); //ONLY ADD FILTERS TO POSSIBLE AUTOMATATION
+      }
+  },
+  automateConsole : function(automationData){
+     let splited = automationData.split('\n');
+
+     let steps = [];
+     for(let i = 0; i < splited.length; i++){
+         if(splited[i].length < 1) continue;
+         let arr = splited[i].split('::');
+         let filter = arr[0].trim();
+
+         steps.push(qu(`[value=${filter}]`));
+     }
+     if(steps.length < 1) return false;
+     let k = 0;
+     let interval = setInterval( t=>{
+        if(k > steps.length-1) clearInterval(interval);
+        else { steps[k].click(); k+=1; }
+     }, 1000);
+  },
   //# SAVE IMAGE
   saveCanvasImage : function(){
                $$.vars.savedImageData = ctx.getImageData(0,0,$$.query.canvas.width, $$.query.canvas.height);
@@ -454,7 +533,7 @@ const $$ = {
             $$.vars.ZOOM_LEV = 1;
             $$.pixelate(false);
             $$.vars.MODE = '';
-            $$.assignActive(e, 'disable-all');
+            // $$.assignActive(e, 'disable-all');
             $$.query.container.style.transform = `translate(${$$.vars.translatedToX}px, ${$$.vars.translatedToY}px)  scale(${$$.vars.ZOOM_LEV})`;
             $$.vars.ISCOLLAGE = 'default';
             $$.show_this($$.query.collageWindow, 'none');
@@ -471,53 +550,128 @@ const $$ = {
             }
             if(that != 'clear') qu(that).classList.add('focused');
    },
-   createColors : function(){
-            let holder = qu('.colors-holder');
-            let colors = $$.vars.DRAW_COLOR_ARR;
-
-            for(let i = 0;i < colors.length; i++){
-                let div = dce('div');
-                    div.classList.add(`color`,`clicker`);
-                    div.title = 'CHANGE COLOR FOR PENCIL';
-                    if(colors[i] == 'custom'){
-                      div.classList.add('rainbow');
-                      div.addEventListener('click', e=>{
-                          let picker = qu('#color-picker');
-                          picker.click();
-                      });
-                      // div.appendChild(input);
-                    }else{
-                     div.setAttribute('data', colors[i]);
-                    }
-                    div.style.background = colors[i];
-                    holder.appendChild(div);
-            }
+   view_recter : function(x, y){
+           let recter = qu('.recter');
+           $$.show_this(recter, 'block');
+           recter.style.left   = x - $$.vars.DRAW_SIZE /2 + 'px';
+           recter.style.top    = y - $$.vars.DRAW_SIZE /2 + 'px';
+           recter.style.width  = $$.vars.DRAW_SIZE + 'px';
+           recter.style.height = $$.vars.DRAW_SIZE + 'px';
    },
-   view_croper : function(x, y){
+   view_croper : function(x, y, w, h){
            let croper = $$.query.croper;
            $$.show_this(croper, 'block');
-           croper.style.left   = x - $$.vars.DRAW_SIZE /2 + 'px';
-           croper.style.top    = y - $$.vars.DRAW_SIZE /2 + 'px';
-           croper.style.width  = $$.vars.DRAW_SIZE + 'px';
-           croper.style.height = $$.vars.DRAW_SIZE + 'px';
+           croper.style.left   = x + 'px';
+           croper.style.top    = y + 'px';
+           croper.style.width  = w + 'px';
+           croper.style.height = h + 'px';
    },
-}//END OF $$
+   createResizableElement : function(that){
+         const detectBorder = function(e, that){
+           let classes = [];
+           let position = null;
 
+           let wid = that.clientWidth;
+           let hei = that.clientHeight;
+           let lim = 50;
+           //corners
+           if(e.offsetX < lim && e.offsetY < lim)              position = 'top-left';
+           else if(e.offsetX > wid-lim && e.offsetY < lim)     position = 'top-right';
+           else if(e.offsetX < lim && e.offsetY > hei-lim )    position = 'bottom-left';
+           else if(e.offsetX > wid-lim && e.offsetY > hei-lim) position = 'bottom-right';
+           //mids
+           else if(e.offsetX < lim )     position = 'left';
+           else if(e.offsetY < lim )     position = 'top';
+           else if(e.offsetX > wid-lim)  position = 'right';
+           else if(e.offsetY > hei-lim)  position = 'bottom';
+           else                          position = position;
 
-//MAIN FUNCTION
-const main = function(){
+           //final output
+           $$.vars.croper_object.border = position;
+           switch(position){
+             case 'top-left':     classes[0] ='resizable-left';  classes[1]='resizable-top';     break;
+             case 'top-right':    classes[0] ='resizable-right'; classes[1]='resizable-top';     break;
+             case 'bottom-left':  classes[0] ='resizable-left';  classes[1]='resizable-bottom';  break;
+             case 'bottom-right': classes[0] ='resizable-right'; classes[1]='resizable-bottom';  break;
+             case 'left':         classes[0] ='resizable-left';   break;
+             case 'top':          classes[0] ='resizable-top';    break;
+             case 'right':        classes[0] ='resizable-right';  break;
+             case 'bottom':       classes[0] ='resizable-bottom'; break;
+           }
+           if(position != null) that.classList.add(...classes);
+           else{
+              that.classList.remove('resizable-bottom','resizable-right','resizable-left','resizable-top' );
+           }
+         }
 
-      $$.collectQuery();
-      $$.createAllCanvases();
-      $$.createColors();
+         that.addEventListener('mousedown', e=>{
+             let rect = that.getBoundingClientRect();
+             detectBorder(e, that);
+             // $$.vars.croper_object.model = e.target.model; //SAVE CURRENT ELEMENT model
+             if( $$.vars.croper_object.border != null ){
+                 $$.vars.croper_object.active = true;
+             }else{
+                 return false;
+             }
+             $$.vars.croper_object.startX = e.clientX;    $$.vars.croper_object.startY = e.clientY;
+             $$.vars.croper_object.startW = rect.width;   $$.vars.croper_object.startH = rect.height
+             $$.vars.croper_object.startLeft = rect.left; $$.vars.croper_object.startTop = rect.top;
+         });
+         window.addEventListener('mousemove', e=>{
+             let resizeHeight =()=> {
+                   let dy = e.clientY - $$.vars.croper_object.startY;
+                   that.style.top    = `${$$.vars.croper_object.startTop + dy}px`;
+                   that.style.height = `${$$.vars.croper_object.startH - 25 - dy}px`;  //it needs -25 to stay on line and dont move total height
+             }
+             let resizeWidth=()=> {
+                   let rect = qu('.container').getBoundingClientRect();
+                   let dx = e.clientX - $$.vars.croper_object.startX;
+                   that.style.left  = ($$.vars.croper_object.startX + dx - rect.left ) + 'px';
+                   that.style.width = ($$.vars.croper_object.startW - 8.5 - dx) + 'px';
+             }     //- leftBar.width -(1)
+             let moveX=()=> {  that.style.width  = e.offsetX + 10 + 'px'; that.width = e.offsetX;   }
+             let moveY=()=> {  that.style.height = e.offsetY + 10 + 'px'; that.height = e.offsetY;  }
 
-      window.addEventListener('click', (e)=>{
-        switch(e.target.classList[0]){
-           case 'reload':    location.reload(); break;
-           case 'img-export':
-                 if(!$$.vars.CANVAS_HAS_IMAGE){ $$.popover('Empty canvas. Nothing to export.'); return false; }
-                 const file = $$.query.canvas.toDataURL("image/"+$$.vars.chosenKind, 1.0);
+             switch($$.vars.croper_object.border){
+                case 'top-left':     resizeHeight();  resizeWidth(); break;  //FIX ALL OF THIS they are not working
+                case 'top-right':    resizeHeight();  moveX();       break;
+                case 'bottom-left':  moveY();         resizeWidth(); break;
+                case 'bottom-right': moveY();         moveX();       break;
+                case 'right':        moveX();            break;
+                case 'bottom':       moveY();            break;
+                case 'left':         resizeWidth();      break;
+                case 'top':          resizeHeight();     break;
+                default :  break;
+             }
+         });
 
+         that.addEventListener('dragenter', (e) => {
+            e.stopPropagation();  // Prevent the event from reaching the canvas
+            e.preventDefault();   // Prevent default behavior
+            return false;         // Explicitly return false to ensure no further action
+         });
+
+         that.addEventListener('dragover', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+         });
+         // that.addEventListener('mouseleave', e=>{
+         //        if( $$.vars.croper_object.active &&
+         //            (that.classList.contains('resizable-top') &&
+         //             that.classList.contains('resizable-right') ) ){
+         //               // $$.vars.ROTATE = true;
+         //        }
+         // qu('.croper').classList.remove('resizable-bottom', 'resizable-right', 'resizable-left', 'resizable-top');
+         // $$.vars.croper_object.active  = false;
+         // $$.vars.croper_object.border  = false;
+         // });
+   },
+   imageExport : function(){
+         if(!$$.vars.CANVAS_HAS_IMAGE){ $$.popover('Empty canvas. Nothing to export.'); return false; }  //BAD REQUEST
+
+         function exporter(fromCanvas){
+                 const file = fromCanvas.toDataURL("image/"+$$.vars.chosenKind, 1.0);
                  //INIT LINK AND URL OBJECT
                  let a_link = dce('a');
                      a_link.href = file;
@@ -528,8 +682,36 @@ const main = function(){
                 //CLICK IT VIRTUALLY
                 setTimeout( t=> qu('#linker').click(), 0.25 * 1000);
                 //CLEAN AFTER YOURSELF
-                setTimeout( t=> qu('#linker').remove() , 1.5 * 1000);
-          break;
+                setTimeout( t=> qu('#linker').remove(), 1.5 * 1000);
+         }
+
+         if(qu('.croper').style.display == 'block') {
+            // EXPORT FROM PREVIEWER
+            let croper = qu('.croper').getBoundingClientRect();
+            $$.grab_ctx(croper.x, croper.y, croper.width, croper.height );
+            setTimeout( t=> exporter( qu('.previewer')), 1*1000 );
+            ;
+         }else{
+            // EXPORT FROM MAIN CANVAS
+            exporter($$.query.canvas);
+         }
+   }
+}//END OF $$
+
+
+//MAIN FUNCTION
+const main = function(){
+
+      $$.collectQuery();
+      $$.createAllCanvases();
+      $$.inventoryListing();
+      // $$.addCroperResizing();
+      $$.createResizableElement( qu('.croper') );
+
+      window.addEventListener('click', e =>{
+        switch(e.target.classList[0]){
+          case 'reload':      location.reload(); break;
+          case 'img-export':  $$.imageExport();  break;
           case 'open':
                 qu('#readFile').click();
                 $$.readUploadedFile();
@@ -540,29 +722,26 @@ const main = function(){
                 $$.clear_canvas(ctx);
                 $$.rotateImage(ctx, $$.vars.IMG_FILE, 0, 0, $$.query.canvas.width, $$.query.canvas.height, $$.vars.ROT);
           break;
-          case 'min-size':
-                $$.vars.CROP_DIM.x = 30;
-                $$.vars.CROP_DIM.y = 30;
-                $$.vars.CROP_DIM.w = 200;
-                $$.vars.CROP_DIM.h = 100;
-                $$.query.croper.style.left   = $$.vars.CROP_DIM.x + 'px';
-                $$.query.croper.style.top    = $$.vars.CROP_DIM.y + 'px';
-                $$.query.croper.style.width  = $$.vars.CROP_DIM.w + 'px';
-                $$.query.croper.style.height = $$.vars.CROP_DIM.h + 'px';
-                qu('.min-size').classList.replace('min-size', 'max-size');
-          break;
-
           case 'color':
                 $$.vars.DRAW_COLOR = e.target.getAttribute('data');
                 qu('.draw').style.color = e.target.getAttribute('data');
           break;
           case 'undo':
-                   $$.getPreviousVersion();
-                   // $$.redrawCanvasImage();
+                $$.getPreviousVersion();
+                // $$.redrawCanvasImage();
           break;
+          case 'save-console'  :  $$.saveToLocal('viewport-console', qu('.console').innerText.replaceAll(`[x]`, '') ); $$.assignLocal(); break;
+          case 'automate'      :  $$.automateConsole($$.vars.Ai.automatation);   break;
+          case 'filter-kill'   :  e.target.parentElement.remove();  break;
 
-          case 'to-crop'       :  $$.vars.MODE = 'crop';         break;
+          case 'to-crop'       :  $$.vars.MODE = 'crop';
+                 let canvasRect = $$.query.canvas.getBoundingClientRect();
+                 $$.view_croper(0, 0, canvasRect.width, canvasRect.height);
+
+
+          break;
           case 'to-clear'      :  $$.vars.MODE = 'clear';        break;
+          case 'to-clean'      :  $$.clear_canvas(ctx, 0, 0, $$.query.canvas.width, $$.query.canvas.height); break;
           case 'to-grayscale'  :  $$.imageMutation('grayscale'); break;
           case 'to-invert'     :  $$.imageMutation('invert');    break;
           case 'to-fade-out'   :  $$.imageMutation('fade-out');  break;
@@ -580,17 +759,17 @@ const main = function(){
           case 'collage-draw'  :  $$.drawCollage($$.vars.collageSetup);   break;
           case 'collage-clear' :  $$.toCollage('clear');                  break;
           case 'watermark'     :  $$.madeOn(ctx, $$.query.canvas.width, $$.query.canvas.height);     break;
-          case '--icon':  let M = qu('.mother-adjuster');
-                          (M.style.display == 'block') ? M.style.display = 'none' : M.style.display = 'block';
+          case '-color'        :  qu('#color-picker').click();   break;
+
           default: return false;  break;
         }
+
         $$.assignActive(e);
       } , true);
       //WHEN APP LOADS DO THIS
       window.addEventListener('DOMContentLoaded', ()=> {
             Object.freeze($$);
             // CANVAS IS EQUAL AS CONTAINER [FOR IMIDDIATE QUICK DRAW]
-
             let containerWidth = $$.query.container.clientWidth;
 
             if(containerWidth <= 700){
@@ -602,6 +781,8 @@ const main = function(){
 
             $$.query.canvas.width  = $$.query.container.clientWidth;
             $$.query.canvas.height = $$.query.container.clientHeight;
+
+            $$.assignLocal();
       });
       // KEYDOWN
       window.addEventListener('keydown', e =>{
@@ -720,7 +901,6 @@ const main = function(){
            }
       });
 
-      //POSITION CROPER
       $$.query.canvas.addEventListener('mousedown', e =>{
             $$.vars.MOUSE_IS_DOWN = true;
             $$.vars.mousedown.x = e.offsetX;
@@ -737,7 +917,7 @@ const main = function(){
       $$.query.canvas.addEventListener('mousemove', e =>{
         switch($$.vars.MODE){
           case 'eraser':
-                $$.view_croper(e.offsetX, e.offsetY);
+                $$.view_recter(e.offsetX, e.offsetY);
                 if($$.vars.ERASING) ctx.clearRect(e.offsetX - $$.vars.DRAW_SIZE /2, e.offsetY -  $$.vars.DRAW_SIZE /2, $$.vars.DRAW_SIZE, $$.vars.DRAW_SIZE);
           break;
           case 'draw':
@@ -770,6 +950,11 @@ const main = function(){
 
       window.addEventListener('mouseup', e=>{
           $$.vars.MOUSE_IS_DOWN = false;
+          if(qu('.croper').style.display != 'none'){
+             qu('.croper').classList.remove('resizable-bottom', 'resizable-right', 'resizable-left', 'resizable-top');
+             $$.vars.croper_object.active  = false;
+             $$.vars.croper_object.border  = false;
+          }
       });
 
      qu('.size-changer').addEventListener('change', e=>{
@@ -821,7 +1006,7 @@ const main = function(){
 
                               $$.imageMutation('clearing', colorDetected, largerOffset); //DETECT COLOR YOU ARE LOOKING AT [R,G,B]
                break;
-               case 'crop':   $$.show_this(qu('.croper'), 'none');  break;
+               // case 'crop':   $$.show_this(qu('.croper'), 'none');  break;
             }
         });
 
@@ -848,6 +1033,11 @@ const main = function(){
         qu('#color-picker').addEventListener('input', e=>{
            $$.vars.DRAW_COLOR = e.target.value;
         });
+
+         $$.query.canvas.addEventListener('drop', $$.quickDropHandler);
+         $$.query.canvas.addEventListener('dragover', $$.quickDragOverHandler);
+         $$.query.canvas.addEventListener('dragleave', $$.quickDragLeave);
+         $$.query.canvas.addEventListener('dragenter', $$.quickDragEnter);
 }
 
 main();

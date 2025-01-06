@@ -12,20 +12,24 @@
 </head>
 <body class='no-overflow-app no-selection'>
   <div class="menu">
-        <!-- RELOAD , OPEN  -->
-        <input type="button" class='reload clicker' value="⏻"     title="RELOAD PROGRAM"/>
-        <input type="button" class='open clicker'   value="▼"     title="OPEN IMAGE"/>
-        <input type="button" class='undo clicker'   value="⏎"     title="UNDO"/>
-        <input type="button" inputmode='none' class='img-collage clicker'  title="IMG-COLLAGE:[create collage of 2 images]" value="⎕⎕" />
-        <!-- HIDDEN READER OF FILE -->
-      <form class='form'>
-        <input type="file"  id="readFile" hidden='true' accept="image/*" />
-        <input type="color" id="color-picker" hidden='true'  />
-      </form>
-      <!-- ADDITIONAL CONTROLS -->
-      <!-- <div class="settings"> -->
+      <!-- FILE-SYSTEM  -->
+      <div class="file-system">
+          <input type="button" class='reload clicker' value="⏻"     title="RELOAD PROGRAM"/>
+          <input type="button" class='open clicker'   value="▼"     title="OPEN IMAGE"/>
+          <input type="button" class='undo clicker'   value="⏎"     title="UNDO"/>
+          <input type="button" inputmode='none' class='img-collage clicker' title="IMG-COLLAGE:[create collage of 2 images]" value="⎕⎕" />
+          <input type="button" inputmode='none' class='img-export clicker'  title="EXPORT"             value="⏍" />
+      </div>
+      <!-- EDITORS-->
+      <div class="editors">
         <input type="button" inputmode='none' class='img-rotate clicker'   title="ROTATE"             value="🅡" />
         <input type="button" inputmode='none' class='to-clear clicker'     title="SMART-CLEAR"        value="⨂" />
+        <input type="button" inputmode='none' class='to-flip clicker'      title="FLIP"               value="⍃⍄" />
+        <input type="button" inputmode='none' class='to-crop clicker'      title="CROP [HIT ESC to CANCEL]" value="⿲" />
+        <input type="button" inputmode='none' class='to-clean clicker'     title="CLEAN-START"        value="⎚" />
+      </div>
+      <!-- FILTERS -->
+      <div class="filters">
         <input type="button" inputmode='none' class='to-grayscale clicker' title="GRAYSCALE"          value="Ⓖ" />
         <input type="button" inputmode='none' class='to-invert clicker'    title="INVERT"             value="◑" />
         <input type="button" inputmode='none' class='to-fade-out clicker'  title="FADE-OUT"           value="𝌋" />
@@ -34,25 +38,32 @@
         <input type="button" inputmode='none' class='to-cartoonize clicker' title="CARTONIZE"         value="Ca" />
         <input type="button" inputmode='none' class='to-noise clicker'     title="NOISE"              value="No" />
         <input type="button" inputmode='none' class='to-glow clicker'      title="GLOW"               value="Gl" />
-        <input type="button" inputmode='none' class='to-flip clicker'      title="FLIP"               value="⍃⍄" />
-        <input type="button" inputmode='none' class='add-background clicker'      title="ADD BACKGROUND TO IMAGE"               value="█" />
-        <input type="button" inputmode='none' class='eraser clicker'       title="ERASER  ⌘:(- +)" value="E" />
-        <input type="button" inputmode='none' class='draw clicker'         title="DRAW    ⌘:(- +)" value="✎" />
+        <input type="button" inputmode='none' class='add-background clicker' title="ADD BACKGROUND TO IMAGE" value="❑" />
+      </div>
+      <!-- TOOLS -->
+      <div class="tools">
+        <input type="button" inputmode='none' class='eraser clicker'       title="ERASER  ⌘:(- +)"    value="E"  />
+        <input type="button" inputmode='none' class='draw clicker'         title="DRAW    ⌘:(- +)"    value="✎"  />
+      </div>
+      <!-- ADDITIONALS -->
+      <div class="additionals">
         <span class="dead">[</span>
           <input type="number" class="size-changer" title="ERASE/DRAW SIZE" value='2' />
-          <!-- <input type="button" inputmode='none' class='minus clicker'      title="-" value="-" />
-          <input type="button" inputmode='none' class='plus clicker'       title="+" value="+" /> -->
         <span class="dead">]</span>
-        <input type="button" inputmode='none' class='watermark clicker'    title="WATERMARK"          value="ø" />
-        <!-- EXPORT -->
-        <input type="button" inputmode='none' class='img-export clicker'   title="EXPORT"             value="⏍" />
-      <!-- </div> -->
-      <div class="colors-holder"></div>
+        <input type="button" inputmode='none' class='watermark clicker'     title="WATERMARK"            value="ø" />
+        <input type="button" inputmode='none' class='-color clicker rainbow' title="CHANGE COLOR [draw]" value="" />
+      </div>
+
+      <!-- HIDDEN READER OF FILE -->
+      <form class='form'>
+        <input type="file"  id="readFile" hidden='true' accept="image/*" />
+        <input type="color" id="color-picker" hidden='true'  />
+      </form>
   </div>
   <!-- MAIN WORKING AREA -->
-  <div class="container" ondrop="$$.quickDropHandler(event)" ondragover="$$.quickDragOverHandler(event)" ondragleave="$$.quickDragLeave(event)" ondragenter="$$.quickDragEnter(event)">
-    <div class="croper"></div>
-
+  <div class="container">
+    <div class="croper" draggable="false"></div>
+    <div class="recter"></div>
   </div>
   <!-- MORE -->
   <div class="collage-window grid">
@@ -68,6 +79,17 @@
   </div>
   <div class="rest">
        <div class="w-h"></div>
+       <div class="console-holder">
+         <div class="console-menu">
+              <input type="button" class='save-console clicker'   value="☁︎" title="SAVE CONSOLE OUTPUT FOR LATER AUTOMATION "/>
+              <input type="button" class='automate clicker'   value="A"     title="AUTOMATE FILTERS CHAIN"/>
+         </div>
+         <div class="automation-order">
+
+         </div>
+          <div class="console"></div>
+       </div>
+
   </div>
   <!-- APP -->
   <script src="program.js"></script>
