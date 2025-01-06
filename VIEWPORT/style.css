@@ -301,6 +301,15 @@ input{
   filter: brightness(33%);
   user-select: none;
 }
+
+@keyframes pulse {  /* PULSE */
+  0    {transform: scale(0.99); animation-fill-mode: backwards; animation-timing-function: ease-in-out; }
+  25%  {transform: scale(1);animation-fill-mode: backwards; }
+  50%  {transform: scale(1.01); animation-fill-mode: backwards; }
+  75%  {transform: scale(0.99); animation-fill-mode: backwards; }
+  100% {transform: scale(1); animation-fill-mode: backwards; animation-timing-function: ease-in-out;}
+}
+
 /* MOBILE */
 @media (max-width: 701px) {
   .container{ width: -webkit-fill-available; overflow-x: scroll;}
@@ -309,10 +318,8 @@ input{
     justify-content: right;
     margin: 10px;
     gap: 5px;
-    max-width: 80%;
-    float: right;
     border-radius: 10px;
-    outline: 3px solid var(--lavander);
+    /* outline: 3px solid var(--lavander); */
   }
   .settings > input{ background: transparent;}
   .main-canvas{
@@ -324,7 +331,14 @@ input{
     grid-template-columns: repeat(9, 1fr);
   }
   .console-holder{
-    background: var(--dark);
+    background: #202124e3;
+    border-radius: 9px;
+    position: fixed;
+    left: 10px;
+    bottom : 10px;
+    top: auto;
+    font-size: 11px;
+    max-width: fit-content;
   }
 }
 /* MICRO view */

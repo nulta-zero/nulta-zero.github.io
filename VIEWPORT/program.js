@@ -217,6 +217,14 @@ const $$ = {
 
                         if(newFile) $$.whenLoaded(reader, newFile);
   },
+  injectAnimation : function(that, anim, time){
+                  that.style.animation = anim;
+                  that.style.animationDuration = time+'s';
+                  setTimeout( ()=>{
+                    that.style.animation = '';
+                      // that.style.animationDuration = 1+'s';
+                  }, (time || 0.2) * 1000);
+  },
   //# GRAB CTX for previewer
   grab_ctx : function(x, y , w,  h ){
                    let croper = qu('.croper').getBoundingClientRect();
@@ -241,13 +249,6 @@ const $$ = {
   quickDragEnter : async e => {
       e.preventDefault();
       e.stopPropagation();
-      // if (!e.dataTransfer.types.includes('Files')) {
-      //     // Ignore internal drag events
-      //     e.preventDefault();
-      //     e.stopPropagation();
-      //     return false;
-      // }
-
       if(e.fromElement && e.fromElement.classList[0] != 'croper' && e.fromElement.nodeName == 'BODY'){
          if(e.target.parentElement.classList.contains('container')) { e.target.parentElement.classList.add('net');  }
      }
@@ -442,8 +443,12 @@ const $$ = {
      let k = 0;
      let interval = setInterval( t=>{
         if(k > steps.length-1) clearInterval(interval);
-        else { steps[k].click(); k+=1; }
-     }, 1000);
+        else {
+          steps[k].click();
+          k+=1;
+          // $$.injectAnimation(qu('.container'), 'pulse', k / 5);
+        }
+     }, 1500);
   },
   //# SAVE IMAGE
   saveCanvasImage : function(){
