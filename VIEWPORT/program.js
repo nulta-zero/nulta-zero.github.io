@@ -140,7 +140,10 @@ const $$ = {
                      $$.query.container.style.width  = w + 'px';
                      $$.query.container.style.height = h + 'px';
 
-                     $$.query.container.style.maxWidth  = (bigger(w)(h) / (w + h) * 100) + 'vw';
+                     let larger = (bigger(w)(h) / (w + h) * 100);
+                     // log(larger);
+
+                     if(qu('.container').clientWidth > 800) $$.query.container.style.maxWidth  = larger + 'vw';
                      $$.query.container.style.maxHeight = 100 + 'vh';
 
                      $$.query.wh.innerText = `[↔︎:${$$.query.canvas.width}  ↕︎:${$$.query.canvas.height}]`;
@@ -151,6 +154,28 @@ const $$ = {
                }
              });
           },
+  minimize_me : function(el){
+      let initiator;
+          initiator = dce('div');
+          initiator.setAttribute('role', 'init-console-holder');
+          initiator.innerHTML = '☰';
+          initiator.style.animation = "fader_in 1s";
+          initiator.style.fontSize = 'larger';
+      doc.body.addEventListener('click', e=>{
+           initiator.style.display = 'block';
+           initiator.style.cssText = document.defaultView.getComputedStyle(el, "").cssText;
+           el.style.display = 'none';
+      });
+
+      initiator.addEventListener('click', e=>{
+           e.stopPropagation();
+           el.style.display = 'block';
+           initiator.style.display = 'none';
+      });
+
+      el.style.display = 'none';
+      qu('.rest').appendChild(initiator);
+  },
   draw_rect : function(it, x,y,width,height,color ){
             //DRAW RECTANGLE ON CANVAS
             it.beginPath();
@@ -712,6 +737,7 @@ const main = function(){
       $$.inventoryListing();
       // $$.addCroperResizing();
       $$.createResizableElement( qu('.croper') );
+      $$.minimize_me( qu('.console-holder') );
 
       window.addEventListener('click', e =>{
         switch(e.target.classList[0]){

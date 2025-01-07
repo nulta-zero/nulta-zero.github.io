@@ -51,7 +51,9 @@ input{
  filter: brightness(30%);
 }
 .menu{
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(100px, 1fr) );
+  grid-auto-flow: dense;
   align-items: baseline;
   justify-content: center;
   margin: auto auto;
@@ -63,6 +65,9 @@ input{
   border-bottom-right-radius: 7px;
   padding: 0 7px 0 11px;
   user-select: none;
+}
+.tools{
+  /* grid-column: 1 / 3; */
 }
 .container{
   display: flex;
@@ -183,8 +188,9 @@ input{
   width: 100%;
   height: 20px;
   display: flex;
-  justify-content: end;
+  /* justify-content: end; */
   margin: 0 -5px;
+  padding: 10px;
   color: var(--lightText);
 }
 .w-h{
@@ -220,11 +226,13 @@ input{
 }
 .console-holder{
   position: fixed;
-  left: 0;
-  top : 0;
+  bottom: 10px;
+  left: 10px;
   font-size: 11px;
   max-width: 15vw;
-
+  overflow: scroll;
+  background: var(--dark);
+  animation: fader_in 1s;
 }
 .console-menu{
   /* background: #2f3f61;   /*Very nice dark blue *\/ */
@@ -309,10 +317,17 @@ input{
   75%  {transform: scale(0.99); animation-fill-mode: backwards; }
   100% {transform: scale(1); animation-fill-mode: backwards; animation-timing-function: ease-in-out;}
 }
+@keyframes fader_in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
 /* MOBILE */
 @media (max-width: 701px) {
-  .container{ width: -webkit-fill-available; overflow-x: scroll;}
+  .container{
+    width: -webkit-fill-available;
+    overflow-x: scroll;
+  }
   .menu{
     flex-wrap: wrap;
     justify-content: right;
