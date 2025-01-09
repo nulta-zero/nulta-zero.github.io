@@ -725,6 +725,16 @@ const $$ = {
             // EXPORT FROM MAIN CANVAS
             exporter($$.query.canvas);
          }
+   },
+   changeCanvasSize : function(providedW, providedH){
+       let width  = parseInt(providedW) || parseInt(qu('.-size-width').value);
+       let height = parseInt(providedH) || parseInt(qu('.-size-height').value);
+
+       qu('.container').style.width  = width + 'px';
+       qu('.container').style.height = height + 'px';
+
+       $$.query.canvas.width  = width;
+       $$.query.canvas.height = height;
    }
 }//END OF $$
 
@@ -758,8 +768,9 @@ const main = function(){
                 qu('.draw').style.color = e.target.getAttribute('data');
           break;
           case 'undo':
+                let previousVersion = $$.vars.previousVersions[$$.vars.previousVersions.length-2];
+                $$.changeCanvasSize(previousVersion.width, previousVersion.height);
                 $$.getPreviousVersion();
-                // $$.redrawCanvasImage();
           break;
           case 'save-console'  :  $$.saveToLocal('viewport-console', qu('.console').innerText.replaceAll(`[x]`, '') ); $$.assignLocal(); break;
           case 'automate'      :  $$.automateConsole($$.vars.Ai.automatation);   break;
@@ -1044,6 +1055,9 @@ const main = function(){
         // window.addEventListener('focus', e=>{
         //  (doc.visibilityState == 'visible') ? log(123) : '';
         // });
+
+        qu('.-size-width').addEventListener('change', $$.changeCanvasSize );
+        qu('.-size-height').addEventListener('change', $$.changeCanvasSize );
 
         window.addEventListener('resize', e =>{
             let a, b;

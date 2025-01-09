@@ -185,13 +185,14 @@ input{
 .rest{
   position: fixed;
   bottom: 0;
-  width: 100%;
+  width: 98%;
   height: 20px;
   display: flex;
   /* justify-content: end; */
-  margin: 0 -5px;
-  padding: 10px;
+  /* margin: 0 -5px; */
+  padding: 5px 15px;
   color: var(--lightText);
+  justify-content: space-between;
 }
 .w-h{
   font-size: 12px;
@@ -224,12 +225,17 @@ input{
   display: flex;
   z-index: 100;
 }
+.-size-width ,
+.-size-height {
+  width: 50px;
+}
+
 .console-holder{
   position: fixed;
   bottom: 10px;
   left: 10px;
   font-size: 11px;
-  max-width: 15vw;
+  max-width: 25vw;
   overflow: scroll;
   background: var(--dark);
   animation: fader_in 1s;
