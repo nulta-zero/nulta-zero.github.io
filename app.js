@@ -7,7 +7,7 @@ const doc = document,
 const $$ = {
     vars : {
       availables : ['CALCULATOR', 'VIEWPORT'],
-      // program_name : 'CALCULATOR',
+      active_program : '',
       abc   : ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'],
     },
     query : {},
@@ -50,32 +50,31 @@ const $$ = {
          // if(qu('.abc-holder') != null) qu('.abc-holder').style.top = ltr.top + ltr.height - 10 + 'px';
     },
     createTRS : function(){
-      let OV = Object.values(DATA);
       let tbody = qu('.projects-list').querySelector('tbody');
-      for(let i = 0; i<OV.length;i++){
+      for(let i = 0; i<DATA.length;i++){
           let tr = dce('tr');
           let td1 = dce('td');
           let td2 = dce('td');
 
           td1.classList.add('lister');
           td2.classList.add('explainer');
-          td1.innerText = OV[i].name + ' ';
-          td2.innerText = OV[i].desc;
-          td1.setAttribute('program-name', OV[i].name);
+          td1.innerText = DATA[i].name + ' ';
+          td2.innerText = DATA[i].desc;
+          td1.setAttribute('program-name', DATA[i].name);
 
-          if(OV[i].link.length > 0){
+          if(DATA[i].link.length > 0){
              let a = dce('a');
                  a.setAttribute('target', '_blank');
                  a.title = 'Open link in a new tab';
                  a.innerText = '⌗';
-                 a.href = OV[i].link;
+                 a.href = DATA[i].link;
                  td1.appendChild(a);
           }
 
-          if(OV[i].power){
+          if(DATA[i].power){
              td1.classList.add('power');
           }
-          if( $$.vars.availables.includes( OV[i].name.toUpperCase()) ){
+          if( $$.vars.availables.includes( DATA[i].name.toUpperCase()) ){
              td1.classList.add('available');
              td1.title = "[tap to run / tap to cancel]";
           }
@@ -99,20 +98,21 @@ const $$ = {
         }
     },
     loadProgram : function(state, source){
-      switch(state){
-        case true:
-             let iframe = dce('iframe');
-             iframe.id = 'program-frame';
-             iframe.src = source;
-             iframe.setAttribute('frameborder', 0);
-            qu('.program').appendChild(iframe);
-        break;
-        case false:  if(qu('#program-frame') != null) qu('#program-frame').remove(); break;
-      }
+        switch(state){
+          case true:
+               let iframe = dce('iframe');
+               iframe.id = 'program-frame';
+               iframe.src = source;
+               iframe.setAttribute('frameborder', 0);
+               qu('.program').appendChild(iframe);
+          break;
+          case false:  if(qu('#program-frame') != null) qu('#program-frame').remove(); break;
+        }
     },
+    replaceProgram : (src, name)=>  { qu('#program-frame').src = src; $$.vars.active_program = name;},
     splitScreen : function(state){
         let splitWindow = qu('.split-window');
-        let window_width = window.innerWidth;
+        let window_width  = window.innerWidth;
         let window_height = window.innerHeight;
 
         let combos = ['width', 'left', window_width];
@@ -147,18 +147,18 @@ const $$ = {
         }
     },
     createPoints : function(max, className, abc){
-       let pointsHolder = dce('div');
-           pointsHolder.classList.add(className);
-       for(let i = 0; i< max; i++){
-           let point = dce('div');
-             point.classList.add('points');
-             switch(abc){
-               case true:   point.innerText = $$.vars.abc[i]; break;
-               default :    point.innerText = i;   break;
-             }
-         pointsHolder.appendChild(point);
-       }
-      qu('.super-container').appendChild(pointsHolder);
+           let pointsHolder = dce('div');
+               pointsHolder.classList.add(className);
+           for(let i = 0; i< max; i++){
+               let point = dce('div');
+                 point.classList.add('points');
+                 switch(abc){
+                   case true:   point.innerText = $$.vars.abc[i]; break;
+                   default :    point.innerText = i;   break;
+                 }
+             pointsHolder.appendChild(point);
+           }
+          qu('.super-container').appendChild(pointsHolder);
     },
     exporter : function(content){
                   //INIT LINK TO DOWNLOAD
@@ -283,7 +283,18 @@ const main = function(){
        case 'lister':
              switch(e.target.classList[1]){
                case 'available':
-                    (programState == false) ? ($$.fetchData('../../'+ e.target.getAttribute('program-name') ), $$.splitScreen(true)) : ($$.loadProgram(false), $$.splitScreen(false));
+                  let clickedProgramName = e.target.getAttribute('program-name');
+                  if(programState == false) {
+                     $$.fetchData('../../'+ clickedProgramName);
+                     $$.splitScreen(true);
+                     $$.vars.active_program = clickedProgramName;
+                  }else if( clickedProgramName != $$.vars.active_program ) {
+                     $$.replaceProgram('../../' + clickedProgramName, clickedProgramName );
+                  }else{
+                     $$.loadProgram(false);
+                     $$.splitScreen(false);
+                     $$.vars.active_program = '';
+                  }
                break;
                    $$.calculateLargestTitlePos();
              }
@@ -300,6 +311,10 @@ const main = function(){
 
   window.addEventListener('resize', e=>{
       $$.calculateLargestTitlePos();
+  });
+
+  window.addEventListener('focus', e=>{
+    (doc.visibilityState == 'visible') ? $$.calculateLargestTitlePos() : '';
   });
 }
 
