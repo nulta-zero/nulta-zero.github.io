@@ -218,9 +218,9 @@ Goal: Develop a melodic, flowing rhythm.</p>
 
 
 <h2>Equipment:</h2>
-<p>Use headphones microphone or have very good microphone available to capture sound more precise.</p>
+<p>Use headphones microphone or have very good microphone available to capture precise sound.</p>
 <p>Modern laptops do decent job also.</p>
 
 <h2>Privacy/anonymity:</h2>
-<p> There is no sound recording inside this app, only listening/detcting mhz your body produces, so feel safe to use it.</p>
+<p> There is no sound recording inside this app, only listening/detecting hz your body produces, so feel safe to use it.</p>
 `;
