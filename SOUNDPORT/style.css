@@ -166,7 +166,8 @@ canvas{
 /* MOBILE */
 @media (max-width: 701px) {
   .info-box{
-     left: 4%;
+     /* left: 4%; */
+     /* width: min-content; */
   }
 }
 /* MICRO view */
