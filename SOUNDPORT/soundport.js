@@ -245,7 +245,7 @@ const main = function(){
           case 'stop':    $$.vars.STATE = false; $$.stopAudioListening($$.vars.audio.stream);  break;
           case 'info':
                let infoBox = qu('.info-box');
-               if(infoBox.style.display == 'block') ? infoBox.style.display = 'none' : infoBox.style.display = 'block';
+               (infoBox.style.display == 'block') ? infoBox.style.display = 'none' : infoBox.style.display = 'block';
           break;
        }
   });
