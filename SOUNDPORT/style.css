@@ -23,7 +23,7 @@ body{
   font-family: Lucida grande;
   margin: 0;
   cursor: default;
-  /* ADDED FOR STABILITY */
+  /* ADDED FOR STABILITY of background on scroll */
   position: fixed;
   width: 100%;
 }
@@ -49,7 +49,6 @@ canvas{
 ::selection{
   background: #d3d3ff36;
 }
-
 .menu > form {
   display: grid;
   gap: 10px;
@@ -66,18 +65,6 @@ canvas{
   margin-left: 2vh;
   transform: translateY(6px);
 }
-
-
-/* ::-webkit-scrollbar { width: 2.5px; } */
-/* Track */
-/* ::-webkit-scrollbar-track { background: transparent; border-radius: 3px;  } */
-/* Handle */
-/* ::-webkit-scrollbar-thumb { background: var(--lavander); border-radius: 3px; } */
-/* Handle on hover */
-/* ::-webkit-scrollbar-thumb:hover { background: grey } /*darker tone of mediumslateblue */
-/* ::-webkit-scrollbar-track { background: transparent;} */
-/* ::-webkit-scrollbar-track-piece { background: var(--lavander); } */
-
 .container{
   display: flex;
   justify-content: space-around;
@@ -105,7 +92,6 @@ canvas{
   display: flex;
   align-items: center;
   text-align: center;
-  /* outline: 2px solid #3a404566; */
 }
 .info-box{
   display: none;
@@ -115,13 +101,11 @@ canvas{
   width: 80%;
   height: 80vh;
   backdrop-filter: blur(10px) contrast(1.025);
-  /* outline: 2px solid; */
   color: var(--lavander);
   white-space: pre-line;
   overflow: scroll;
   padding: 25px;
   border-radius: 10px;
-  /* background: #10101124; */
   animation: fader_in .5s;
 }
 .info-box > hr {
@@ -143,11 +127,11 @@ canvas{
 }
 
 @keyframes pulse {  /* PULSE */
-  0    {transform: scale(0.99); animation-fill-mode: backwards; animation-timing-function: ease-in-out; }
-  25%  {transform: scale(1);animation-fill-mode: backwards; }
-  50%  {transform: scale(1.01); animation-fill-mode: backwards; }
-  75%  {transform: scale(0.99); animation-fill-mode: backwards; }
-  100% {transform: scale(1); animation-fill-mode: backwards; animation-timing-function: ease-in-out;}
+  0    {transform: scale(0.99);  animation-fill-mode: backwards; animation-timing-function: ease-in-out; }
+  25%  {transform: scale(1);     animation-fill-mode: backwards; }
+  50%  {transform: scale(1.01);  animation-fill-mode: backwards; }
+  75%  {transform: scale(0.99);  animation-fill-mode: backwards; }
+  100% {transform: scale(1);     animation-fill-mode: backwards; animation-timing-function: ease-in-out;}
 }
 @keyframes fader_in {
   from { opacity: 0; }
@@ -165,10 +149,7 @@ canvas{
 
 /* MOBILE */
 @media (max-width: 701px) {
-  .info-box{
-     /* left: 4%; */
-     /* width: min-content; */
-  }
+
 }
 /* MICRO view */
 @media (max-width : 300px){
