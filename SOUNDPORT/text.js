@@ -1,75 +1,3 @@
-const TEXTS = [
-  `### **Shaving and Skin Irritation**
-If shaving regularly irritates your skin, here are **alternatives and strategies** to minimize discomfort:
-1. **Shaving Prep**
-   - Use a hot towel to soften the skin and hair follicles before shaving.
-   - Apply a high-quality shaving gel for sensitive skin (look for aloe vera or chamomile).
-
-2. **Gentle Shaving Techniques**
-   - Shave in the direction of hair growth to reduce irritation.
-   - Use a fresh, sharp razor with multiple blades.
-   - Avoid pressing too hard—let the blade glide smoothly over the skin.
-
-3. **Post-Shave Care**
-   - Rinse with cold water to close the pores.
-   - Apply a soothing aftershave balm or moisturizer designed for sensitive skin.
-   - Use an anti-inflammatory product, such as tea tree oil or hydrocortisone cream, to calm redness.
-
-4. **Explore Hair Removal Alternatives**
-   - **Depilatory Creams:** Gentle formulas for the face can remove hair without shaving.
-   - **Electric Trimmers:** Ideal for shorter hair and less irritation.
-   - **Laser Hair Removal:** Permanent reduction if you’re ready for a longer-term commitment.`,
-
-`### **Additional Ideas for Feminine Look**
-1. **Skin Glow**
-   - Use gentle exfoliation weekly (e.g., with a natural scrub or chemical exfoliant like AHA/BHA).
-   - Try a hydrating sheet mask for a quick, radiant boost.
-
-2. **Neck Slimming Visual Effect**
-   - Wear tops with a V-neckline to elongate the appearance of the neck.
-
-3. **Eyebrow Shaping**
-   - Regularly comb eyebrows upward with a spoolie brush.
-   - Use a clear eyebrow gel to set them in place.
-
-4. **Facial Posture Awareness**
-   - Keep your tongue gently resting against the roof of your mouth. This improves jawline definition.
-
-5. **Dietary Tips for Skin and Hair**
-   - Eat foods rich in collagen (bone broth, fish, citrus) and biotin (eggs, nuts).
-   - Stay hydrated to improve skin elasticity and glow.`,
-
-`#### **Eyebrow Lifts and Gentle Eyelid Stretches**
-1. **Eyebrow Lifts**
-   - Place your fingers just under your eyebrows and gently push upward.
-   - Hold for 10–15 seconds while keeping your eyes open wide.
-   - Repeat 5–10 times. This strengthens the frontalis muscle and gives a subtle lift.
-   - Bonus: Combine this with massaging the upper brow bone area to relax tension and smoothen lines.
-
-2. **Gentle Eyelid Stretches**
-   - Use your fingertips to gently pull the outer corners of your eyes upward.
-   - Hold for 5 seconds, then release.
-   - Focus on stretching gently without overexerting.
-   - Do this 5–10 times per day to help open up the eyes and reduce puffiness.`,
-
-`
-#### **Facial Feminization Exercises**
-1. **Cheek Toning**
-   - Smile as wide as you can without showing your teeth.
-   - Hold for 10 seconds, then relax. Repeat 10–15 times.
-   - Helps to lift and shape cheekbones.
-
-2. **Jawline Slimming**
-   - Say the vowels (“A,” “E,” “I,” “O,” “U”) in an exaggerated manner while engaging your neck and jaw.
-   - Repeat 10–15 times.
-   - Tightens jawline and creates a more refined look.
-
-3. **Lip Shaping**
-   - Pucker your lips as if you’re blowing a kiss, then smile.
-   - Repeat 15–20 times.
-   - Softens lip contours and adds subtle volume.`,
-];
-
 const INFO = `
 <h2>Understanding human anatomy</h2>
 <hr>
@@ -220,6 +148,8 @@ Goal: Develop a melodic, flowing rhythm.</p>
 <h2>Equipment:</h2>
 <p>Use headphones microphone or have very good microphone available to capture precise sound.</p>
 <p>Modern laptops do decent job also.</p>
+<p>Loud noise will be auto-detected by program and it will halt analysis process to protect stream of data capturing.
+In this way canvas preserves your effort to train voices.</p>
 
 <h2>Privacy/anonymity:</h2>
 <p> There is no sound recording inside this app, only listening/detecting hz your body produces, so feel safe to use it.</p>

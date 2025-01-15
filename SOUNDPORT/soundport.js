@@ -25,277 +25,7 @@ const $$ = {
         }
         return total / arr.length;
   },
-  detectVoiceRangeWithStabilization : async function(){
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        const bufferLength = analyser.fftSize;
-        const timeDomainData = new Float32Array(bufferLength);
-
-        let fColor = "#cd5c5c";  //indianred
-        let mColor = "#00bfff";  //deepskyblue
-
-  const voiceFrequencyBuffer = [];
-  const bufferSize = 15;
-  let lastDetectedRange = '';
-  const switchThreshold = 8;
-
-  function smoothFrequency(frequency) {
-    if (frequency > 0) {
-      voiceFrequencyBuffer.push(frequency);
-      if (voiceFrequencyBuffer.length > bufferSize) {
-        voiceFrequencyBuffer.shift(); // Keep buffer size fixed
-      }
-      const recentFrequencies = [...voiceFrequencyBuffer].sort((a, b) => a - b);
-      return recentFrequencies[Math.floor(recentFrequencies.length / 2)];
-    }
-    return -1;
-  }
-
-  function analyzeVoiceRange(frequency) {
-    const smoothedFrequency = smoothFrequency(frequency);
-    if (smoothedFrequency > 0) {
-      let detectedRange = '';
-      if (smoothedFrequency >= 165 && smoothedFrequency <= 255) {
-        detectedRange = 'Female Voice';
-      } else if (smoothedFrequency >= 85 && smoothedFrequency < 165) {
-        detectedRange = 'Male Voice';
-      }
-      if (detectedRange && detectedRange !== lastDetectedRange) {
-        const recentRangeCount = voiceFrequencyBuffer.filter(f => {
-          detectedRange === 'Female Voice' ? f >= 165 : f < 165;
-
-          if(detectedRange === 'Female Voice') {
-             qu('.traxer').style.background = fColor;
-             $$.paintOnCanvas(ctx, Math.random() * canvas.width,  Math.random() * canvas.height, fColor, smoothedFrequency );
-           }else{
-             qu('.traxer').style.background = mColor;
-             $$.paintOnCanvas(ctx, Math.random() * canvas.width,  Math.random() * canvas.height, mColor, smoothedFrequency );
-           }
-         }).length;
-
-        qu('.traxer').innerText = `${smoothedFrequency.toFixed(2)} Hz`;
-
-        if (recentRangeCount >= switchThreshold) {
-          // console.log(`%cDetected ${detectedRange} at ${smoothedFrequency.toFixed(2)} Hz`, detectedRange === 'Female Voice' ? fColor : mColor);
-          lastDetectedRange = detectedRange;
-        }
-      }
-    }
-  }
-
-  // function autoCorrelation(buffer, sampleRate) {
-  //     let bestOffset = -1;
-  //     let bestCorrelation = 0;
-  //     let rms = 0;
-  //
-  //     for (let i = 0; i < buffer.length; i++) {
-  //       const val = buffer[i];
-  //       rms += val * val;
-  //     }
-  //     rms = Math.sqrt(rms / buffer.length);
-  //
-  //     if(rms > 0.4) { $$.popover('Loud noise detected!'); return 'false-positive'; }
-  //
-  //     if (rms < 0.02 || rms > 0.4) return -1;  // Skip classification for low or high rms,  If environment is noisy, increase rms < 0.03 and/or lower the upper bound slightly.
-  //
-  //     const correlations = new Float32Array(buffer.length);
-  //     let maxSamples = buffer.length / 2;
-  //     const minPitchSamples = Math.floor(sampleRate / 300);
-  //     const maxPitchSamples = Math.floor(sampleRate / 85);
-  //
-  //     for (let offset = minPitchSamples; offset < maxPitchSamples; offset++) {
-  //       let correlation = 0;
-  //       for (let i = 0; i < maxSamples; i++) {
-  //         correlation += buffer[i] * buffer[i + offset];
-  //       }
-  //       correlations[offset] = correlation;
-  //       if (correlation > bestCorrelation) {
-  //         bestCorrelation = correlation;
-  //         bestOffset = offset;
-  //       }
-  //     }
-  //
-  //     if (bestCorrelation > 0.03) {
-  //       return sampleRate / bestOffset;
-  //     }
-  //     return -1;
-  // }
-  let previousRMS = 0;
-
-  function autoCorrelation(buffer, sampleRate) {
-      let bestOffset = -1;
-      let bestCorrelation = 0;
-      let rms = 0;
-
-      for(let i = 0; i < buffer.length; i++) {
-          const val = buffer[i];
-          rms += val * val;
-      }
-      rms = Math.sqrt(rms / buffer.length);
-
-      const amplitudeSpike = Math.abs(rms - previousRMS) > 0.2;  // Adjust sensitivity as needed
-      previousRMS = rms;
-
-      if(rms > 0.4) { $$.popover('Loud noise detected!'); return -1; }     //false-positives
-
-      if (rms < 0.02 || rms > 0.4 || amplitudeSpike) {
-        return -1;  // Ignore low, high, or spike-induced noise
-      }
-
-      const correlations = new Float32Array(buffer.length);
-      let maxSamples = buffer.length / 2;
-      const minPitchSamples = Math.floor(sampleRate / 300);
-      const maxPitchSamples = Math.floor(sampleRate / 85);
-
-      for (let offset = minPitchSamples; offset < maxPitchSamples; offset++) {
-        let correlation = 0;
-        for (let i = 0; i < maxSamples; i++) {
-          correlation += buffer[i] * buffer[i + offset];
-        }
-        correlations[offset] = correlation;
-        if (correlation > bestCorrelation) {
-          bestCorrelation = correlation;
-          bestOffset = offset;
-        }
-      }
-
-      if (bestCorrelation > 0.03) {
-        return sampleRate / bestOffset;
-      }
-      return -1;
-  }
-
-  try {
-    let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    let source = audioContext.createMediaStreamSource(stream);
-    source.connect(analyser);
-
-    $$.vars.audio = {
-      stream : stream,
-      source : source
-    }
-
-    function analyze() {
-      if($$.vars.STATE == false) return false;
-      analyser.getFloatTimeDomainData(timeDomainData);
-      const frequency = autoCorrelation(timeDomainData, audioContext.sampleRate);
-      if(frequency > 0){
-         analyzeVoiceRange(frequency);
-       }
-      requestAnimationFrame(analyze);
-    }
-
-    analyze();
-  } catch (err) {
-    console.error('Error accessing microphone:', err);
-  }
-},
-// detectVoice : function(){
-//   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-//   const analyser = audioContext.createAnalyser();
-//   analyser.fftSize = 2048;
-//   const bufferLength = analyser.fftSize;
-//   const timeDomainData = new Float32Array(bufferLength);
-//
-//       const voiceFrequencyBuffer = [];
-//       const bufferSize = 15;
-//       const noiseDurationThreshold = 5;  // Minimum frames for sustained speech
-//       let sustainedFrameCount = 0;
-//
-//       function smoothFrequency(frequency) {
-//         if (frequency > 0) {
-//           voiceFrequencyBuffer.push(frequency);
-//           if (voiceFrequencyBuffer.length > bufferSize) {
-//             voiceFrequencyBuffer.shift();  // Fixed buffer size
-//           }
-//           const medianFrequency = [...voiceFrequencyBuffer].sort((a, b) => a - b)[Math.floor(bufferSize / 2)];
-//           return medianFrequency;
-//         }
-//         return -1;
-//       }
-//
-//       function analyzeVoiceRange(frequency) {
-//         const smoothedFrequency = smoothFrequency(frequency);
-//         const minFramesForSpeech = 8;  // Number of consistent frames needed to classify as speech
-//         if (smoothedFrequency > 0) {
-//           let detectedRange = '';
-//           if (smoothedFrequency >= 165 && smoothedFrequency <= 255) {
-//             detectedRange = 'Female Voice';
-//           } else if (smoothedFrequency >= 85 && smoothedFrequency < 165) {
-//             detectedRange = 'Male Voice';
-//           }
-//
-//           if (detectedRange) {
-//             sustainedFrameCount++;
-//             if (sustainedFrameCount >= minFramesForSpeech) {
-//
-//               if(detectedRange === 'Female Voice') {
-//                  qu('.traxer').style.background = fColor;
-//                  $$.paintOnCanvas(ctx, Math.random() * canvas.width,  Math.random() * canvas.height, fColor, smoothedFrequency );
-//                }else{
-//                  qu('.traxer').style.background = mColor;
-//                  $$.paintOnCanvas(ctx, Math.random() * canvas.width,  Math.random() * canvas.height, mColor, smoothedFrequency );
-//                }
-//
-//                qu('.traxer').innerText = `${smoothedFrequency.toFixed(2)} Hz`;
-//
-//               console.log(`Detected ${detectedRange} at ${smoothedFrequency.toFixed(2)} Hz`);
-//               sustainedFrameCount = 0;  // Reset after a valid speech detection
-//             }
-//           } else {
-//             sustainedFrameCount = 0;  // Reset if no valid range detected
-//           }
-//         }
-//       }
-//
-//       function autoCorrelation(buffer, sampleRate) {
-//         let bestOffset = -1;
-//         let bestCorrelation = 0;
-//         let rms = 0;
-//
-//         for (let i = 0; i < buffer.length; i++) {
-//           const val = buffer[i];
-//           rms += val * val;
-//         }
-//         rms = Math.sqrt(rms / buffer.length);
-//
-//         if (rms < 0.02 || rms > 0.35) return -1;  // More refined RMS range
-//         if (Math.abs(rms - previousRMS) > 0.15) return -1;  // Ignore sharp amplitude spikes
-//         previousRMS = rms;
-//
-//         const correlations = new Float32Array(buffer.length);
-//         let maxSamples = buffer.length / 2;
-//         const minPitchSamples = Math.floor(sampleRate / 300);
-//         const maxPitchSamples = Math.floor(sampleRate / 85);
-//
-//         for (let offset = minPitchSamples; offset < maxPitchSamples; offset++) {
-//           let correlation = 0;
-//           for (let i = 0; i < maxSamples; i++) {
-//             correlation += buffer[i] * buffer[i + offset];
-//           }
-//           correlations[offset] = correlation;
-//           if (correlation > bestCorrelation) {
-//             bestCorrelation = correlation;
-//             bestOffset = offset;
-//           }
-//         }
-//
-//         if (bestCorrelation > 0.03) {
-//           return sampleRate / bestOffset;
-//         }
-//         return -1;
-//       }
-//
-//       function analyze() {
-//         analyser.getFloatTimeDomainData(timeDomainData);
-//         const frequency = autoCorrelation(timeDomainData, audioContext.sampleRate);
-//         analyzeVoiceRange(frequency);  // Integrating smoothing and classification
-//         requestAnimationFrame(analyze);
-//         }
-//
-// },
-detectVoice : function(){
+  detectVoice : function(){
     // Audio context and analyser setup
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioContext.createAnalyser();
@@ -375,6 +105,8 @@ detectVoice : function(){
         rms += val * val;
       }
       rms = Math.sqrt(rms / buffer.length);
+
+      if(rms > 0.4) { $$.popover('Loud noise detected!'); return -1; }
 
       if (rms < 0.02 || rms > 0.35 || Math.abs(rms - previousRMS) > 0.15) {
         return -1;
@@ -510,8 +242,6 @@ paintOnCanvas : function(it, x, y, color, mhz){
           let freq_color = `rgba(${$$.hexToRGB(color).join(',')},${mhz/2})`;
           if(Math.random() < 0.5)  $$.draw_rect(ctx, x, y,  Math.random() * randomMhz, Math.random() * randomMhz, freq_color );
           else                     $$.draw_rect(ctx, y, x,  Math.log2(Math.random() * Math.log2(mhz)), Math.log2(Math.random() * Math.log10(mhz)), freq_color );
-
-          // log(freq_color);
         }
 },
 stopAudioListening : function(stream) {
@@ -531,7 +261,6 @@ const main = function(){
        switch(e.target.classList[0]){
          case 'start':
                $$.vars.STATE = true;
-               // $$.detectVoiceRangeWithStabilization();
                $$.detectVoice();
                $$.generateTextPasus();
           break;
