@@ -196,7 +196,7 @@ const DATA = [
   {
     name : 'ROS',
     link : 'https://fb.watch/u1K_fRiUbu/',
-    desc : `Ready Operational System, entire desktop fileSystem environment for web [JS-PHP-HTML-CSS]`,
+    desc : `Ready Operational System, entire desktop fileSystem environment for web [JS,PHP,HTML,CSS]`,
     power : true,
   },
   {
@@ -260,8 +260,8 @@ const DATA = [
     desc : `Legendary X/O game`,
   },
   {
-    name : 'ZADACI',
+    name : 'MNEMONIC',
     link : '',
-    desc : `Reminder / To-Do [JS]`,
+    desc : `Reminder / To-Do, list and task [JS,PHP]`,
   },
 ]
