@@ -147,6 +147,11 @@ const DATA = [
     desc : `Dating CMS [JS-PHP-HTML-CSS] (content-management-system)`,
   },
   {
+    name : 'MNEMONIC',
+    link : '',
+    desc : `Reminder / To-Do, list and task [JS,PHP]`,
+  },
+  {
     name : 'NINJA_ESCAPE',
     link : 'https://fb.watch/rAUoMBtkav/',
     desc : `Flappy bird inspired game (Ninja-theme)`,
@@ -258,10 +263,5 @@ const DATA = [
     name : 'X_O',
     link : '',
     desc : `Legendary X/O game`,
-  },
-  {
-    name : 'MNEMONIC',
-    link : '',
-    desc : `Reminder / To-Do, list and task [JS,PHP]`,
   },
 ]
