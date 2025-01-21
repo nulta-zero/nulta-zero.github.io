@@ -258,7 +258,7 @@ const $$ = {
   },
   saveToLocal   : (name, data, action)=> { localStorage.setItem(name, data);  if(action != null) action(); },
   pullFromLocal : (name)=> localStorage.getItem(name),
-  checkLocal    : (name)=> (localStorage.getItem(name) != null) ? localStorage.getItem(name) : '',
+  checkLocal    : (name)=> (localStorage.getItem(name) != null) ? localStorage.getItem(name) : null,
   deleteLocal   : (name, action)=> { localStorage.removeItem(name);  if(action != null) action(); },
 
   local_request : function(mode, name){
@@ -269,7 +269,9 @@ const $$ = {
                                });
                break;
                case 'delete':  $$.deleteLocal(name,  acion=> { $$.animate(doc.body, 'shake', 0.25); location.reload();  });          break;
-               case 'get':     $$.vars.LISTE = JSON.parse($$.checkLocal(name));   break;
+               case 'get':
+                            let checked = $$.checkLocal(name);
+                            (checked != null) ? $$.vars.LISTE = JSON.parse(checked) : $$.vars.LISTE = {};   break;
        }
   },
   checkServer : async function(){
