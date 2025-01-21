@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="shortcut icon" href="setup/icon.png" type="image/png" >
+<link rel="stylesheet" href="style.css" />
+<title>🄼nemonic</title>
+</head>
+ <body class="no-overflow-app no-scrollbar no-selection">
+   <div class="container">
+     <div class="top-form">
+         <input type="button" class="save minimal-btn"   value="save"   title="SAVE" />
+         <input type="button" class="delete minimal-btn" value="delete" title="DELETE [NUKE ALL LISTS]" />
+         <input type="button" class="view minimal-btn"   value="view"   title="VIEW" />
+         <span class="modified-date" title="Last time of update"></span>
+      </div>
+     <div class="main-div">
+        <ol class="main-list"></ol>
+        <div class="controls">
+           <input type="button" class="plus-list btn" value="+" title="NEW LIST" />
+        </div>
+      </div>
+      <div class="sub-div">
+        <ol class="sub-list"></ol>
+           <div class="controls">
+             <input type="button" class="back btn" value="<<" title="BACK" />
+             <input type="button" class="plus-task btn" value="+" title="NEW TASK" />
+           </div>
+       </div>
+  </div>
+<script src="mnemonic.js"></script>
+</body>
+</html>
