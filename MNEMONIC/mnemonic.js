@@ -12,6 +12,7 @@ const $$ = {
       LISTE : {},
       activeListName : null,
       FILE : 'list.json',
+      colors  : ['', '--mint', '--teal','--babyBlue','--magicMint','--earth','--lavander','--beige', '--softGold'],
   },
   query : {},
   collectQuery : function(){
@@ -24,9 +25,10 @@ const $$ = {
             }
           },
   taskIs : function(state, el ){
+            let myTask = el.parentElement.querySelector('.to-edit');
              switch(state){
-               case 'done':  el.innerText = '◼︎';  el.nextElementSibling.classList.add('done');      el.nextElementSibling.classList.add('sub-is-done');       break;  //.parentNode
-               default :     el.innerText = '◻︎';  el.nextElementSibling.classList.remove('done');   el.nextElementSibling.classList.remove('sub-is-done');    break;
+               case 'done':  el.innerText = '◼︎';  myTask.classList.add('done');      myTask.classList.add('sub-is-done');       break;  //.parentNode
+               default :     el.innerText = '◻︎';  myTask.classList.remove('done');   myTask.classList.remove('sub-is-done');    break;
              }
           return state;
   },
@@ -40,6 +42,8 @@ const $$ = {
           let text_div = dce('div');
               text_div.classList.add('to-edit');
               text_div.setAttribute('contenteditable', true);
+
+              text_div.addEventListener('paste', $$.onlyPlainText);
 
               if(OK == null) text_div.innerText = '/';
               else           text_div.innerText = content;
@@ -60,10 +64,35 @@ const $$ = {
                      if(text_div.classList.contains('done')) $$.taskIs('', square);
                      else                                    $$.taskIs('done', square);
 
-                     log('inc ' +inc);
-
                   $$.vars.LISTE[$$.vars.activeListName][ inc ].status = status;
               });
+          let myColors = dce('div');
+              myColors.classList.add('task-colors-holder');
+              for(let i = 0; i < $$.vars.colors.length; i++){
+                  let small_div = dce('div');
+                  // <div>
+                  //   <input type="radio" id="huey" name="drone" value="huey" checked />
+                  //   <label for="huey">Huey</label>
+                  // </div>
+
+                  // let input = dce('input');
+                  // input.type = 'radio';
+                  // input.name = 'task-color';
+                  // input.value = $$.vars.colors[i].replaceAll('-', '');
+                  small_div.style.background = `var(${$$.vars.colors[i]})`;
+                    small_div.setAttribute('color-data' , `${$$.vars.colors[i]}`);
+                  small_div.classList.add('color-div', 'minimal-btn');
+                  // small_div.appendChild(input);
+                  myColors.appendChild(small_div);
+              }
+
+              myColors.addEventListener('click', e=>{
+                let colorIs = e.target.getAttribute('color-data');
+                e.target.parentElement.parentElement.querySelector('.to-edit').style.background = (colorIs == '') ? '' : `var(${colorIs})`;
+              });
+
+
+
           let del = dce('span');
                   del.innerText = '⤬';
                   del.classList.add('delete-me');
@@ -75,6 +104,7 @@ const $$ = {
                           delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
                   });
             li.appendChild(square);
+            li.appendChild(myColors);
             li.appendChild(text_div);
             li.appendChild(del);
 
@@ -123,6 +153,17 @@ const $$ = {
 
           // ADD TO LISTE OBJECT
           if(data == null) $$.vars.LISTE[possible_name] = {};  //CREATE NEW LIST OR if data provided recreate from old data
+  },
+  //# PASTE JUST PLAIN TEXT
+  onlyPlainText : function(e){
+                  e.preventDefault(); let format = 'text/plain';
+                  const text = (e.clipboardData || window.clipboardData).getData(format);
+                  const selection = window.getSelection();
+
+                  if (selection.rangeCount) {
+                    selection.deleteFromDocument();
+                    selection.getRangeAt(0).insertNode(document.createTextNode(text))
+                  }
   },
   adjustTextSizePerLength : function(el){
          let text = el.innerText;

@@ -7,6 +7,11 @@
   --periwinkle : #ccccff;
   --lavander   : #d3d3ff;
 
+  --softGold  : #b9be81;
+  --beige : #d1bda0;
+  --teal  : #3ae1e1;
+  --earth : #4d5840;
+
   --nextMint : #7dffc0d6;
   --dark : #202124;
   --nextTextColor : #848588;
@@ -83,7 +88,7 @@ li{
 }
 .is-done{ font-size: larger; }
 .sub-is-done{
-  background: var(--nextMint);
+  /* background: var(--nextMint); */
   color: black;
   font-weight: 700;
 }
@@ -94,6 +99,7 @@ li{
   max-width: 65%;
   padding: 5%;
   border: 1px solid var(--dark);
+  text-shadow: 0px 0px 0.5px;
 }
 .controls{
   display: flex;
@@ -109,8 +115,10 @@ li{
   outline: none;
 }
 ::selection{
-  background: #d3d3ff4d;  /* SOFT-lavander */
-  color: #c8c0c0;
+  /* background: #d3d3ff4d;  /* SOFT-lavander */
+  /* color: #c8c0c0; */
+  background: #d3d3ff4d;
+  color: #0b0b0b;
 }
 
 .grid-view{
@@ -136,6 +144,23 @@ li{
   display: block;
   background: var(--nextTextColor);
   border-radius: 100px;
+}
+.task-colors-holder{
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(3, 1fr);
+}
+.color-div{
+  /* border-radius: 100px; */
+  height: 15px;
+  width: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: self-end;
+}
+.color-div:first-child{
+  outline: 1px solid;
+  outline-offset: -1px;
 }
 
 @keyframes slideFromRight {  /* SLIDE FROM RIGHT */
