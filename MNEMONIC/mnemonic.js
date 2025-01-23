@@ -52,12 +52,13 @@ const $$ = {
               text_div.addEventListener('keyup', e=>{
                    inc = li.getAttribute('data');
                    if( $$.vars.LISTE[$$.vars.activeListName][ inc ] == null)  $$.vars.LISTE[$$.vars.activeListName][ inc ] = {};
-                   else                                                         $$.vars.LISTE[$$.vars.activeListName][ inc ].content = e.target.innerText;
+                   else                                                       $$.vars.LISTE[$$.vars.activeListName][ inc ].content = e.target.innerText;
               });
+              // STATUS OF TASK, DONE or NOT
           let square = dce('span');
               square.innerText = '◻︎';
               square.classList.add('is-done');
-              //CHANGE STATUS OF TASK
+
               square.addEventListener('mousedown', e=>{
                      inc = li.getAttribute('data'); //RESET
                      let status = 'done';
@@ -66,32 +67,26 @@ const $$ = {
 
                   $$.vars.LISTE[$$.vars.activeListName][ inc ].status = status;
               });
+              // ADD COLORING OPTIONS
           let myColors = dce('div');
               myColors.classList.add('task-colors-holder');
               for(let i = 0; i < $$.vars.colors.length; i++){
                   let small_div = dce('div');
-                  // <div>
-                  //   <input type="radio" id="huey" name="drone" value="huey" checked />
-                  //   <label for="huey">Huey</label>
-                  // </div>
-
-                  // let input = dce('input');
-                  // input.type = 'radio';
-                  // input.name = 'task-color';
-                  // input.value = $$.vars.colors[i].replaceAll('-', '');
                   small_div.style.background = `var(${$$.vars.colors[i]})`;
-                    small_div.setAttribute('color-data' , `${$$.vars.colors[i]}`);
+                  small_div.setAttribute('color-data' , `${$$.vars.colors[i]}`);
                   small_div.classList.add('color-div', 'minimal-btn');
-                  // small_div.appendChild(input);
                   myColors.appendChild(small_div);
               }
 
               myColors.addEventListener('click', e=>{
-                let colorIs = e.target.getAttribute('color-data');
-                e.target.parentElement.parentElement.querySelector('.to-edit').style.background = (colorIs == '') ? '' : `var(${colorIs})`;
+                 let colorIs = e.target.getAttribute('color-data');
+                 e.target.parentElement.parentElement.querySelector('.to-edit').style.background = (colorIs == '') ? '' : `var(${colorIs})`;
+                 $$.vars.LISTE[$$.vars.activeListName][ inc ].color = colorIs;
               });
 
-
+              //AUTO RECOGNIZE ALREADY SET COLOR, when RECREATING TASK
+              let colorWas = $$.vars.LISTE[$$.vars.activeListName][ inc] != null ? $$.vars.LISTE[$$.vars.activeListName][ inc ].color : '';
+              text_div.style.background = (colorWas == '') ? '' : `var(${colorWas})`;
 
           let del = dce('span');
                   del.innerText = '⤬';
@@ -107,7 +102,6 @@ const $$ = {
             li.appendChild(myColors);
             li.appendChild(text_div);
             li.appendChild(del);
-
 
             $$.adjustTextSizePerLength(text_div);
 
