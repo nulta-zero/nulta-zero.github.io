@@ -11,6 +11,7 @@ const $$ = {
     audio : {},
     fColor : "#cd5c5c",  //indianred
     mColor : "#00bfff",  //deepskyblue
+    TIMEOUT : false,
   },
   query : {},
   collectQuery : function(){
@@ -61,6 +62,8 @@ const $$ = {
           detectedRange = 'Female Voice';
         } else if (smoothedFrequency >= 85 && smoothedFrequency < 165) {
           detectedRange = 'Male Voice';
+        }else{
+          detectedRange = null;
         }
 
         if (detectedRange) {
@@ -106,7 +109,17 @@ const $$ = {
       }
       rms = Math.sqrt(rms / buffer.length);
 
-      if(rms > 0.4) { $$.popover('Loud noise detected!'); return -1; }
+      if(rms > 0.4) {
+         $$.popover('Loud noise detected!');
+         let i = 0;
+         //KEEP preventing loud noise sounds for the time of timeout period
+         $$.vars.INTERVAL = setInterval( t=>{
+             $$.vars.TIMEOUT = true;
+             i+=1;
+             if(i > 20) { clearInterval( $$.vars.INTERVAL); $$.vars.TIMEOUT = false; }
+         },0.1 * 1000);
+
+      }
 
       if (rms < 0.02 || rms > 0.35 || Math.abs(rms - previousRMS) > 0.15) {
         return -1;
@@ -225,24 +238,34 @@ hexToRGB : function(hex){
         }
         return RGB;
 },
-paintOnCanvas : function(it, x, y, color, mhz){
-        let randomMhz = parseInt(Math.random() * mhz/5) * Math.random();
-        let symbolSize = randomMhz;
+paintOnCanvas : function(it, x, y, color, hz){
+        let i = 0;
+        let previous_x = Math.random() * ctx.canvas.width,
+            previous_y = Math.random() * ctx.canvas.height;
+        let w = 5, h = 5,  limit = (hz < 100) ? hz * 0.1 : hz * 0.05;
 
-        let formSymbol = (hz)=>{
-           if(hz >= 155 && hz < 185)     { symbolSize = 25;  return '⚧';  }
-           else if(hz >= 185)            { symbolSize = 20;  return '♀';   }
-           else  if(hz < 155 && hz >= 85){ symbolSize = 15;  return '♂';   }
-        }
+        let inter = setInterval( t=>{
+            if($$.vars.TIMEOUT ) return clearInterval(inter);
+            let randomHz = parseInt(Math.random() * hz/5) * Math.random();
+            i+=1;
+            let freq_color = `rgba(${$$.hexToRGB(color).join(',')},${(hz + limit) * 0.005})`;
 
-        if(Math.random() > 0.997){
-          it.strokeStyle = '#202124ba';
-          $$.draw_text(ctx, formSymbol(mhz), x, y, color, symbolSize);  //`rgba(${$$.hexToRGB(color).join(',')},0.5)`  //Math.random() * mhz/15, Math.random() * mhz/15
-        }else{
-          let freq_color = `rgba(${$$.hexToRGB(color).join(',')},${mhz/2})`;
-          if(Math.random() < 0.5)  $$.draw_rect(ctx, x, y,  Math.random() * randomMhz, Math.random() * randomMhz, freq_color );
-          else                     $$.draw_rect(ctx, y, x,  Math.log2(Math.random() * Math.log2(mhz)), Math.log2(Math.random() * Math.log10(mhz)), freq_color );
-        }
+              let dir = 1;
+                  (Math.random() > 0.5) ? dir = -1 : dir = 1;  //first dir
+                  x += (dir * randomHz);
+              let offset_x = x + (i*2) * dir;
+                  (Math.random() > 0.5) ? dir = -1 : dir = 1;  //repeat dir assignment
+                  y += (dir * randomHz);
+              let offset_y = y + (i*2) * dir;
+
+               $$.draw_rect(ctx, offset_x, offset_y, w, h, freq_color );
+               $$.draw_line(ctx, offset_x + w/2, offset_y+h/2,  previous_x + w/2, previous_y+h/2, freq_color, .089);
+               previous_x = offset_x;
+               previous_y = offset_y;
+               w -= (limit / (limit * 2));
+               h -= (limit / (limit * 2));
+               if(i > limit) clearInterval(inter);
+        },0.1* 1000);
 },
 stopAudioListening : function(stream) {
         stream.getTracks().forEach((track) => {
