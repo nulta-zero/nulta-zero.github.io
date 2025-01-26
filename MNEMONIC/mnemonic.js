@@ -32,6 +32,12 @@ const $$ = {
              }
           return state;
   },
+  updateListState : function(e, data){
+        let inc = e.target.parentElement.getAttribute('data');
+        if( $$.vars.LISTE[$$.vars.activeListName][ inc ] == null)  $$.vars.LISTE[$$.vars.activeListName][ inc ] = {}; //if it does not exist create new
+
+        $$.vars.LISTE[$$.vars.activeListName][ inc ].content = data || e.target.innerText; //data is used when droping file
+  },
   //TASK inside LIST[?]...
   addTask : function(OK, content, status){
           let li = dce('li');
@@ -48,12 +54,14 @@ const $$ = {
               if(OK == null) text_div.innerText = '/';
               else           text_div.innerText = content;
 
-             //REMEMBER CONTENT
-              text_div.addEventListener('keyup', e=>{
-                   inc = li.getAttribute('data');
-                   if( $$.vars.LISTE[$$.vars.activeListName][ inc ] == null)  $$.vars.LISTE[$$.vars.activeListName][ inc ] = {};
-                   else                                                       $$.vars.LISTE[$$.vars.activeListName][ inc ].content = e.target.innerText;
-              });
+              //REMEMBER CONTENT
+              text_div.addEventListener('keyup', $$.updateListState );
+
+              text_div.addEventListener('drop',      $$.quickDropHandler     );
+              text_div.addEventListener('dragover',  $$.quickDragOverHandler );
+              text_div.addEventListener('dragleave', $$.quickDragLeave       );
+              text_div.addEventListener('dragenter', $$.quickDragEnter       );
+
               // STATUS OF TASK, DONE or NOT
           let square = dce('span');
               square.innerText = '◻︎';
@@ -162,7 +170,8 @@ const $$ = {
   adjustTextSizePerLength : function(el){
          let text = el.innerText;
          let ratio = (350 / text.length) * 100;
-         if(ratio > 40) ratio = 40;
+         if(ratio > 40) ratio = 40; //dont make it grande
+         if(ratio < 12) ratio = 12; //dont make it tiny
          el.style.fontSize = ratio + 'px';
   },
   changeView : function(){
@@ -318,6 +327,56 @@ const $$ = {
     if($$.vars.SERVER == 'PHP') $$.fetchAndParse('list.json');
     else                        $$.local_request('get', 'mnemonic-liste');
   },
+  quickDragOverHandler : (e) => { e.preventDefault(); },
+  quickDragEnter : async e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if(e.target.classList.contains('to-edit') == false) return false;
+          e.target.classList.add('net');
+  },
+  quickDragLeave : e => { e.target.classList.remove('net') },
+  //QUICK DROP OF ELEMENT TO GET DATA ON QUICKMENU[RIGHT MOUSE CLICK]
+  quickDropHandler : function(e) {
+          e.preventDefault();
+          let newFile = e.dataTransfer.files[0]; //FILE;
+          if(newFile == null ) return false;
+          if(e.target.classList.contains('to-edit') == false) return false; //only allow on to-edit
+
+          let reader = new FileReader();
+          e.target.classList.remove('net');
+
+          // log(newFile);
+          if(newFile.type.search('text') < 0) return $$.popover('Wrong file format.\nOnly text files.');
+
+          if(newFile) $$.whenLoaded(reader, newFile, e );
+  },
+  whenLoaded : function(that, file, dropEvent ){
+                //APPEND
+               that.addEventListener('load', ()=>{
+                  let _type= file.name;
+
+                  dropEvent.target.innerText = that.result;
+                  $$.adjustTextSizePerLength(dropEvent.target);
+                  $$.updateListState(dropEvent, that.result);
+               });
+                 //READ
+                 if(file) { that.readAsText(file); } //RESET BORDER WHEN LOADED  //ONCE IN, REVEAL IT
+  },
+  popover : (newContent, disappear)=>  {
+          if(doc.getElementById("pop") != null) doc.getElementById("pop").remove();  //ONLY ONCE pop AT THE TIME remove old
+          let pop = doc.createElement('DIV');
+          pop.id = 'pop';
+          disappear = disappear || 4130; //can be not set it will use default value
+
+          //DEFINE INNER CONTENT OF POP DIV
+          pop.innerHTML = newContent;
+          doc.body.appendChild(pop); //ADD POP TO DOCUMENT
+
+          let hide = () => {pop.style.opacity = '0'}
+
+          setTimeout(hide, disappear) //FADE OUT EFFECT
+          setTimeout( t=> pop.remove(), disappear + 300) //REMOVE OLD POP
+  },
 } //END OF $$ACI OBJECT
 
 const main = function(){
@@ -352,7 +411,9 @@ const main = function(){
                                                            }, .5* 1000);  //be late
                                                      });
      window.addEventListener('resize', e=> $$.resizeList() );
+
      Object.freeze($$);  //FREEZE FOREVER
+
 }
 
 main();
