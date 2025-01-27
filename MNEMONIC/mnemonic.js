@@ -27,8 +27,8 @@ const $$ = {
   taskIs : function(state, el ){
             let myTask = el.parentElement.querySelector('.to-edit');
              switch(state){
-               case 'done':  el.innerText = '◼︎';  myTask.classList.add('done');      myTask.classList.add('sub-is-done');       break;  //.parentNode
-               default :     el.innerText = '◻︎';  myTask.classList.remove('done');   myTask.classList.remove('sub-is-done');    break;
+               case 'done':  el.innerText = '◼︎';  myTask.classList.add('done');     break;
+               default :     el.innerText = '◻︎';  myTask.classList.remove('done');  break;
              }
           return state;
   },
@@ -331,6 +331,7 @@ const $$ = {
   quickDragEnter : async e => {
           e.preventDefault();
           e.stopPropagation();
+          // log(e);
           if(e.target.classList.contains('to-edit') == false) return false;
           e.target.classList.add('net');
   },
@@ -338,16 +339,15 @@ const $$ = {
   //QUICK DROP OF ELEMENT TO GET DATA ON QUICKMENU[RIGHT MOUSE CLICK]
   quickDropHandler : function(e) {
           e.preventDefault();
+          e.target.classList.remove('net');
+
           let newFile = e.dataTransfer.files[0]; //FILE;
           if(newFile == null ) return false;
           if(e.target.classList.contains('to-edit') == false) return false; //only allow on to-edit
 
           let reader = new FileReader();
-          e.target.classList.remove('net');
 
-          // log(newFile);
           if(newFile.type.search('text') < 0) return $$.popover('Wrong file format.\nOnly text files.');
-
           if(newFile) $$.whenLoaded(reader, newFile, e );
   },
   whenLoaded : function(that, file, dropEvent ){
@@ -362,7 +362,7 @@ const $$ = {
                  //READ
                  if(file) { that.readAsText(file); } //RESET BORDER WHEN LOADED  //ONCE IN, REVEAL IT
   },
-  popover : (newContent, disappear)=>  {
+  popover : (newContent, disappear, action)=>  {
           if(doc.getElementById("pop") != null) doc.getElementById("pop").remove();  //ONLY ONCE pop AT THE TIME remove old
           let pop = doc.createElement('DIV');
           pop.id = 'pop';
@@ -376,6 +376,13 @@ const $$ = {
 
           setTimeout(hide, disappear) //FADE OUT EFFECT
           setTimeout( t=> pop.remove(), disappear + 300) //REMOVE OLD POP
+
+          pop.addEventListener('click', e=>{
+            // log('he literally clicked me...');
+            if(action){
+               action();
+            }
+          });
   },
 } //END OF $$ACI OBJECT
 
@@ -393,8 +400,10 @@ const main = function(){
                                    else                        $$.local_request('save', 'mnemonic-liste');
                break;
                case 'delete':
-                                   if($$.vars.SERVER == 'PHP') $$.php_request("{}" , php=> { $$.animate(doc.body, 'shake', 0.25); location.reload(); });
-                                   else                        $$.local_request('delete', 'mnemonic-liste');
+                                  $$.popover('Confirm delete action by clicking me', 5000, action=>{
+                                     if($$.vars.SERVER == 'PHP') $$.php_request("{}" , php=> { $$.animate(doc.body, 'shake', 0.25); location.reload(); });
+                                     else                        $$.local_request('delete', 'mnemonic-liste');
+                                  });
                break;  //transmit EMPTY OBJECT aka delete
                case 'view':        $$.changeView();           break;
            }
