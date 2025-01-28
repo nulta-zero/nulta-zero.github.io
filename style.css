@@ -341,6 +341,14 @@ hr{
 .simple-btn:hover{
   color: snow;
 }
+.file-hash{
+  font-size: 11px;
+  word-break: break-word;
+  color: #545859;
+}
+.file-hash::before{
+  content: "hash: ";
+}
 footer{
   padding: 2% 0;
 }
