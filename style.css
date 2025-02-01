@@ -344,7 +344,7 @@ hr{
 .file-hash{
   font-size: 11px;
   word-break: break-word;
-  color: #545859;
+  /* color: #545859; */
 }
 .file-hash::before{
   content: "hash: ";
