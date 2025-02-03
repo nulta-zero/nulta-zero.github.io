@@ -123,7 +123,7 @@ hr{
 /* TABLE */
 .table-holder{
   overflow: hidden;
-  padding: 2% 0;
+  padding: 5vh;
 }
 .matrix{
   overflow: scroll;
@@ -234,7 +234,7 @@ hr{
   top: 0;
   left: 5%;
   width: 1.5px;
-  height: 100%;
+  height: 100vh;
   background: linear-gradient(-154deg, #343438 27%, transparent);
   z-index: -1;
 }
@@ -304,7 +304,7 @@ hr{
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   align-items: baseline;
-  padding: 2% 0px;
+  padding: 5vh;
   gap: 1vw 5vw;
 }
 .research-area > div{
@@ -364,7 +364,7 @@ hr{
   content: "hash: ";
 }
 footer{
-  padding: 2% 0;
+  padding: 5vh;
 }
 
 body::-webkit-scrollbar {
@@ -382,9 +382,16 @@ body::-webkit-scrollbar-thumb {
 
 
 /* HUGE SCREEN */
+
 @media screen and (min-width: 900px) {
   .super-container{
-    width: 65vh;
+    width: 70vw;
+    margin: 0 auto;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .super-container{
+    width: 50vw;
     margin: 0 auto;
   }
 }
