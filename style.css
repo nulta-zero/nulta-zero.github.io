@@ -292,9 +292,13 @@ hr{
 
 .research-area{
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   align-items: baseline;
-  padding: 2% 0;
+  padding: 2% 0px;
+  gap: 1vw 5vw;
+}
+.research-area > div{
+  /* width: min-content; */
 }
 .dark-span{
   color: #3a3b40;
