@@ -15,7 +15,8 @@ const $$ = {
             $$.query.aud  = qu('.aud-mode'),
             $$.query.dl   = qu('.dl-mode'),
             $$.query.mat  = qu('.mat-mode'),
-            $$.query.wr   = qu('.wr-mode');
+            $$.query.wr   = qu('.wr-mode'),
+            $$.query.rev  = qu('.rev-mode');
     },
     speakThis : function(rate, word ){ //SPEAKs string/number
                     $$.vars.speakInc+=1;
@@ -111,40 +112,13 @@ const $$ = {
     },
     replaceProgram : (src, name)=>  { qu('#program-frame').src = src; $$.vars.active_program = name;},
     splitScreen : function(state){
-        let splitWindow = qu('.split-window');
-        let window_width  = window.innerWidth;
-        let window_height = window.innerHeight;
-
-        let combos = ['width', 'left', window_width];
-
-        // DETECT TO SPLIT VERTICAL OR HORIZONTAL (smaller screens horizontal, larger vertical)
-        if(window_width > 900)  combos = ['width', 'left', window_width];   // SPLIT HORIZONTAL
-        else                    combos = ['height', 'top', window_height];  // SPLIT VERTICAL
-
-        for(let i = 0; i<splitWindow.children.length; i++){
-          switch(state){
-            case true:
-                 splitWindow.children[i].style.position = 'fixed';
-                 if(combos.includes('width')) splitWindow.children[i].style.height = '-webkit-fill-available';
-                 else                         splitWindow.children[i].style.width  = '-webkit-fill-available';
-                 splitWindow.children[i].style[combos[0]] = combos[2]/2 + 'px';
-                 switch(i){
-                   case 1:
-                        splitWindow.children[i].style[combos[1]] = splitWindow.children[0].getBoundingClientRect()[combos[0]] + 'px';
-                        splitWindow.children[i].style.overflow = 'scroll';
-                        splitWindow.children[i].style[combos[0]] = combos[2]/2-70 + 'px'; //asign right side to somewhat less space -70px
-                   break;
-                 }
-            break;
-            case false:
-                 splitWindow.children[i].style.position = '';
-                 splitWindow.children[i].style.height   = '';
-                 splitWindow.children[i].style.width    = '';
-                 splitWindow.children[i].style.left     = '';
-                 splitWindow.children[i].style.top      = '';
-            break;
-          }
-        }
+       let windowHolder = qu('.window-holder');
+       let horizontalLine = qu('.horizontal-line');
+       let banderY = qu('.bander-y');
+      switch(state){
+        case true :  windowHolder.classList.add('grid-split-window');   window.scrollTo(0, 0); horizontalLine.style.position = 'relative';  banderY.style.position = 'relative';  break;
+        case false : windowHolder.classList.remove('grid-split-window'); horizontalLine.style.position = 'absolute'; banderY.style.position = 'absolute'; break;
+      }
     },
     createPoints : function(max, className, abc){
            let pointsHolder = dce('div');
@@ -276,6 +250,15 @@ const main = function(){
     }
     setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
 });
+
+  $$.query.rev.addEventListener('input', e=>{
+   let state = e.target.checked;
+   if(qu('.window-holder').classList.contains('grid-split-window') == false) return false; //NO need to change
+   switch(state){
+     case true:  qu('.super-container').style.order = -1;  break;
+     case false: qu('.super-container').style.order = 0;   break;
+   }
+  });
 
   window.addEventListener('click', e=>{
      let programState = qu('.program').contains(qu('#program-frame'));
