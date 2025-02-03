@@ -215,50 +215,35 @@ const $$ = {
 const main = function(){
    $$.loadQuery();
 
-   $$.query.dl.addEventListener('input', e=>{
-      let state = e.target.checked;
-      switch(state){
-        case true:  $$.lightMode(); break;
-        case false: $$.darkMode();  break;
-      }
-  });
 
-   $$.query.aud.addEventListener('input', e=>{
-     let text = qu('.container').innerText;
-         text = text.split('\n').join('!'); //adds pause in speaking when reading next row in table
-     switch(e.target.checked){
-       case true :  $$.speakThis(1 ,text); break;
-       case false:  if($$.vars.synth == null) return false;
-                    else $$.vars.synth.pause();
-       break;
-     }
-  });
-
-   $$.query.mat.addEventListener('input', e=>{
-    let state = e.target.checked;
-    switch(state){
-      case true:  $$.matrix(true);   break;
-      case false: $$.matrix(false);  break;
-    }
-  });
-
-  $$.query.wr.addEventListener('input', e=>{
-    let state = e.target.checked;
-    switch(state){
-      case true:  $$.createPad();        break;
-      case false: qu('.pad').remove();   break;
-    }
-    setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
-});
-
-  $$.query.rev.addEventListener('input', e=>{
-   let state = e.target.checked;
-   if(qu('.window-holder').classList.contains('grid-split-window') == false) return false; //NO need to change
-   switch(state){
-     case true:  qu('.super-container').style.order = -1;  break;
-     case false: qu('.super-container').style.order = 0;   break;
+   let checkboxes = quAll("[type=checkbox]");
+   for(let i = 0; i<checkboxes.length;i++){
+       let onStateAct = (state, T, F)=>{
+           switch(state){
+             case true : T(); break;
+             case false: F(); break;
+           }
+       }
+       checkboxes[i].addEventListener('input', e=>{
+       switch(checkboxes[i].classList[0]){
+          case 'dl-mode':  onStateAct(e.target.checked, $$.lightMode, $$.darkMode);  break;
+          case 'aud-mode':
+                    let text = qu('.container').innerText;
+                        text = text.split('\n').join('!'); //adds pause in speaking when reading next row in table
+                        onStateAct(e.target.checked, f=> $$.speakThis(1 ,text),  f=>{  ($$.vars.synth == null) ? false : $$.vars.synth.pause(); } );
+          break;
+          case 'mat-mode':   onStateAct(e.target.checked, f=> $$.matrix(true), f=> $$.matrix(false) );  break;
+          case 'wr-mode':
+                           onStateAct(e.target.checked, $$.createPad, f=> qu('.pad').remove() );
+                           setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
+          break;
+          case 'rev-mode':
+                      if(qu('.window-holder').classList.contains('grid-split-window') == false) return false; //NO need to change
+                        onStateAct(e.target.checked, f=> qu('.super-container').style.order = -1, f=> qu('.super-container').style.order = 0 );
+          break;
+          }
+      });
    }
-  });
 
   window.addEventListener('click', e=>{
      let programState = qu('.program').contains(qu('#program-frame'));
