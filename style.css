@@ -393,6 +393,15 @@ body::-webkit-scrollbar-thumb {
   .flexed {
     display: block;
   }
+  .grid-split-window{
+    grid-template-columns: none;
+  }
+  .grid-split-window > .program{
+    height: 50vh;
+  }
+  .grid-split-window > .super-container{
+    height: 50vh;
+  }
   .stock-img{
     width: auto;
   }
