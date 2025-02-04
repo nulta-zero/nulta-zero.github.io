@@ -66,10 +66,8 @@ canvas{
   transform: translateY(6px);
 }
 .container{
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 .text-div{
   overflow: scroll;
@@ -79,6 +77,10 @@ canvas{
 }
 .canvas-div{
   animation: fader_in 2s;
+}
+.container > .text-div,
+.container > .canvas-div{
+   padding: 3%;
 }
 .traxer{
   width: 50px;
@@ -164,7 +166,17 @@ canvas{
 
 /* MOBILE */
 @media (max-width: 701px) {
-
+  .container{
+     grid: none;
+  }
+  .container > .text-div,
+  .container > .canvas-div{
+     height: 50vh;
+     padding: 3%;
+  }
+  .container > .canvas-div{
+    order: -1;
+  }
 }
 /* MICRO view */
 @media (max-width : 300px){
