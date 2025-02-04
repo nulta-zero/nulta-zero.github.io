@@ -241,7 +241,6 @@ const $$ = {
           return RGB;
   },
   paintOnCanvas : function(it, x, y, color, hz){
-          let i = 0;
           let w = 5, h = 5,  limit = (hz < 100) ? hz * 0.1 : hz * 0.05;
 
           let freq_color = `rgba(${$$.hexToRGB(color).join(',')},${(hz + limit) * 0.005})`;
@@ -277,6 +276,8 @@ const $$ = {
 
             let realNextX = $$.vars.cors.x + next_x;
             let realNextY = $$.vars.cors.y + next_y;
+            if($$.vars.cors.counter > 20) { ctx.clearRect($$.vars.cors.x-1, $$.vars.cors.y,  realNextX,  realNextY); $$.vars.cors.counter = 0 } //TRY TO CREEATE SPACE IN LABYRYNTH
+
             $$.draw_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY, freq_color, Math.log10(hz) );
             $$.vars.cors.x = realNextX;
             $$.vars.cors.y = realNextY;
