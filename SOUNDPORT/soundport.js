@@ -272,7 +272,7 @@ const $$ = {
             else if(rand > 0.5 && rand < 0.75) {  $$.vars.cors.vec = 'N';  }  //NORTH
             else                               {  $$.vars.cors.vec = 'E';  }  //EAST
 
-            if(oldVec == $$.vars.cors.vec) { let randomVec = selectRandomWithout( ['S', 'W', 'N', 'E'], $$.vars.cors.vec); vectorIs(randomVec); log('used random'); }
+            if(oldVec == $$.vars.cors.vec) { let randomVec = selectRandomWithout( ['S', 'W', 'N', 'E'], $$.vars.cors.vec); vectorIs(randomVec); }
             else                           { vectorIs($$.vars.cors.vec); }
 
             let realNextX = $$.vars.cors.x + next_x;
