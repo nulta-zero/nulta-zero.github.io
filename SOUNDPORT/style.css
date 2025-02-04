@@ -68,6 +68,7 @@ canvas{
 .container{
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  margin-top: 3%;
 }
 .text-div{
   overflow: scroll;
