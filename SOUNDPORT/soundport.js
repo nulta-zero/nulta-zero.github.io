@@ -14,6 +14,8 @@ const $$ = {
     TIMEOUT : false,
     cors : {x : 0, y: 0, counter : 0, vec : null},
     imageData : null,
+    chosenKind : 'png',
+    backColor : '#202124',
   },
   query : {},
   collectQuery : function(){
@@ -304,6 +306,45 @@ const $$ = {
   fillInfoBox : function(){
           qu('.info-box').innerHTML = INFO;
   },
+  // USE ALWAYS RENDER SO YOU CAN HAVE JPEG AND PNG EXPORT
+  backgroundOnCanvasImage : function(color){
+      // $$.saveCanvasImage();
+      let image = new Image();
+      let data = canvas.toDataURL('image/png', 1);
+          image.src = data;
+      let render = dce('canvas');
+          render.width  = canvas.width;
+          render.height = canvas.height;
+      let renderCtx = render.getContext("2d", {willReadFrequently : true});
+
+          image.addEventListener('load', e=>{
+              if(color == false)  renderCtx.clearRect(0, 0, render.width, render.height);
+              else                $$.draw_rect(renderCtx, 0, 0, render.width, render.height, color );
+
+              renderCtx.drawImage(image, 0, 0, render.width, render.height);
+              render.remove();
+          });
+  },
+  exportImage : function(){
+    function exporter(fromCanvas){
+           if($$.vars.chosenKind == 'png') $$.backgroundOnCanvasImage(false);
+           else                            $$.backgroundOnCanvasImage($$.vars.backColor);
+
+            const file = fromCanvas.toDataURL("image/"+ ($$.vars.chosenKind || 'png') , 1.0);
+            //INIT LINK AND URL OBJECT
+            let a_link = dce('a');
+                a_link.href = file;
+                a_link.download = '$$';
+                a_link.hidden = true;
+                a_link.id = 'linker';
+            doc.body.appendChild(a_link);
+           //CLICK IT VIRTUALLY
+           setTimeout( t=> qu('#linker').click(), 0.25 * 1000);
+           //CLEAN AFTER YOURSELF
+           setTimeout( t=> qu('#linker').remove(), 1.5 * 1000);
+    }
+    exporter(canvas);
+  }
 
 } //END OF $$ Object
 
@@ -321,6 +362,9 @@ const main = function(){
                let infoBox = qu('.info-box');
                (infoBox.style.display == 'block') ? infoBox.style.display = 'none' : infoBox.style.display = 'block';
           break;
+          case 'export-image':   $$.exportImage();            break;
+          case 'image-is-png':   $$.vars.chosenKind = 'png';  break;
+          case 'image-is-jpeg':  $$.vars.chosenKind = 'jpeg';  break;
        }
   });
   window.addEventListener('DOMContentLoaded', e=>{

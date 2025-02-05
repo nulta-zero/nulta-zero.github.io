@@ -79,6 +79,10 @@ canvas{
 .canvas-div{
   animation: fader_in 2s;
 }
+.canvas-controls{
+  font-size: 11px;
+  text-align: right;
+}
 .container > .text-div,
 .container > .canvas-div{
    padding: 3%;
@@ -177,6 +181,11 @@ canvas{
   }
   .container > .canvas-div{
     order: -1;
+  }
+  .canvas-controls{
+    position: absolute;
+    top: 0;
+    right: 0;
   }
 }
 /* MICRO view */
