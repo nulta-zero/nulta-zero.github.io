@@ -16,6 +16,7 @@ const $$ = {
     imageData : null,
     chosenKind : 'png',
     backColor : '#202124',
+    COUNT_LIMIT : 10,
   },
   query : {},
   collectQuery : function(){
@@ -293,7 +294,7 @@ const $$ = {
 
             let realNextX = $$.vars.cors.x + next_x;
             let realNextY = $$.vars.cors.y + next_y;
-            if($$.vars.cors.counter > 30) { $$.clear_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY); $$.vars.cors.counter = 0 } //TRY TO CREEATE SPACE IN LABYRYNTH
+            if($$.vars.cors.counter > $$.vars.COUNT_LIMIT) { $$.clear_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY); $$.vars.cors.counter = 0 } //TRY TO CREEATE SPACE IN LABYRYNTH
 
             $$.draw_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY, freq_color, Math.log10(hz) );
             $$.vars.cors.x = realNextX;
@@ -372,14 +373,18 @@ const main = function(){
                $$.detectVoice();
                $$.generateTextPasus();
           break;
-          case 'stop':    $$.vars.STATE = false; $$.stopAudioListening($$.vars.audio.stream);  break;
+          case 'stop':    $$.vars.STATE = false; $$.stopAudioListening($$.vars.audio.stream);   break;
           case 'info':
                let infoBox = qu('.info-box');
                (infoBox.style.display == 'block') ? infoBox.style.display = 'none' : infoBox.style.display = 'block';
           break;
-          case 'export-image':   $$.exportImage();            break;
-          case 'image-is-png':   $$.vars.chosenKind = 'png';  break;
+          case 'export-image':   $$.exportImage();             break;
+          case 'image-is-png':   $$.vars.chosenKind = 'png';   break;
           case 'image-is-jpeg':  $$.vars.chosenKind = 'jpeg';  break;
+       }
+
+       if($$.vars.STATE == false){
+          qu('.traxer').style.background = 'silver'; //show you are not listening anymore
        }
   });
   window.addEventListener('DOMContentLoaded', e=>{
