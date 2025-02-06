@@ -201,7 +201,7 @@ const $$ = {
         it.lineWidth = Math.log(Math.log10(x + y));
         it.fillRect(x, y, width, height);
   },
-  draw_line_with_angle : function(it, x1, y1, angle, length, color, thikness){
+  draw_line_with_angle : function(it, x1, y1, angle, length, color, thickness){
         let radians = angle/180*Math.PI;
         let dx = (length/2)*Math.cos( radians ),
         dy = (length/2)*Math.sin( radians );
@@ -209,20 +209,35 @@ const $$ = {
         it.moveTo(x1, y1);
         it.lineTo(dx, dy);
         it.strokeStyle = color;
-        it.lineWidth = thikness;
+        it.lineWidth = thickness;
         it.stroke();
     // draw_line(ctx, NULTA.vars.mouse.x, NULTA.vars.mouse.y, NULTA.vars.mouse.x + dx, NULTA.vars.mouse.y-dy, colors[i] || 'deeppink', .5);
   },
-  draw_line : function(it, x1, y1, x2, y2, color, thikness){
+  draw_line : function(it, x1, y1, x2, y2, color, thickness){
         //DRAW LINE ON CANVAS
         it.beginPath();
         it.moveTo(x1, y1);
         it.lineTo(x2, y2);
         it.strokeStyle = color;
-        it.lineWidth = thikness;
+        it.lineWidth = thickness;
         it.stroke();
 
-    it.lineWidth = 1; //normalize grid
+        it.lineWidth = 1; //normalize on end
+  },
+  clear_line : function(it, x1, y1, x2, y2, thickness){
+        it.save();
+
+        it.globalCompositeOperation = "destination-out"; // Makes drawing transparent
+        it.lineWidth = thickness;
+        it.strokeStyle = "rgba(0,0,0,1)"; // Any color works since it will be erased
+
+        it.beginPath();
+        it.moveTo(x1, y1);
+        it.lineTo(x2, y2);
+        it.stroke();
+
+        it.restore();
+        it.lineWidth = 1; //normalize on end
   },
   draw_text : function(it, text, x, y, color, textSize){
          //DRAW TEXT ON CANVAS
@@ -278,7 +293,7 @@ const $$ = {
 
             let realNextX = $$.vars.cors.x + next_x;
             let realNextY = $$.vars.cors.y + next_y;
-            if($$.vars.cors.counter > 20) { ctx.clearRect($$.vars.cors.x-1, $$.vars.cors.y,  realNextX,  realNextY); $$.vars.cors.counter = 0 } //TRY TO CREEATE SPACE IN LABYRYNTH
+            if($$.vars.cors.counter > 30) { $$.clear_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY); $$.vars.cors.counter = 0 } //TRY TO CREEATE SPACE IN LABYRYNTH
 
             $$.draw_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY, freq_color, Math.log10(hz) );
             $$.vars.cors.x = realNextX;
