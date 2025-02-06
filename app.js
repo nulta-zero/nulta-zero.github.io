@@ -210,11 +210,16 @@ const $$ = {
 
          doc.body.appendChild(pad);
     },
+    collectPageSEOkeywords : function(){
+         let from =  qu('.container') || qu('body');
+         let keywords = from.innerText.replaceAll(/\t|\n|\W+/gi, ' ');
+             qu('[name="keywords"]').setAttribute('content', keywords);
+    }
 }
 
 const main = function(){
    $$.loadQuery();
-
+   $$.collectPageSEOkeywords();
 
    let checkboxes = quAll("[type=checkbox]");
    for(let i = 0; i<checkboxes.length;i++){
