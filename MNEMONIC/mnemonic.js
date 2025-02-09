@@ -384,11 +384,50 @@ const $$ = {
             }
           });
   },
+  createPresets : function(){
+       let preset_holder = dce('select');
+           preset_holder.name = 'presets';
+           preset_holder.classList.add('preset-holder');
+
+        //ADD DISABLED OPTION
+        let first_option = dce('option');
+            first_option.classList.add('preset');
+            first_option.value = '';
+            first_option.disabled = true;
+            first_option.selected = true;
+            first_option.innerText = 'presets';
+            preset_holder.appendChild(first_option);
+       //ADD PRESETS
+       let Ok = Object.keys(PRESETS);
+       for(let i = 0; i < Ok.length; i++){
+           let option = dce('option');
+               option.classList.add('preset');
+
+           let preset_name    = Ok[i];
+           let preset_content = PRESETS[preset_name];
+
+               option.value = preset_content;
+               option.innerText = preset_name;
+               preset_holder.appendChild(option);
+       }
+       qu('.top-form').appendChild(preset_holder);
+       //PRESET EVENT
+       preset_holder.addEventListener('input', e=>{
+           $$.addTask();
+           let all_edits = quAll('.to-edit');
+           let last_to_edit = all_edits[all_edits.length-1];
+               last_to_edit.innerText = e.target.value;
+           $$.adjustTextSizePerLength(last_to_edit);
+           $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );
+           quAll('.preset')[0].selected = true; //Return back to default
+       });
+  }
 } //END OF $$ACI OBJECT
 
 const main = function(){
     $$.checkServer();   //IMIDIATLY CHECK IF PHP IS THERE SO WE CAN USE IT OR STICK WITH localStorage
     $$.collectQuery();
+    $$.createPresets();
     window.addEventListener('mousedown', e=>{
          let the_class = e.target.classList[0];
           switch(the_class){
