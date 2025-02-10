@@ -88,8 +88,15 @@ const $$ = {
 
               myColors.addEventListener('click', e=>{
                  let colorIs = e.target.getAttribute('color-data');
-                 e.target.parentElement.parentElement.querySelector('.to-edit').style.background = (colorIs == '') ? '' : `var(${colorIs})`;
-                 $$.vars.LISTE[$$.vars.activeListName][ inc ].color = colorIs;
+                 let myToEdit = e.target.parentElement.parentElement.querySelector('.to-edit');
+                     myToEdit.style.background = (colorIs == '') ? '' : `var(${colorIs})`;
+                 inc = parseInt( myColors.parentElement.getAttribute('data'));
+                 // $$.updateListState(myColors, myToEdit.innerText );
+                 if( isNaN(inc) == false && $$.vars.LISTE[$$.vars.activeListName][ inc ] == null) {
+                     $$.vars.LISTE[$$.vars.activeListName][ inc ] = {};
+                     if( myToEdit.innerText.length > 1 ) $$.vars.LISTE[$$.vars.activeListName][ inc ].content =  myToEdit.innerText;   //ALTERNATIVE TO UPDATE LIST STATE
+                 }
+                 if($$.vars.LISTE[$$.vars.activeListName][ inc ] != null) $$.vars.LISTE[$$.vars.activeListName][ inc ].color = colorIs;
               });
 
               //AUTO RECOGNIZE ALREADY SET COLOR, when RECREATING TASK
@@ -435,8 +442,8 @@ const main = function(){
                case "plus-task":   $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );            break;
                case "back":        $$.switchTO('main-div');   $$.referenceTasksPerList();  break;
                case 'save':
-                                   if($$.vars.SERVER == 'PHP') $$.php_request($$.vars.LISTE , php=> $$.animate(qu('.sub-list'), 'understood ease-out', 1.5) );
-                                   else                        $$.local_request('save', 'mnemonic-liste');
+                                   if($$.vars.SERVER == 'PHP') { $$.php_request($$.vars.LISTE , php=> $$.animate(qu('.sub-list'), 'understood ease-out', 1.5) ); log('php');}
+                                   else                        { $$.local_request('save', 'mnemonic-liste'); log('js'); }
                break;
                case 'delete':
                                   $$.popover('Confirm delete action by clicking me', 5000, action=>{
