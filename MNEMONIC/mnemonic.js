@@ -177,7 +177,7 @@ const $$ = {
   adjustTextSizePerLength : function(el){
          let text = el.innerText;
          let ratio = (350 / text.length) * 100;
-         if(ratio > 40) ratio = 40; //dont make it grande
+         if(ratio > 35) ratio = 35; //dont make it grande
          if(ratio < 12) ratio = 12; //dont make it tiny
          el.style.fontSize = ratio + 'px';
   },
@@ -424,11 +424,12 @@ const $$ = {
            let all_edits = quAll('.to-edit');
            let last_to_edit = all_edits[all_edits.length-1];
                last_to_edit.innerText = e.target.value;
+               log(last_to_edit);
            $$.adjustTextSizePerLength(last_to_edit);
            $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );
            quAll('.preset')[0].selected = true; //Return back to default
        });
-  }
+  },
 } //END OF $$ACI OBJECT
 
 const main = function(){

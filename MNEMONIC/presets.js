@@ -1,5 +1,5 @@
 const PRESETS = {
-"FEF_TRACKING_JOURNAL" : `Feminine Embodiment Tracking Journal
+FEF_TRACKING_JOURNAL : `Feminine Embodiment Tracking Journal
 
 Date: [00-00-0000]
 ________________________________________
@@ -65,6 +65,102 @@ How to Use FEF Journal:
 
 Track patterns over time.
 Use measurable data to visualize transformation.`,
+
+
+FACE_TREATMENTS : `DIY Face Treatments:
+_________________________________
+🌿 Daily Gentle Face Wash (for softness & glow)
+✔ Ingredients:
+
+1 tbsp oat flour (or blend regular oats)
+1 tsp honey (moisturizing, antibacterial)
+2 tbsp rose water (soothing, refreshing)
+✔ How to use:
+
+Mix into a paste.
+Massage onto damp skin in circular motions for 1–2 minutes.
+Rinse with lukewarm water.
+👉 Results: Removes dirt without stripping oils, leaves skin soft & balanced.
+
+🥑 Ultra-Nourishing Face Mask (for deep hydration & glow)
+✔ Ingredients:
+
+½ ripe avocado (nourishing, rich in vitamins)
+1 tsp olive oil (deep hydration, softening)
+1 tsp yogurt (gentle exfoliation)
+½ tsp honey (antibacterial, glow-boosting)
+✔ How to use:
+
+Mash all ingredients into a smooth paste.
+Apply to clean face and leave for 15–20 minutes.
+Rinse with warm water.
+👉 Results: Deeply softens, hydrates, and enhances skin elasticity.
+
+🍊 Brightening & Pore-Tightening Toner
+✔ Ingredients:
+
+2 tbsp fresh orange juice (Vitamin C, brightens)
+1 tbsp apple cider vinegar (balances pH, tightens pores)
+3 tbsp chilled green tea (anti-inflammatory)
+✔ How to use:
+
+Mix ingredients & store in a small bottle.
+Apply with a cotton pad after cleansing.
+Follow with moisturizer.
+👉 Results: Instantly brightens, smooths, and refines skin texture.
+
+🧖‍♀️ Deep-Cleansing Steam Ritual
+✔ How to do it:
+
+Boil water & pour into a bowl.
+Add chamomile tea, lavender, or green tea.
+Cover your head with a towel & steam face for 5 minutes.
+Rinse with cool water & apply moisturizer.
+👉 Results: Clears pores, hydrates, and boosts glow.
+
+🍯 Overnight Glow Serum
+✔ Ingredients:
+
+1 tsp rosehip oil (boosts collagen, evens skin tone)
+2 drops vitamin E oil (heals & softens skin)
+1 drop lavender essential oil (calms & soothes)
+✔ How to use:
+
+Mix & apply a few drops before bed.
+Massage gently into skin.
+Wake up glowing & refreshed.
+
+BONUS TIPS 💡
+✔ Drink lots of water – hydration makes skin naturally shiny & soft.
+✔ Eat fresh fruits & healthy fats (avocado, nuts, olive oil) – skin thrives on good nutrition.
+✔ Sleep well – skin regenerates during deep rest.
+✔ Be gentle with your face – avoid harsh scrubbing or overwashing.`,
+
+SIMPLE_LIST : `The Ultimate Cure for Identity Crises [Identity Embodiment Framework - Process of Emulation]
+
+By following this model, one can develop a working solution to the common gender/identity struggle:
+✔ No destructive medical interventions.
+✔ No identity confusion or self-rejection.
+✔ No external validation needed for transformation.
+✔ No loss of characteristics in previous identity.
+✔ A functional, adaptable multi-layered identity system.`,
+
+FACE_EXERCISE : `💆‍♀️ 2. Facial Massage & Exercises (Tone & Lift)
+💜 Jawline & Neck Tightening Massage
+✔ Apply a few drops of aloe vera gel or face oil.
+✔ Use upward strokes from collarbone to jawline.
+✔ Massage 5 minutes daily to improve elasticity.
+
+👉 Results: Helps tighten sagging neck & jawline over time.
+
+✨ Face Yoga (5-Minute Tightening Routine)
+1️⃣ Cheek Lift: Smile wide & place fingers on cheekbones. Push upward & hold for 10 seconds.
+2️⃣ Neck Tightener: Tilt head back & kiss the ceiling (hold for 10 seconds).
+3️⃣ Jawline Definer: Press tongue to the roof of mouth & hold for 5 seconds.
+
+👉 Do daily for visible results in 4-6 weeks!`
+
+
 
 
 }
