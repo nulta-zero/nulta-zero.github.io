@@ -20,9 +20,7 @@ const $$ = {
   },
   query : {},
   collectQuery : function(){
-                 $$.query = {
-
-                 }
+                 $$.query = {}
   },
   mean : function(arr){
           let total = 0;
@@ -258,6 +256,14 @@ const $$ = {
           }
           return RGB;
   },
+  line_thikness : function(input){
+      if(typeof input != 'number') return 1;
+      else{
+        if(input > 160)      return input * 0.025;
+        else if(input < 110) return input * 0.01;
+        else                 return input * 0.015;
+      }
+  },
   paintOnCanvas : function(it, x, y, color, hz){
           let w = 5, h = 5,  limit = (hz < 100) ? hz * 0.1 : hz * 0.05;
 
@@ -296,7 +302,7 @@ const $$ = {
             let realNextY = $$.vars.cors.y + next_y;
             if($$.vars.cors.counter > $$.vars.COUNT_LIMIT) { $$.clear_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY); $$.vars.cors.counter = 0 } //TRY TO CREEATE SPACE IN LABYRYNTH
 
-            $$.draw_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY, freq_color, Math.log10(hz) );
+            $$.draw_line(ctx, $$.vars.cors.x, $$.vars.cors.y,  realNextX,  realNextY, freq_color, $$.line_thikness(hz) );
             $$.vars.cors.x = realNextX;
             $$.vars.cors.y = realNextY;
 
