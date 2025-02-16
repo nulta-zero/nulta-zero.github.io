@@ -400,6 +400,12 @@ const main = function(){
        $$.adjustCanvasPerWindow();
   });
 
+  qu('.traxer').addEventListener('click', e=>{
+     let trax = qu('.traxer');
+     if(trax.style.transform == '') trax.style.transform = 'scale(2)';
+     else                           trax.style.transform = '';
+  });
+
   window.canvas = qu('.canvas');
   window.ctx = canvas.getContext("2d", {willReadFrequently : true});
 }
