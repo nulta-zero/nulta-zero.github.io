@@ -4,6 +4,7 @@ const doc = document,
       bigger = (x)=>(y)=> x > y ? x : y,
       dce = (x)=> doc.createElement(x);
 
+
 const $$ = {
   vars : {
     STATE : false,
@@ -17,6 +18,13 @@ const $$ = {
     chosenKind : 'png',
     backColor : '#202124',
     COUNT_LIMIT : 10,
+    word_complexity_object : {peaks : 0, time: 0, complexity_score: 0},
+   },
+  math : {
+      normalize : (x, min, max)=> (x - min) / (max - min),
+      bias      : (x, biasFactor) => Math.pow(x, Math.log(biasFactor) / Math.log(0.5)),
+      sigmoid   : (x, shift= 0, steepness= 10) => 1 / (1 + Math.exp(-steepness * (x - shift))),
+      inverseSigmoid : (x, shift = 0.5, steepness = 10) => 1 - (1 / (1 + Math.exp(-steepness * (x - shift)))),
   },
   query : {},
   collectQuery : function(){
@@ -62,9 +70,9 @@ const $$ = {
         if (smoothedFrequency > 0) {
           let detectedRange = '';
           if (smoothedFrequency >= 165 && smoothedFrequency <= 255) {
-            detectedRange = 'Female Voice';
+            detectedRange = 'Female';
           } else if (smoothedFrequency >= 85 && smoothedFrequency < 165) {
-            detectedRange = 'Male Voice';
+            detectedRange = 'Male';
           }else{
             detectedRange = null;
           }
@@ -73,13 +81,30 @@ const $$ = {
             sustainedFrameCount++;
             if (sustainedFrameCount >= minFramesForSpeech) {
               // console.log(`Detected ${detectedRange} at ${smoothedFrequency.toFixed(2)} Hz`);
-                if(detectedRange === 'Female Voice') {
-                   qu('.traxer').style.background = $$.vars.fColor;
-                   $$.paintOnCanvas(ctx, Math.random() * canvas.width,  Math.random() * canvas.height, $$.vars.fColor, smoothedFrequency );
-                }else{
-                   qu('.traxer').style.background = $$.vars.mColor;
-                   $$.paintOnCanvas(ctx, Math.random() * canvas.width,  Math.random() * canvas.height, $$.vars.mColor, smoothedFrequency );
-                }
+
+              // WORD COMPLEXITY ANALYSER
+              $$.wordComplexityAnalyzer(analyser);
+              // log(Object.values($$.vars.word_complexity_object));
+              let directionX = Math.random() * canvas.width + $$.math.bias(smoothedFrequency, 0.75);
+              let directionY = Math.random() * canvas.height + $$.math.bias(smoothedFrequency, 0.75);
+
+              if($$.vars.word_complexity_object.peaks >= 10 && $$.vars.word_complexity_object.time > 800) {
+                  directionX = Math.random() * canvas.width - $$.math.inverseSigmoid(165, smoothedFrequency, 0.01);
+                  directionY = Math.random() * canvas.height - $$.math.inverseSigmoid(165, smoothedFrequency, 0.01);
+              }
+
+            switch(detectedRange){
+              case 'Female':
+                      qu('.traxer').style.background = $$.vars.fColor;
+                      $$.paintOnCanvas(ctx, directionX, directionY, $$.vars.fColor, smoothedFrequency );
+              break;
+              default: case 'Male':
+                      qu('.traxer').style.background = $$.vars.mColor;
+                      $$.paintOnCanvas(ctx, directionX, directionY, $$.vars.mColor, smoothedFrequency );
+              break;
+            }
+
+
               qu('.traxer').innerText = `${smoothedFrequency.toFixed(2)} Hz`;
               sustainedFrameCount = 0;
             }
@@ -152,6 +177,8 @@ const $$ = {
         return -1;
       }
 
+
+
       function analyze() {
         analyser.getFloatTimeDomainData(timeDomainData);
         const frequency = autoCorrelation(timeDomainData, audioContext.sampleRate);
@@ -161,6 +188,66 @@ const $$ = {
 
       // Start microphone processing
       microphoneStream();
+  },
+  wordComplexityAnalyzer : function(analyser){
+     const dataArray = new Uint8Array(analyser.frequencyBinCount);
+     let isSpeaking = false;
+     let startTime = 0;
+     let peakCount = 0;
+     let lastPeakTime = 0;
+
+     function analyzeSpeech() {
+         analyser.getByteFrequencyData(dataArray);
+         let volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length; // Avg Volume
+
+         if(  $$.vars.STATE == false) return false;
+         // else                         log('AVG VOLUME', volume);
+
+         if (volume > 5) {  // Detect if speaking
+             if (!isSpeaking) {
+                 isSpeaking = true;
+                 startTime = performance.now();
+                 peakCount = 0;
+                 lastPeakTime = startTime;
+             }
+
+             // Detect rapid frequency change (syllable count)
+             let peakDetected = false;
+             for (let i = 1; i < dataArray.length; i++) {
+                 if (Math.abs(dataArray[i] - dataArray[i - 1]) > 20) { // Large jump in frequency
+                     let now = performance.now();
+                     if (now - lastPeakTime > 50) { // Avoid duplicate peaks
+                         peakCount++;
+                         lastPeakTime = now;
+                         peakDetected = true;
+                     }
+                 }
+             }
+         } else {
+             if (isSpeaking) {
+                 let duration = performance.now() - startTime;
+                 let syllableDensity = peakCount / duration; // Peaks per ms
+
+                 $$.vars.word_complexity_object = { //object with data
+                          complexity_score: syllableDensity.toFixed(3),
+                          peaks: peakCount,
+                          time : duration.toFixed(2)
+                        }
+                 //Complexity Score: 0.015 | Peaks: 21 | Time: 1399.90ms
+                 isSpeaking = false;
+             }
+         }
+
+         requestAnimationFrame(analyzeSpeech);
+     }
+     analyzeSpeech();
+  },
+  activateWordRecognition : function(){   //WILL NOT WORK ON BRAVE, SHOULD WORK ON CHROME
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.onresult = (event) => {
+             console.log("Recognized word:", event.results[0][0].transcript);
+      };
+    recognition.start();
   },
   popover : (newContent, disappear)=>  {
       if(doc.getElementById("pop") != null) doc.getElementById("pop").remove();  //ONLY ONCE pop AT THE TIME remove old
@@ -259,16 +346,21 @@ const $$ = {
   line_thikness : function(input){
       if(typeof input != 'number') return 1;
       else{
-        if(input > 160)      return input * 0.025;
-        else if(input < 110) return input * 0.01;
-        else                 return input * 0.015;
+        let wco = $$.vars.word_complexity_object;
+        let complexity = $$.math.normalize(wco.peaks * wco.time * (wco.peaks * wco.complexity_score), 0, 100);
+
+        if(complexity > 50)      return input * 0.019;
+        else if(complexity < 10) return input * 0.011;
+        else                     return input * 0.015;
       }
   },
   paintOnCanvas : function(it, x, y, color, hz){
           let w = 5, h = 5,  limit = (hz < 100) ? hz * 0.1 : hz * 0.05;
+          let wco = $$.word_complexity_object;
 
           let freq_color = `rgba(${$$.hexToRGB(color).join(',')},${(hz + limit) * 0.005})`;
-                 let rand = Math.random();
+                 let rand = (wco && wco.peaks > 10 && wco.time > 500 ) ? $$.math.inverseSigmoid(160, hz, 0.01) : $$.math.sigmoid(160, hz, 0.01);
+                 //First testing shows feminne voice drives pattern toward North and masculine toward South
                  let len = (window.innerWidth > 750) ? canvas.width / 15 : canvas.width / 5;    //larger screen == smaller line, smaller screen == larger lines to be seen
 
             function vectorIs(vec){
@@ -378,6 +470,7 @@ const main = function(){
                $$.vars.STATE = true;
                $$.detectVoice();
                $$.generateTextPasus();
+               // $$.activateWordRecognition();
           break;
           case 'stop':    $$.vars.STATE = false; $$.stopAudioListening($$.vars.audio.stream);   break;
           case 'info':
