@@ -266,10 +266,10 @@ const $$ = {
   },
   generateTextPasus : function(){
        fetch('./text/aristotle.txt').then( x=> x.text() ).then( xx=> {
-          let arr = xx.split(/\-THE END\-/gi);          //xx.split('\r\n\r\n\r\n');
+          let arr = xx.split(/[0-9][0-9]/gi);           //xx.split(/\-THE END\-/gi);          //xx.split('\r\n\r\n\r\n');
            let random = arr[Math.floor(Math.random() * arr.length) ];
-           while(random.length < 300){
-             random = arr[Math.floor(Math.random() * arr.length) ];    //make sure its not small text
+           while(random.length < 1000){
+             random += ' \n\n' + arr[Math.floor(Math.random() * arr.length) ];    //make sure its not small text
            }
            qu('.text-div').innerHTML =  "<h3>Read Aloud in speaking voice:</h3> \n\n" + random;
         });
