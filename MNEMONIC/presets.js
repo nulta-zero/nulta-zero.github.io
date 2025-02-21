@@ -174,6 +174,7 @@ HOMEMADE_COSMETICS : `Simple, homemade cosmetics to enhance design features subt
 Melt everything together in a double boiler, pour into a small container, let it cool.
 Dab on lips with a finger or brush for a sheer, natural flush.
 ________________________________________
+
 2️⃣ Softening & Brightening Face Powder
 ✨ DIY Recipe:
 
@@ -185,6 +186,7 @@ ________________________________________
 Mix ingredients well and store in a small jar.
 Use a fluffy brush to dust lightly over forehead, nose, chin—it evens out skin tone and gives a soft-focus effect.
 ________________________________________
+
 3️⃣ Natural Blush for a Soft Feminine Glow
 🌷 DIY Recipe:
 
@@ -194,7 +196,19 @@ A pinch of kaolin clay (helps blend)
 
 🌞 How to Apply:
 Lightly tap onto cheekbones and nose using fingers or a soft brush.
-Blend outward for a naturally flushed, healthy glow.`,
+Blend outward for a naturally flushed, healthy glow.
+________________________________________
+
+4️⃣ Subtle Eye Enhancements (Bright & Feminine)
+👁️ DIY Eye Shadow & Liner:
+
+Cocoa powder → light brown shadow for depth
+Activated charcoal → mix with coconut oil for a soft, smudged eyeliner look
+Chamomile tea → soak cotton pads, place on eyes to reduce puffiness
+
+🌙 Application Tips:
+Use a soft brush or fingertip for shadows.
+Apply charcoal eyeliner with a fine brush for a natural, smokey effect.`,
 
 
 
