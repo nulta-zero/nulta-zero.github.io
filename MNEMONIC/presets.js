@@ -158,7 +158,43 @@ FACE_EXERCISE : `💆‍♀️ 2. Facial Massage & Exercises (Tone & Lift)
 2️⃣ Neck Tightener: Tilt head back & kiss the ceiling (hold for 10 seconds).
 3️⃣ Jawline Definer: Press tongue to the roof of mouth & hold for 5 seconds.
 
-👉 Do daily for visible results in 4-6 weeks!`
+👉 Do daily for visible results in 4-6 weeks!`,
+
+
+HOMEMADE_COSMETICS : `Simple, homemade cosmetics to enhance design features subtly
+1️⃣ Tinted Lip Balm (Soft, Natural Lips)
+💄 DIY Recipe:
+
+1 tsp beeswax (holds it together)
+1 tsp coconut oil (moisturizing)
+½ tsp beetroot powder (natural pink tint)
+1 drop peppermint oil (optional for slight plumpness)
+
+🌿 How to Apply:
+Melt everything together in a double boiler, pour into a small container, let it cool.
+Dab on lips with a finger or brush for a sheer, natural flush.
+________________________________________
+2️⃣ Softening & Brightening Face Powder
+✨ DIY Recipe:
+
+2 tbsp arrowroot powder (light texture)
+1 tsp cocoa powder (adjust for skin tone)
+½ tsp cinnamon powder (glow boost)
+
+🌸 How to Apply:
+Mix ingredients well and store in a small jar.
+Use a fluffy brush to dust lightly over forehead, nose, chin—it evens out skin tone and gives a soft-focus effect.
+________________________________________
+3️⃣ Natural Blush for a Soft Feminine Glow
+🌷 DIY Recipe:
+
+1 tsp hibiscus powder (rosy tint)
+½ tsp beetroot powder
+A pinch of kaolin clay (helps blend)
+
+🌞 How to Apply:
+Lightly tap onto cheekbones and nose using fingers or a soft brush.
+Blend outward for a naturally flushed, healthy glow.`,
 
 
 
