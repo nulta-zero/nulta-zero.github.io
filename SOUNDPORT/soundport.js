@@ -80,238 +80,48 @@ const $$ = {
       analyser.smoothingTimeConstant = 0.8;  // was 0.7  Reduce noise
       const frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
-      // const detectMaxPitch = function(analyserObject){
-      //        // if($$.vars.counter.time % 3 == 0) {
-      //        analyserObject.getByteFrequencyData(frequencyData);
-      //
-      //         let nyquist = audioContext.sampleRate / 2; // Max frequency captured
-      //         let maxIndex = 0;
-      //         let maxAmplitude = 0;
-      //
-      //         // Find the dominant frequency in the spectrum
-      //         for (let i = 0; i < frequencyData.length; i++) {
-      //             if (frequencyData[i] > maxAmplitude) {
-      //                 maxAmplitude = frequencyData[i];
-      //                 maxIndex = i;
-      //             }
-      //         }
-      //         if (maxAmplitude < 50) {
-      //            return;
-      //         }
-      //
-      //         let peakFrequency = (maxIndex / frequencyData.length) * nyquist;
-      //
-      //
-      //         // Classify voice type
-      //         let voiceType = "";
-      //         if (peakFrequency >= 40 && peakFrequency < 120)        voiceType = "Bass (Low Male)";
-      //         else if (peakFrequency >= 120 && peakFrequency < 180)  voiceType = "Baritone (Mid Male)";
-      //         else if (peakFrequency >= 180 && peakFrequency < 250)  voiceType = "Tenor/Alto (High Male / Low Female)";
-      //         else if (peakFrequency >= 250 && peakFrequency < 600)  voiceType = "Mezzo-Soprano (Mid Female)";
-      //         else if (peakFrequency >= 600 && peakFrequency < 1600) voiceType = "Soprano (High Female)";
-      //         else if (peakFrequency >= 1600)                        voiceType = "Whistle Register (Extreme High)";
-      //
-      //         qu('.traxer').style.background = $$.vars.zColor;
-      //         qu('.traxer').innerText = '⋔';
-      //         qu('.guider').innerText = `Your Pitch: ${voiceType == "" ? '' : peakFrequency.toFixed(2)} Hz | ${voiceType}`;
-      //       // }
-      // };
+      const detectMaxPitch = function (analyserObject) {
+          analyserObject.getByteFrequencyData(frequencyData);
 
-      // const detectMaxPitch = (analyserObject) => {
-      //       analyserObject.getByteFrequencyData(frequencyData);
-      //
-      //       let nyquist = audioContext.sampleRate / 2; // Max frequency captured
-      //       let maxIndex = 0;
-      //       let maxAmplitude = 0;
-      //
-      //       // Find dominant frequency in the spectrum
-      //       for (let i = 0; i < frequencyData.length; i++) {
-      //           if (frequencyData[i] > maxAmplitude) {
-      //               maxAmplitude = frequencyData[i];
-      //               maxIndex = i;
-      //           }
-      //       }
-      //
-      //       if (maxAmplitude < 50) return; // Ignore weak sounds
-      //
-      //       let peakFrequency = (maxIndex / frequencyData.length) * nyquist;
-      //
-      //       // **🔹 Smooth fluctuations using moving average**
-      //       const smoothingFactor = 0.5; // Adjust for more/less stability
-      //       if (!window.smoothPitch) window.smoothPitch = peakFrequency;
-      //       else window.smoothPitch = smoothingFactor * peakFrequency + (1 - smoothingFactor) * window.smoothPitch;
-      //
-      //       // **🔹 Prevent small jumps between voice types**
-      //       let voiceType = "";
-      //       if (window.smoothPitch >= 40 && window.smoothPitch < 120)        voiceType = "Bass (Low Male)";
-      //       else if (window.smoothPitch >= 120 && window.smoothPitch < 180)  voiceType = "Baritone (Mid Male)";
-      //       else if (window.smoothPitch >= 180 && window.smoothPitch < 250)  voiceType = "Tenor/Alto (High Male / Low Female)";
-      //       else if (window.smoothPitch >= 250 && window.smoothPitch < 600)  voiceType = "Mezzo-Soprano (Mid Female)";
-      //       else if (window.smoothPitch >= 600 && window.smoothPitch < 1600) voiceType = "Soprano (High Female)";
-      //       else if (window.smoothPitch >= 1600)                             voiceType = "Whistle Register (Extreme High)";
-      //
-      //       qu('.traxer').style.background = $$.vars.zColor;
-      //       qu('.traxer').innerText = '⋔';
-      //       qu('.guider').innerText = `Your Pitch: ${voiceType ? window.smoothPitch.toFixed(2) : ''} Hz | ${voiceType}`;
-      // };
-      // const detectMaxPitch = (analyserObject) => {
-      //       analyserObject.getByteFrequencyData(frequencyData);
-      //
-      //       let nyquist = audioContext.sampleRate / 2;
-      //       let maxIndex = 0;
-      //       let maxAmplitude = 0;
-      //
-      //       // Find dominant frequency in the spectrum
-      //       for (let i = 0; i < frequencyData.length; i++) {
-      //           if (frequencyData[i] > maxAmplitude) {
-      //               maxAmplitude = frequencyData[i];
-      //               maxIndex = i;
-      //           }
-      //       }
-      //
-      //       // Ignore very loud sudden noises (claps, drops, etc.)
-      //       if (maxAmplitude > 200) return;
-      //
-      //       // Compute the peak frequency
-      //       let peakFrequency = (maxIndex / frequencyData.length) * nyquist;
-      //
-      //       // Ignore weak background noise
-      //       if (maxAmplitude < 50) {
-      //           window.stablePitch = null; // Reset stability timer
-      //           return;
-      //       }
-      //
-      //       // Apply smoothing to prevent jumps
-      //       const smoothingFactor = 0.2;
-      //       if (!window.smoothPitch) window.smoothPitch = peakFrequency;
-      //       else window.smoothPitch = smoothingFactor * peakFrequency + (1 - smoothingFactor) * window.smoothPitch;
-      //
-      //       // Ensure we have a stable pitch for at least 2 seconds
-      //       const stabilityTime = 2000; // 2 seconds in ms
-      //       const now = performance.now();
-      //
-      //       if (!window.stablePitch) {
-      //           window.stablePitch = { value: window.smoothPitch, startTime: now };
-      //       } else if (Math.abs(window.smoothPitch - window.stablePitch.value) < 10) {
-      //           if (now - window.stablePitch.startTime < stabilityTime) return; // Still waiting for stability
-      //       } else {
-      //           // Reset if the pitch is changing too much
-      //           window.stablePitch = { value: window.smoothPitch, startTime: now };
-      //           return;
-      //       }
-      //
-      //       // Classify voice type based on stabilized pitch
-      //       let voiceType = "";
-      //       if (window.smoothPitch >= 40 && window.smoothPitch < 120)        voiceType = "Bass (Low Male)";
-      //       else if (window.smoothPitch >= 120 && window.smoothPitch < 180)  voiceType = "Baritone (Mid Male)";
-      //       else if (window.smoothPitch >= 180 && window.smoothPitch < 250)  voiceType = "Tenor/Alto (High Male / Low Female)";
-      //       else if (window.smoothPitch >= 250 && window.smoothPitch < 600)  voiceType = "Mezzo-Soprano (Mid Female)";
-      //       else if (window.smoothPitch >= 600 && window.smoothPitch < 1600) voiceType = "Soprano (High Female)";
-      //       else if (window.smoothPitch >= 1600)                             voiceType = "Whistle Register (Extreme High)";
-      //
-      //       qu('.traxer').style.background = $$.vars.zColor;
-      //       qu('.traxer').innerText = '⋔';
-      //       qu('.guider').innerText = `Your Pitch: ${voiceType ? window.smoothPitch.toFixed(2) : ''} Hz | ${voiceType}`;
-      // };
+          let nyquist = audioContext.sampleRate / 2;
+          let maxIndex = 0;
+          let maxAmplitude = 0;
 
+          for (let i = 0; i < frequencyData.length; i++) {
+              if (frequencyData[i] > maxAmplitude) {
+                  maxAmplitude = frequencyData[i];
+                  maxIndex = i;
+              }
+          }
 
-//       const detectMaxPitch = function (analyserObject) {
-//     analyserObject.getByteFrequencyData(frequencyData);
-//
-//     let nyquist = audioContext.sampleRate / 2; // Max frequency captured
-//     let maxIndex = 0;
-//     let maxAmplitude = 0;
-//
-//     // Find dominant frequency
-//     for (let i = 0; i < frequencyData.length; i++) {
-//         if (frequencyData[i] > maxAmplitude) {
-//             maxAmplitude = frequencyData[i];
-//             maxIndex = i;
-//         }
-//     }
-//
-//     // Ignore background noise
-//     if (maxAmplitude < 50) {
-//         window.stablePitch = null;
-//         return;
-//     }
-//
-//     let peakFrequency = (maxIndex / frequencyData.length) * nyquist;
-//
-//     // Smooth frequency jumps (rolling average)
-//     const smoothingFactor = 0.3; // Adjust for sensitivity (0.1 = smoother, 0.5 = more responsive)
-//     if (!window.smoothPitch) window.smoothPitch = peakFrequency;
-//     else window.smoothPitch = smoothingFactor * peakFrequency + (1 - smoothingFactor) * window.smoothPitch;
-//
-//     // Ensure we have a stable pitch for 500ms
-//     const stabilityTime = 500; // 500ms for stability check
-//     const now = performance.now();
-//
-//     if (!window.stablePitch) {
-//         window.stablePitch = { value: window.smoothPitch, startTime: now };
-//     } else if (Math.abs(window.smoothPitch - window.stablePitch.value) < 10) {
-//         if (now - window.stablePitch.startTime < stabilityTime) return; // Still stabilizing
-//     } else {
-//         window.stablePitch = { value: window.smoothPitch, startTime: now };
-//         return;
-//     }
-//
-//     // Classify voice type
-//     let voiceType = "";
-//     if (window.smoothPitch >= 40 && window.smoothPitch < 120)        voiceType = "Bass (Low Male)";
-//     else if (window.smoothPitch >= 120 && window.smoothPitch < 180)  voiceType = "Baritone (Mid Male)";
-//     else if (window.smoothPitch >= 180 && window.smoothPitch < 250)  voiceType = "Tenor/Alto (High Male / Low Female)";
-//     else if (window.smoothPitch >= 250 && window.smoothPitch < 600)  voiceType = "Mezzo-Soprano (Mid Female)";
-//     else if (window.smoothPitch >= 600 && window.smoothPitch < 1600) voiceType = "Soprano (High Female)";
-//     else if (window.smoothPitch >= 1600)                             voiceType = "Whistle Register (Extreme High)";
-//
-//     qu('.traxer').style.background = $$.vars.zColor;
-//     qu('.traxer').innerText = '⋔';
-//     qu('.guider').innerText = `Your Pitch: ${voiceType ? window.smoothPitch.toFixed(2) : ''} Hz | ${voiceType}`;
-// };
+          // Ignore background noise
+          if (maxAmplitude < 50) return;
 
-const detectMaxPitch = function (analyserObject) {
-    analyserObject.getByteFrequencyData(frequencyData);
+          let peakFrequency = (maxIndex / frequencyData.length) * nyquist;
 
-    let nyquist = audioContext.sampleRate / 2;
-    let maxIndex = 0;
-    let maxAmplitude = 0;
+          // ⬇⬇ Moving window filter for smoothing (tracks real voice, no sticking) ⬇⬇
+          if (!window.pitchHistory) window.pitchHistory = [];
+          const historySize = 5; // Change this to 3-7 for fine-tuning (higher = smoother, lower = faster)
 
-    for (let i = 0; i < frequencyData.length; i++) {
-        if (frequencyData[i] > maxAmplitude) {
-            maxAmplitude = frequencyData[i];
-            maxIndex = i;
-        }
-    }
+          window.pitchHistory.push(peakFrequency);
+          if (window.pitchHistory.length > historySize) window.pitchHistory.shift();
 
-    // Ignore background noise
-    if (maxAmplitude < 50) return;
+          let smoothPitch = window.pitchHistory.reduce((sum, val) => sum + val, 0) / window.pitchHistory.length;
 
-    let peakFrequency = (maxIndex / frequencyData.length) * nyquist;
+          // Classify voice type
+          let voiceType = "";
+          if (smoothPitch >= 40 && smoothPitch < 120)        voiceType = "Bass (Low Male)";
+          else if (smoothPitch >= 120 && smoothPitch < 180)  voiceType = "Baritone (Mid Male)";
+          else if (smoothPitch >= 180 && smoothPitch < 250)  voiceType = "Tenor/Alto (High Male / Low Female)";
+          else if (smoothPitch >= 250 && smoothPitch < 600)  voiceType = "Mezzo-Soprano (Mid Female)";
+          else if (smoothPitch >= 600 && smoothPitch < 1600) voiceType = "Soprano (High Female)";
+          else if (smoothPitch >= 1600)                      voiceType = "Whistle Register (Extreme High)";
 
-    // ⬇⬇ Moving window filter for smoothing (tracks real voice, no sticking) ⬇⬇
-    if (!window.pitchHistory) window.pitchHistory = [];
-    const historySize = 5; // Change this to 3-7 for fine-tuning (higher = smoother, lower = faster)
-
-    window.pitchHistory.push(peakFrequency);
-    if (window.pitchHistory.length > historySize) window.pitchHistory.shift();
-
-    let smoothPitch = window.pitchHistory.reduce((sum, val) => sum + val, 0) / window.pitchHistory.length;
-
-    // Classify voice type
-    let voiceType = "";
-    if (smoothPitch >= 40 && smoothPitch < 120)        voiceType = "Bass (Low Male)";
-    else if (smoothPitch >= 120 && smoothPitch < 180)  voiceType = "Baritone (Mid Male)";
-    else if (smoothPitch >= 180 && smoothPitch < 250)  voiceType = "Tenor/Alto (High Male / Low Female)";
-    else if (smoothPitch >= 250 && smoothPitch < 600)  voiceType = "Mezzo-Soprano (Mid Female)";
-    else if (smoothPitch >= 600 && smoothPitch < 1600) voiceType = "Soprano (High Female)";
-    else if (smoothPitch >= 1600)                      voiceType = "Whistle Register (Extreme High)";
-
-    // Update UI
-    qu('.traxer').style.background = $$.vars.zColor;
-    qu('.traxer').innerText = '⋔';
-    qu('.guider').innerText = `Your Pitch: ${smoothPitch.toFixed(2)} Hz | ${voiceType}`;
-};
+          // Update UI
+          qu('.traxer').style.background = $$.vars.zColor;
+          qu('.traxer').innerText = '⋔';
+          qu('.guider').innerText = `Your Pitch: ${smoothPitch.toFixed(2)} Hz | ${voiceType}`;
+      };
 
 
       const microphoneStream = async () => {
