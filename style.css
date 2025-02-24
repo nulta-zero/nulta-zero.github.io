@@ -310,6 +310,9 @@ hr{
 .research-area > div{
   /* width: min-content; */
 }
+.research-area > p {
+  grid-column: span 2;
+}
 .dark-span{
   color: #3a3b40;
 }
