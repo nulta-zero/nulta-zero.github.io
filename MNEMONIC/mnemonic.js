@@ -424,7 +424,6 @@ const $$ = {
            let all_edits = quAll('.to-edit');
            let last_to_edit = all_edits[all_edits.length-1];
                last_to_edit.innerText = e.target.value;
-               log(last_to_edit);
            $$.adjustTextSizePerLength(last_to_edit);
            $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );
            quAll('.preset')[0].selected = true; //Return back to default
