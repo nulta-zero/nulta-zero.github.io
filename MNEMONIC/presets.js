@@ -210,7 +210,41 @@ Chamomile tea → soak cotton pads, place on eyes to reduce puffiness
 Use a soft brush or fingertip for shadows.
 Apply charcoal eyeliner with a fine brush for a natural, smokey effect.`,
 
+NAILS_CARE : ` Enhance the Natural Color of the Free Edge
+________________________________________
+The free edge sometimes looks dull or uneven compared to the nail bed. To brighten it:
+✅ Lemon + Baking Soda Scrub – Mix a bit of lemon juice with baking soda, rub it on the tips for a few minutes, and rinse. It naturally whitens the edges.
+✅ Hydrogen Peroxide Soak – A quick dip (a few minutes in a 3% solution) lifts stains and makes the free edge appear whiter.
+✅ Gentle Buffing – Lightly buffing the nail edge smooths out discoloration and enhances translucency.
+________________________________________
 
+Use a Sheer, Milky, or Soft Pink Polish
+If you want a healthy, polished glow while still looking natural:
+🎨 Sheer Pink or Nude Polish – Gives the nail bed a fresh, rosy hue while keeping the free edge visible.
+🎨 Milky White or Translucent Coat – Adds a soft brightness to the entire nail without making it look “painted.”
+🎨 French Manicure Style – If you prefer a defined white tip, you can use a sheer pink polish on the nail bed and a soft white on the free edge for a classic look.
+________________________________________
 
+Maintain a Smooth Shape & Healthy Tips
+Keep your nails filed neatly in a shape that complements your fingers (rounded or oval shapes often enhance elegance).
+Moisturize your nails and cuticles regularly to prevent brittleness—hydrated nails look shinier and grow stronger.
+A clear glossy top coat seals everything in, giving a refined, elegant finish.`,
+
+FACE_MASK : `Face Masks (Natural Softening & Hydration)
+🔹 Yogurt + Honey Mask (hydrates & softens)
+
+1 tbsp yogurt
+1 tsp honey
+Apply 10-15 min → rinse with warm water
+🔹 Oatmeal + Milk Mask (exfoliates rough skin)
+
+2 tbsp ground oats
+1 tbsp warm milk
+Apply 15 min → rinse
+🔹 Aloe Vera + Rosewater (calms & refreshes)
+
+Aloe vera gel + rosewater
+Apply as a daily lightweight mask
+🥒 Extra tip: Cold cucumber slices reduce eye puffiness and help soften the face.`,
 
 }
