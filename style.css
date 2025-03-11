@@ -79,10 +79,21 @@ hr{
   overflow-y: scroll;
 }
 .about{
-  /* background: #6478e1; */
-  letter-spacing: 1px;
-  border-radius: 5px;
-  padding: 1%;
+  background: #88898c78;
+  color: #202124;
+  border-radius: 10px;
+  font-weight: bolder;
+  padding: 3%;
+  letter-spacing: 20px;
+}
+.about::selection{
+  background: inherit;
+}
+.special{
+  color: #b6bac4;
+}
+.synopsis{
+  color: #545859;
 }
 .settings{
   text-align: center;
