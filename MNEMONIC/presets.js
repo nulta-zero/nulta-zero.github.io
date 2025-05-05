@@ -247,4 +247,36 @@ Aloe vera gel + rosewater
 Apply as a daily lightweight mask
 🥒 Extra tip: Cold cucumber slices reduce eye puffiness and help soften the face.`,
 
+FEM_GESTURES : `
+🌸 Feminine Gestures, Movements & Sounds
+________________________________________
+1. The “Floating Turn”
+🧝‍♀️ What it is: Turning your head or gaze in a way that moves slower than expected. Pause halfway before completing the motion.
+💫 Effect: Creates softness and mystery. People feel “invited” into your attention, not caught in it.
+💡 Tip: Think of your chin as leading your gaze. Let your eyes follow second.
+
+2. The “Ribbon Sit”
+🪷 What it is: Sit as though you have a silk ribbon connecting your ribcage to the crown of your head. Spine gently elongated, pelvis slightly tilted forward.
+💫 Effect: Creates elegance and gentle poise. Makes your waist and neck more visible.
+💡 Tip: Keep your knees together, ankles tucked just slightly to the side — like your lower half is mid-dance.
+
+3. The “Neckline Exposure”
+🧣 What it is: Tilt your head ever so slightly when listening. Tuck chin gently. Elongates the neck, exposes the collarbones.
+💫 Effect: Suggests openness and softness, often perceived as sensual or graceful.
+💡 Tip: Let your hand lightly rest near your collarbone when thoughtful or when reacting — it draws attention to the area.
+
+4. The “Drifted Touch”
+🖐️ What it is: Let your fingers drift across surfaces, fabrics, your own skin or hair. It’s slow and unintentional in appearance.
+💫 Effect: Signals sensitivity, elegance, presence in the body. It’s mesmerizing.
+💡 Tip: Use it while speaking — brushing hair behind ear, trailing hand down neck, or smoothing your skirt.
+
+5. The “Feminine Sigh”
+💨 What it is: A breath with sound, but not volume — a whisper of release, a gentle “mmm” on exhale.
+💫 Effect: Sensuality without sexuality. It’s being felt, not performing.
+💡 Tip: Let it happen naturally when stretching, sitting down, or transitioning between tasks.
+
+6. The “Pause-and-Blink”
+👁️ What it is: A soft blink after a sentence or when receiving attention. It’s a micro-moment of stillness.
+💫 Effect: Gives weight to your presence, adds grace to your silence.
+💡 Tip: Combine with a small tilt of the head for charm or softness.`
 }
