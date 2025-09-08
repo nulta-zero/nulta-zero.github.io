@@ -89,6 +89,9 @@ hr{
 .about::selection{
   background: inherit;
 }
+.about > .os::selection{
+  color : snow;
+}
 .special{
   color: #b6bac4;
 }
