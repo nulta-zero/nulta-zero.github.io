@@ -72,6 +72,11 @@ const $$ = {
                  td1.appendChild(a);
           }
 
+          if(DATA[i].break){
+             tr.classList.add('segment-break');
+             td2.innerText = '-- ' + DATA[i].desc + ' --'; 
+          }
+
           if(DATA[i].power){
              td1.classList.add('power');
           }

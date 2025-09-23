@@ -149,7 +149,7 @@ hr{
   text-align: center;
   font-size: small;
   /* background: sienna; */
-  background: #7572711f;
+  /* background: #7572711f; */
   height: 1pc;
 }
 .projects-list{
@@ -395,6 +395,12 @@ body::-webkit-scrollbar-track {
 body::-webkit-scrollbar-thumb {
   background-color: var(--pastText);
   /* outline: 1px solid var(--pastText); */
+}
+
+.segment-break{
+  background: #7572711f;
+  text-align: center;
+  font-size: small;
 }
 
 
