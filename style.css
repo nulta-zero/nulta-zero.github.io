@@ -135,7 +135,7 @@ hr{
   padding: 0 5px;
 }
 /* TABLE */
-.table-holder{
+.table-holder, .specific-algorithms-dev{
   overflow: hidden;
   padding: 5vh;
 }
@@ -402,7 +402,26 @@ body::-webkit-scrollbar-thumb {
   text-align: center;
   font-size: small;
 }
+.dark-element{
+  background: #7572711f;
+}
+.big-words{
+  font-size: 8vh;
+}
+.centered{
+  text-align: center;
+}
+.nda-head{
+  text-align: center;
+}
 
+pre{
+  white-space: pre-wrap;
+}
+.pre-form{
+  font-family: math;
+  font-weight: 100;
+}
 
 /* HUGE SCREEN */
 
