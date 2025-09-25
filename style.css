@@ -407,6 +407,7 @@ body::-webkit-scrollbar-thumb {
 }
 .big-words{
   font-size: 8vh;
+  margin: 0;
 }
 .centered{
   text-align: center;
@@ -421,6 +422,11 @@ pre{
 .pre-form{
   font-family: math;
   font-weight: 100;
+}
+.emphasized{
+  background: #7572711f;
+  border-radius: 5px;
+  padding: 1px 8px;
 }
 
 /* HUGE SCREEN */
