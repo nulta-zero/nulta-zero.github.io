@@ -419,6 +419,9 @@ body::-webkit-scrollbar-thumb {
 pre{
   white-space: pre-wrap;
 }
+.formulas{
+  font-size: 111%;
+}
 .pre-form{
   font-family: math;
   font-weight: 100;
