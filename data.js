@@ -154,6 +154,11 @@ const DATA = [
     break : true,
   },
   {
+    name : 'PLAN_3D',
+    link : 'https://www.facebook.com/share/v/16jc9Xz8HL/',
+    desc : `3D environment for shape creation which can be used in planing`,
+  },
+  {
     name : 'BUILDER',
     link : '',
     desc : `Drag and drop website builder, similiar to google sites, wix`,
