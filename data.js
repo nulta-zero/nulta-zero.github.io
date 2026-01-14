@@ -156,7 +156,7 @@ const DATA = [
   {
     name : 'PLAN_3D',
     link : 'https://www.facebook.com/share/v/16jc9Xz8HL/',
-    desc : `3D environment for shape creation which can be used in planing`,
+    desc : `3D environment for shape creation/handling, which is ideal for planning structures`,
   },
   {
     name : 'BUILDER',
