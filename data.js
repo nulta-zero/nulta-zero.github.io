@@ -224,7 +224,7 @@ const DATA = [
   {
     name : 'TABELA',
     link : '',
-    desc : `Spreadsheet tool similiar to sql | excel | table`,
+    desc : `Spreadsheet tool as sql | excel`,
   },
   {
     name : 'VID',
@@ -247,7 +247,7 @@ const DATA = [
   {
     name : 'AI_DOK',
     link : 'https://fb.watch/u1KKJtZxzC/',
-    desc : 'Aalgorithmic doctor',
+    desc : 'Algorithmic doctor',
   },
   {
     name : 'CAMERA',
