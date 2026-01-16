@@ -10,42 +10,42 @@ const DATA = [
   {
     name : 'AKONKAGAYA',
     link : 'https://fb.watch/u1L8TJZSt1/',
-    desc : 'Space-galaxy shooter game',
+    desc : 'Space-shooter game',
   },
   {
     name : 'BALKAN_KINGPIN',
     link : '',
-    desc : `Learn business rules in this strategic game, with theme of selling psychoactive substances`,
+    desc : `Strategic business game`,
   },
   {
     name : 'C-VIRUS',
     link : '',
-    desc : `Pseudo FPS post-apocalyptic, maze navigating, items collecting game`,
+    desc : `Pseudo FPS maze navigating game`,
   },
   {
     name : 'CHESS',
     link : 'https://fb.watch/u1L5hxe5Rj/',
-    desc : `Chess game (first edition)`,
+    desc : `Chess game`,
   },
   {
     name : 'DEMIR_KAPIJE',
     link : '',
-    desc : `Brick-breaker game (Iron-Gates theme)`,
+    desc : `Brick-breaking game (Iron-Gates theme)`,
   },
   {
     name : 'DOROTEJA',
     link : 'https://fb.watch/rAUdR589Dx/',
-    desc : `Adventure game, navigate Doroteja in this addictive puzzle grid-world`,
+    desc : `Adventure game | Doroteja navigates puzzle grid-world`,
   },
   {
     name : 'FROGGY_LEAP',
     link : 'https://fb.watch/rAurJEg6Cw/',
-    desc : `Legendary frog jumping game, unique new twist...`,
+    desc : `Frog jumping game | unique new twists`,
   },
   {
     name : 'HUNT',
     link : 'https://www.facebook.com/nulta.io/videos/185311370221164',
-    desc : `First-person 3D adventure arena game, build walls, survive...`,
+    desc : `FPS 3D arena game`,
   },
   {
     name : 'INTELEKT',
@@ -65,7 +65,7 @@ const DATA = [
   {
     name : 'PINBALL',
     link : 'https://docs.google.com/presentation/d/e/2PACX-1vTsVdOkX-hc7zuHZojxgRxc19tcs2KE_XHnDSmRmDgBdGPV0P1wRew59eeA5tsj6z5UBkEUk7VHOlqD/pub?start=false&loop=false&delayms=3000',
-    desc : `Legendary Pinball machine now in digital version`,
+    desc : `Pinball machine`,
   },
   {
     name : 'PONG',
@@ -85,22 +85,22 @@ const DATA = [
   {
     name : 'SUPER_BLOB',
     link : '',
-    desc : `Jumping blob, the platform adventure game`,
+    desc : `Jumping blob | platform adventure game`,
   },
   {
     name : 'TETRIS',
     link : 'https://fb.watch/u1K-P2Rfte/',
-    desc : `Tetris, with traditional and new unique shapes`,
+    desc : `Tetris | with new shapes`,
   },
   {
     name : 'WHACK-A-JAR',
     link : 'https://www.facebook.com/reel/1530997947629427',
-    desc : `Product business strategy gamification. [Advanced marketing]`,
+    desc : `Business product gamification example. [Advanced marketing]`,
   },
   {
     name : 'X_O',
     link : '',
-    desc : `Legendary X/O game`,
+    desc : `X/O game`,
   },
 // ------------------------------------------------------
   {
@@ -112,18 +112,18 @@ const DATA = [
   {
     name : 'ANIMIX',
     link : 'https://fb.watch/upFTjF6R1I/',
-    desc : `Pixel animation editor, pixel art editor and more`,
+    desc : `Pixel animation editor | pixel art editor`,
   },
   {
     name : 'ART',
     link : 'https://fb.watch/u1KXh6iDXs/',
-    desc : `Artist's toolbox and graphical editor`,
+    desc : `Artist's toolbox | graphical image editor`,
     power : true,
   },
   {
     name : 'CHIP_TUNE',
     link : 'https://fb.watch/u1KVvXu8WL/',
-    desc : `Draw sounds. Hear drawings in this one-of-the-kind chip-tune unique music creation station`,
+    desc : `Chip-tune | unique music creation station`,
   },
   {
     name : 'DRUM',
@@ -133,7 +133,7 @@ const DATA = [
   {
     name : 'GUITAR',
     link : '',
-    desc : `Play guitar simulator`,
+    desc : `Guitar simulator`,
   },
   {
     name : 'PIANO',
@@ -143,7 +143,7 @@ const DATA = [
   {
     name : 'TRIMER',
     link : '',
-    desc : `Trim and play audio, create slow tunes`,
+    desc : `Trim | play audio | create slow tunes`,
   },
 
 // ------------------------------------------------------
@@ -156,85 +156,85 @@ const DATA = [
   {
     name : 'PLAN_3D',
     link : 'https://www.facebook.com/share/v/16jc9Xz8HL/',
-    desc : `3D environment for shape creation/handling, which is ideal for planning structures`,
+    desc : `3D environment for shape, ideal for planning | structures | presentations`,
   },
   {
     name : 'BUILDER',
     link : '',
-    desc : `Drag and drop website builder, similiar to google sites, wix`,
+    desc : `Drag and drop website builder, as google sites | wix`,
   },
   {
     name : 'CALCULATOR',
     link : '',
-    desc : `Replica of famous Apple calculator`,
+    desc : `Apple calculator`,
   },
   {
     name : 'DIANA',
     link : '',
-    desc : `Ai voice assistent`,
+    desc : `Voice assistant`,
   },
   {
     name : 'ETAR',
     link : '',
-    desc : `Supreme code-editor built on top of JS. Etar uses PHP to manipulate FileSystem and is capable of running SHELL commands`,
+    desc : `Code-editor. Similiar to Atom`,
     power : true,
   },
   {
     name : 'FAVI',
     link : '',
-    desc : `Fastest favicon generator`,
+    desc : `Favicon Generator`,
   },
   {
     name : 'GRAPH',
     link : 'https://fb.watch/u1KtdaQq7c/',
-    desc : `Create diagrams as graph connections, roadmap presentations`,
+    desc : `Diagram creator | graph connections presentation`,
   },
   {
     name : 'MNEMONIC',
     link : '',
-    desc : `Reminder / To-Do, list and task [JS,PHP]`,
+    desc : `Reminder | To-Do | Lists`,
   },
   {
     name : 'NULTA',
     link : 'https://fb.watch/rAucvZRbE8/',
-    desc : `Supreme analytics tool, swiss army knife of data analysis and data visualization`,
+    desc : `Data analysis tool | Data visualization | Data handling`,
     power : true,
   },
   {
     name : 'PAPER',
     link : 'https://drive.google.com/file/d/1PJ7i8pPYU9laYd86CeCraCB2AwkVpfrF/view?usp=sharing',
-    desc : `Graphic editor, image creator, idea sketching tool, presentations tool`,
+    desc : `Idea sketching tool, presentations tool`,
     power : true,
   },
   {
     name : 'PCELAR',
     link : 'https://www.linkedin.com/pulse/p%2525C4%25258Delar-program-za-vo%2525C4%252591enje-evidencije-ko%2525C5%2525A1nica-kao-i-istih-petar/?trackingId=j6TMeHjDhJAIi2DqTrcJKQ%3D%3D',
-    desc : `Beekeping made easy with hive organization digital tool`,
+    desc : `Beekeping | digital hives organization tool`,
   },
   {
     name : 'VIEWPORT',
     link : '',
-    desc : `Quick image viewer/editor`,
+    desc : `Light image viewer | editor`,
   },
   {
     name : 'SOUNDPORT',
     link : '',
-    desc : 'Practise masculine / feminine voice by reading'
+    desc : 'Feminine | masculine voice tool'
   },
   {
     name : 'TABELA',
     link : '',
-    desc : `SQL meets excel + table data viewer [JS]`,
+    desc : `Spreadsheet tool similiar to sql | excel | table`,
   },
   {
     name : 'VID',
     link : '',
-    desc : `Video player [JS]`,
+    desc : `Video player`,
   },
   {
     name : 'WRITER',
     link : '',
-    desc : `Simple text editor [JS]`,
+    desc : `Text editor`,
   },
 
 // ------------------------------------------------------
@@ -247,12 +247,12 @@ const DATA = [
   {
     name : 'AI_DOK',
     link : 'https://fb.watch/u1KKJtZxzC/',
-    desc : 'Medically accurate algorithmic doctor, query away',
+    desc : 'Aalgorithmic doctor',
   },
   {
     name : 'CAMERA',
     link : 'https://fb.watch/u1L5hxe5Rj/',
-    desc : `Camera movement tracking program, burst bubbles simulation`,
+    desc : `Camera movement tracking program`,
   },
   {
     name : 'CUBE',
@@ -262,17 +262,17 @@ const DATA = [
   {
     name : 'DOKAZ',
     link : '',
-    desc : `2-step (phone+laptop) unlocking system through web protocol`,
+    desc : `2-devices unlocking web system protocol`,
   },
   {
     name : 'GENETICS',
     link : '',
-    desc : `Tool for playing around with evolution theory (advanced marketing technique example)`,
+    desc : `Evolution theory tool`,
   },
   {
     name : 'GERMAN',
     link : '',
-    desc : `German langauge learning app (business strategy example)`,
+    desc : `Langauge learning app (German)`,
   },
   {
     name : 'IM',
@@ -282,23 +282,23 @@ const DATA = [
   {
     name : 'LIMBO_GC',
     link : '',
-    desc : `Dating CMS [JS-PHP-HTML-CSS] (content-management-system)`,
+    desc : `CMS | Dating`,
   },
   {
     name : 'ROS',
     link : 'https://fb.watch/u1K_fRiUbu/',
-    desc : `Ready Operational System, entire desktop fileSystem environment for web [JS,PHP,HTML,CSS]`,
+    desc : `Web desktop environment for invoking other apps`,
     power : true,
   },
   {
     name : 'SRP',
     link : '',
-    desc : `SEO advanced toolkit`,
+    desc : `SEO tool`,
   },
   {
     name : 'SURF',
     link : '',
-    desc : `Web browser [JS]`,
+    desc : `Web Browser`,
   },
 
 
