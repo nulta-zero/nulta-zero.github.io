@@ -155,8 +155,8 @@ const DATA = [
   },
   {
     name : 'PLAN_3D',
-    link : 'https://www.facebook.com/share/v/16jc9Xz8HL/',
-    desc : `3D environment for shape, ideal for planning | structures | presentations`,
+    link : 'https://www.facebook.com/share/v/1CcFKqWifn/',
+    desc : `3D planning space for investors | real-estate-market`,
   },
   {
     name : 'BUILDER',
