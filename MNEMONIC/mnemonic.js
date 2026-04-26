@@ -360,7 +360,6 @@ const $$ = {
 
   local_request : function(mode, name){
        switch(mode){
-               case 'reload':  location.reload(); break;
                case 'save':    $$.saveToLocal(name, JSON.stringify($$.vars.LISTE), action=> {
                                     $$.animate(qu('.sub-list'), 'understood ease-out', 1.5);
                                     $$.vars.RESPONSE = $$.vars.LISTE;
@@ -489,6 +488,7 @@ const main = function(){
                case "plus-list":   $$.addList();              break;
                case "plus-task":   $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );            break;
                case "back":        $$.switchTO('main-div');   $$.referenceTasksPerList();  break;
+               case 'reload':  location.reload(); break;
                case 'save':
                                    if($$.vars.SERVER == 'PHP') { $$.php_request($$.vars.LISTE , php=> $$.animate(qu('.sub-list'), 'understood ease-out', 1.5) ); log('php');}
                                    else                        { $$.local_request('save', 'mnemonic-liste'); log('js'); }

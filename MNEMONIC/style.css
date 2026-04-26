@@ -97,8 +97,7 @@ select>option {}
   position: relative;
   outline: 1px solid #84858854;
   min-height: calc(46vh);
-  max-height: calc(100vh / 4);
-  overflow: scroll;
+  max-height: calc(100vh / 5);
 }
 .done{
   text-decoration: line-through;
@@ -106,8 +105,9 @@ select>option {}
 }
 .to-edit{
   white-space: pre-wrap;
-  width: 80%;
+  width: 75%;
   text-shadow: 0px 0px 0.5px;
+  overflow-wrap: anywhere;
 }
 .copy-task-text{
    position: absolute;
@@ -134,7 +134,7 @@ select>option {}
 .sub-li > div{
   display: grid;
   overflow: scroll;
-  max-height: 45vh;
+  max-height: -webkit-fill-available;
 }
 .controls{
   display: flex;
