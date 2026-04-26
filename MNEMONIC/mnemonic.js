@@ -13,6 +13,7 @@ const $$ = {
       activeListName : null,
       FILE : 'list.json',
       colors  : ['', '--mint', '--teal','--babyBlue','--magicMint','--earth','--lavander','--beige', '--softGold'],
+      activeTask : null, //will be index
   },
   query : {},
   collectQuery : function(){
@@ -63,7 +64,7 @@ const $$ = {
               text_div.addEventListener('dragenter', $$.quickDragEnter       );
 
               // STATUS OF TASK, DONE or NOT
-          let square = dce('span');
+          let square = dce('div');
               square.innerText = '◻︎';
               square.classList.add('is-done');
 
@@ -73,37 +74,15 @@ const $$ = {
                      if(text_div.classList.contains('done')) $$.taskIs('', square);
                      else                                    $$.taskIs('done', square);
 
-                  $$.vars.LISTE[$$.vars.activeListName][ inc ].status = status;
-              });
-              // ADD COLORING OPTIONS
-          let myColors = dce('div');
-              myColors.classList.add('task-colors-holder');
-              for(let i = 0; i < $$.vars.colors.length; i++){
-                  let small_div = dce('div');
-                  small_div.style.background = `var(${$$.vars.colors[i]})`;
-                  small_div.setAttribute('color-data' , `${$$.vars.colors[i]}`);
-                  small_div.classList.add('color-div', 'minimal-btn');
-                  myColors.appendChild(small_div);
-              }
-
-              myColors.addEventListener('click', e=>{
-                 let colorIs = e.target.getAttribute('color-data');
-                 let myToEdit = e.target.parentElement.parentElement.querySelector('.to-edit');
-                     myToEdit.style.background = (colorIs == '') ? '' : `var(${colorIs})`;
-                 inc = parseInt( myColors.parentElement.getAttribute('data'));
-                 // $$.updateListState(myColors, myToEdit.innerText );
-                 if( isNaN(inc) == false && $$.vars.LISTE[$$.vars.activeListName][ inc ] == null) {
-                     $$.vars.LISTE[$$.vars.activeListName][ inc ] = {};
-                     if( myToEdit.innerText.length > 1 ) $$.vars.LISTE[$$.vars.activeListName][ inc ].content =  myToEdit.innerText;   //ALTERNATIVE TO UPDATE LIST STATE
-                 }
-                 if($$.vars.LISTE[$$.vars.activeListName][ inc ] != null) $$.vars.LISTE[$$.vars.activeListName][ inc ].color = colorIs;
+                     let the_list = $$.vars.LISTE[$$.vars.activeListName][ inc ];
+                     if(the_list) the_list.status = status;
               });
 
               //AUTO RECOGNIZE ALREADY SET COLOR, when RECREATING TASK
               let colorWas = $$.vars.LISTE[$$.vars.activeListName][ inc] != null ? $$.vars.LISTE[$$.vars.activeListName][ inc ].color : '';
-              text_div.style.background = (colorWas == '') ? '' : `var(${colorWas})`;
+              li.style.background = (colorWas == '') ? '' : `var(${colorWas})`;
 
-          let del = dce('span');
+          let del = dce('div');
                   del.innerText = '⤬';
                   del.classList.add('delete-me');
                   //DELETE TASK
@@ -114,7 +93,6 @@ const $$ = {
                           delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
                   });
             li.appendChild(square);
-            li.appendChild(myColors);
             li.appendChild(text_div);
             li.appendChild(del);
 
@@ -173,6 +151,38 @@ const $$ = {
                     selection.deleteFromDocument();
                     selection.getRangeAt(0).insertNode(document.createTextNode(text))
                   }
+  },
+  addTaskColoring : function(){
+    // ADD COLORING OPTIONS
+      let myColors = dce('div');
+          myColors.classList.add('task-colors-holder');
+          for(let i = 0; i < $$.vars.colors.length; i++){
+              let small_div = dce('div');
+              small_div.style.background = `var(${$$.vars.colors[i]})`;
+              small_div.setAttribute('color-data' , `${$$.vars.colors[i]}`);
+              small_div.classList.add('color-div', 'minimal-btn');
+              myColors.appendChild(small_div);
+          }
+
+          myColors.addEventListener('click', e=>{
+             let colorIs = e.target.getAttribute('color-data');
+             let inc = parseInt($$.vars.activeTask) || 0;
+
+             let task = quAll('.sub-li')[inc];
+                 task.style.background = (colorIs == '') ? '' : `var(${colorIs})`;
+
+             let ToEdit = task.querySelector('.to-edit');    //$$.vars.LISTE[$$.vars.activeListName][ inc ]
+                 // ToEdit.style.background = (colorIs == '') ? '' : `var(${colorIs})`;
+             // inc = parseInt( myColors.parentElement.getAttribute('data'));
+             // $$.updateListState(myColors, ToEdit.innerText );
+             if( isNaN(inc) == false && $$.vars.LISTE[$$.vars.activeListName][ inc ] == null) {
+                 $$.vars.LISTE[$$.vars.activeListName][ inc ] = {};
+                 if( ToEdit.innerText.length > 1 ) $$.vars.LISTE[$$.vars.activeListName][ inc ].content =  ToEdit.innerText;   //ALTERNATIVE TO UPDATE LIST STATE
+             }
+             if($$.vars.LISTE[$$.vars.activeListName][ inc ] != null) $$.vars.LISTE[$$.vars.activeListName][ inc ].color = colorIs;
+          });
+
+          qu('.top-form').appendChild(myColors);
   },
   adjustTextSizePerLength : function(el){
          let text = el.innerText;
@@ -263,7 +273,7 @@ const $$ = {
                 }, (time || 0.2) * 1000);
   },
   resizeList : function(){
-              qu('.sub-list').style.height  = window.innerHeight -$$.vars.heightOffset + 'px';
+              // qu('.sub-list').style.height  = window.innerHeight -$$.vars.heightOffset + 'px';
               qu('.main-list').style.height = window.innerHeight -$$.vars.heightOffset * 1.5 + 'px';
   },
   generateHeaders : function(link){
@@ -434,6 +444,7 @@ const $$ = {
 const main = function(){
     $$.checkServer();   //IMIDIATLY CHECK IF PHP IS THERE SO WE CAN USE IT OR STICK WITH localStorage
     $$.collectQuery();
+    $$.addTaskColoring();
     $$.createPresets();
     window.addEventListener('mousedown', e=>{
          let the_class = e.target.classList[0];
@@ -452,6 +463,14 @@ const main = function(){
                                   });
                break;  //transmit EMPTY OBJECT aka delete
                case 'view':        $$.changeView();           break;
+
+                case 'sub-li': case 'to-edit': case 'is-done':
+                      if(e.target.nodeName == "LI"){
+                        $$.vars.activeTask = e.target.getAttribute('data');
+                      }else{
+                        $$.vars.activeTask = e.target.parentElement.getAttribute('data');
+                      }
+                 break;
            }
          $$.autoShow();
      });

@@ -21,6 +21,8 @@
 html{ min-height: 100%;   }
 body{
     min-height: 100%;
+    width: 100%;
+    position: fixed;
     background: var(--dark);
     color: var(--nextTextColor);
     margin: 0;
@@ -85,6 +87,8 @@ select>option {}
   height: 555px;
   overflow-x: hidden;
   transition: 1s;
+  padding: 1%;
+  height: 91vh;
 }
 .sub-li{
   overflow-y: hidden;
@@ -92,6 +96,10 @@ select>option {}
   height: fit-content;
   align-self: center;
   position: relative;
+  outline: 1px solid #84858854;
+  min-height: calc(46vh);
+  max-height: calc(100vh / 4);
+  overflow: scroll;
 }
 .is-done{ font-size: larger; }
 .done{
@@ -100,22 +108,18 @@ select>option {}
 }
 .to-edit{
   white-space: pre-wrap;
-  width: 65%;
-  max-width: 65%;
-  padding: 5%;
+  width: 80%;
   text-shadow: 0px 0px 0.5px;
 }
-.to-edit::after{
-  content: "(𝍍)⬇︎";
-  font-size: 11px;
-  color: transparent;
-  text-shadow: 0px 0px 0px #0000006b;
-  float: right;
+.sub-li > div{
+  display: grid;
+  overflow: scroll;
+  max-height: 45vh;
 }
 .controls{
   display: flex;
   justify-content: space-between;
-  bottom: 2%;
+  width: 99%;
 }
 .delete-me{ font-size: 33px; text-shadow: none; }
 .delete-me:hover{ color: indianred; }
@@ -137,7 +141,7 @@ select>option {}
 }
 .grid-view > li > .to-edit{
   overflow: scroll;
-  max-height: calc(100vh / 3);
+  max-height: calc(100vh / 2.5);
   border-radius: 10px;
 }
 .micro-holder{
@@ -156,12 +160,7 @@ select>option {}
   border-radius: 100px;
 }
 .task-colors-holder{
-  /* display: grid; */
-  /* grid-template-columns: repeat(3, 1fr); */
-  position: absolute;
-  top: 4px;
-  left: 7vw;
-  box-shadow: 2px 1px 2px #0000007a;
+  display: flex;
 }
 .color-div{
   height: 15px;
@@ -173,7 +172,6 @@ select>option {}
 .color-div:first-child{
   outline: 2.5px solid;
   outline-offset: -2.5px;
-  border-top-left-radius: 6px;
 }
 
 .net{
