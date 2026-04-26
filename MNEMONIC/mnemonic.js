@@ -1,3 +1,4 @@
+"use strict";
 const doc = document,
       log   = (...x)=> console.log(x),
       dce   = (x)=>    doc.createElement(x),
@@ -14,6 +15,16 @@ const $$ = {
       FILE : 'list.json',
       colors  : ['', '--mint', '--teal','--babyBlue','--magicMint','--earth','--lavander','--beige', '--softGold'],
       activeTask : null, //will be index
+
+      list_views : {
+        index : 0,
+        map : {
+            0 : '',
+            1 : 'grid-view',
+            2 : 'table-view',
+          },
+      },
+
   },
   query : {},
   collectQuery : function(){
@@ -23,6 +34,7 @@ const $$ = {
               subDiv    : qu('.sub-div'),
               mainList  : qu('.main-list'),
               subList   : qu('.sub-list'),
+              noti      : qu('.noti'),
             }
           },
   taskIs : function(state, el ){
@@ -39,11 +51,32 @@ const $$ = {
 
         $$.vars.LISTE[$$.vars.activeListName][ inc ].content = data || e.target.innerText; //data is used when droping file
   },
+  copyEvent : async function(btn, textToCopy){
+          try {
+            await navigator.clipboard.writeText(textToCopy);
+            $$.notification('Copied to clipboard!');
+          } catch (err) {
+            $$.notification('Failed to copy...');
+          }
+  },
+  notification : function(text){
+       let noti = $$.query.noti;
+           noti.textContent = text;
+       show_this(noti, 'block');
+
+       setTimeout(t=> show_this(noti, 'none'), 5 * 1000);
+  },
+  randomEmoji : function(index=null){
+    let emojis = ['o_o', '-_-', '  +_+', '  * ^ *', '  #_#', '  0_o', '  `_`', '  ~_~', '  :=_=:',' ♥︎_♥︎', '⧸⧸⧼⧽⋰', '౨ৎ', '୨ৎ', '𝒢𑄺', '𝜗⍴', '𝜗ৎ', '𝜗𐑞', '𝜗𝜚'];
+    if(index && emojis[index] != null) return emojis[index];  //you can pass desired emoji index
+    return emojis[Math.ceil(Math.random() * emojis.length)] || emojis[0]; 
+  },
   //TASK inside LIST[?]...
   addTask : function(OK, content, status){
+
           let li = dce('li');
               li.classList.add('sub-li');
-              inc = quAll('.sub-li').length || 0;
+          let inc = quAll('.sub-li').length || 0;
 
               li.setAttribute('data', inc);
           let text_div = dce('div');
@@ -52,7 +85,7 @@ const $$ = {
 
               text_div.addEventListener('paste', $$.onlyPlainText);
 
-              if(OK == null) text_div.innerText = '/';
+              if(OK == null) text_div.innerText =  '  ' + $$.randomEmoji();
               else           text_div.innerText = content;
 
               //REMEMBER CONTENT
@@ -66,7 +99,7 @@ const $$ = {
               // STATUS OF TASK, DONE or NOT
           let square = dce('div');
               square.innerText = '◻︎';
-              square.classList.add('is-done');
+              square.classList.add('is-done', 'btn');
 
               square.addEventListener('mousedown', e=>{
                      inc = li.getAttribute('data'); //RESET
@@ -84,7 +117,7 @@ const $$ = {
 
           let del = dce('div');
                   del.innerText = '⤬';
-                  del.classList.add('delete-me');
+                  del.classList.add('delete-me', 'btn');
                   //DELETE TASK
                   del.addEventListener('mousedown', e=>{
                       inc = li.getAttribute('data');
@@ -92,6 +125,12 @@ const $$ = {
                           $$.animate(li, 'deletedFromRight linear forwards', .66, true);
                           delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
                   });
+          let copySpan = dce('span');
+              copySpan.classList.add('copy-task-text', 'btn');
+              copySpan.textContent = "⧉";
+              copySpan.addEventListener( 'click', async e=> $$.copyEvent(copySpan, text_div.textContent ));
+
+            li.appendChild(copySpan);
             li.appendChild(square);
             li.appendChild(text_div);
             li.appendChild(del);
@@ -153,7 +192,7 @@ const $$ = {
                   }
   },
   addTaskColoring : function(){
-    // ADD COLORING OPTIONS
+      // ADD COLORING OPTIONS
       let myColors = dce('div');
           myColors.classList.add('task-colors-holder');
           for(let i = 0; i < $$.vars.colors.length; i++){
@@ -171,10 +210,7 @@ const $$ = {
              let task = quAll('.sub-li')[inc];
                  task.style.background = (colorIs == '') ? '' : `var(${colorIs})`;
 
-             let ToEdit = task.querySelector('.to-edit');    //$$.vars.LISTE[$$.vars.activeListName][ inc ]
-                 // ToEdit.style.background = (colorIs == '') ? '' : `var(${colorIs})`;
-             // inc = parseInt( myColors.parentElement.getAttribute('data'));
-             // $$.updateListState(myColors, ToEdit.innerText );
+             let ToEdit = task.querySelector('.to-edit');
              if( isNaN(inc) == false && $$.vars.LISTE[$$.vars.activeListName][ inc ] == null) {
                  $$.vars.LISTE[$$.vars.activeListName][ inc ] = {};
                  if( ToEdit.innerText.length > 1 ) $$.vars.LISTE[$$.vars.activeListName][ inc ].content =  ToEdit.innerText;   //ALTERNATIVE TO UPDATE LIST STATE
@@ -192,15 +228,15 @@ const $$ = {
          el.style.fontSize = ratio + 'px';
   },
   changeView : function(){
-        //find active sub-list
-        let sub_lists = quAll('.sub-list');
-        let list_with_children = null;
-        for(let i = 0; i<sub_lists.length; i++){
-          if(sub_lists[i].children.length > 0) {list_with_children = sub_lists[i]; break;}
-        }
-        // CHANGE VIEW
-        if(list_with_children.classList.contains('grid-view')) list_with_children.classList.remove('grid-view');
-        else                                                   list_with_children.classList.add('grid-view');
+       let list_views = $$.vars.list_views;
+           list_views.index +=1;
+        let map = list_views.map;
+        let OK = Object.keys(map);
+        if(list_views.index > parseInt(OK[OK.length-1]) ) list_views.index = 0;
+
+        qu('.sub-list').classList.remove('grid-view', 'table-view');
+        let view = list_views.map[list_views.index];
+        if(view != '') qu('.sub-list').classList.add(view);
   },
   referenceTasksPerList : function(){
         let OK = Object.keys($$.vars.LISTE);
@@ -324,6 +360,7 @@ const $$ = {
 
   local_request : function(mode, name){
        switch(mode){
+               case 'reload':  location.reload(); break;
                case 'save':    $$.saveToLocal(name, JSON.stringify($$.vars.LISTE), action=> {
                                     $$.animate(qu('.sub-list'), 'understood ease-out', 1.5);
                                     $$.vars.RESPONSE = $$.vars.LISTE;

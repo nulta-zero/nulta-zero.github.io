@@ -28,7 +28,7 @@ body{
     margin: 0;
     cursor: default;
 }
-input{ outline: none; }
+input{ outline: none; color: inherit; }
 ol{
   list-style-type: none;
   padding: 0;
@@ -50,7 +50,6 @@ select {
 select>option {}
 .btn{
   background: transparent;
-  color: silver;
   border: none;
 }
 .btn:hover{
@@ -101,7 +100,6 @@ select>option {}
   max-height: calc(100vh / 4);
   overflow: scroll;
 }
-.is-done{ font-size: larger; }
 .done{
   text-decoration: line-through;
   filter: opacity(0.35);
@@ -111,6 +109,28 @@ select>option {}
   width: 80%;
   text-shadow: 0px 0px 0.5px;
 }
+.copy-task-text{
+   position: absolute;
+   top:  0;
+   left: 4px;
+   transform: rotateX(180deg) scale(.75);
+}
+.noti{
+  position: absolute;
+  bottom: 10px;
+  left: 41vw;
+  width: fit-content;
+  max-width: 200px;
+  background: #ccccff87;
+  outline: 1px solid black;
+  color: black;
+  border-radius: 5px;
+  font-weight: 100;
+  padding: 1px 5px;
+  font-size: 90%;
+  animation: slideFromBottom 1s;
+  display: none;
+}
 .sub-li > div{
   display: grid;
   overflow: scroll;
@@ -119,12 +139,12 @@ select>option {}
 .controls{
   display: flex;
   justify-content: space-between;
-  width: 99%;
+  width: 98%;
+  padding: 0 10px;
 }
-.delete-me{ font-size: 33px; text-shadow: none; }
-.delete-me:hover{ color: indianred; }
-.controls{ padding: 0 10px; }
 .controls > input{ font-size: xx-large; }
+
+.delete-me{ font-size: 33px; text-shadow: none; }
 
 [contenteditable='true']{
   outline: none;
@@ -144,6 +164,16 @@ select>option {}
   max-height: calc(100vh / 2.5);
   border-radius: 10px;
 }
+
+.table-view{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+.table-view > .sub-li{
+  min-height: 25vw;
+}
+
 .micro-holder{
   justify-content: center;
   display: grid;
@@ -216,6 +246,10 @@ select>option {}
 }
 @keyframes slideFromLeft { /* SLIDE FROM LEFT */
   from {transform: translate(-100px);}
+  to   {transform: translate(0);}
+}
+@keyframes slideFromBottom {  /* SLIDE FROM BOTTOM */
+  from {transform: translate(0, 300px);}
   to   {transform: translate(0);}
 }
 @keyframes zoomOut {  /* ZOOM OUT */
