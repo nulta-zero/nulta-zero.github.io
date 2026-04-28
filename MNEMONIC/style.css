@@ -6,7 +6,20 @@
   --magicMint  : #AAF0D1;
   --periwinkle : #ccccff;
   --lavander   : #d3d3ff;
-
+    /* Warm & Sunny */
+  --apricot: #FFDAB9;       /*(A soft, creamy orange)*/
+  --lemonChiffon: #FFFACD; /*(A very pale, airy yellow)*/
+  --peach: #FFCCBB;        /*(Warm but muted)*/
+  --roseQuartz: #F7CAC9;   /*(A classic, dusty pale pink)*/
+     /* Earthy & Neutral */
+  --dustyRose: #E4B4B4;  /* (A slightly deeper, more sophisticated pink)*/
+  --sage: #D1E8D1;       /* (A very muted, greyish green)*/
+  --linen: #FAF0E6;      /* (A clean, warm off-white)*/
+     /* Cool & Fresh */
+  --paleAqua: #BCD4E6;   /* (Crisp and clean, sits between blue and grey)*/
+  --pistachio: #E2F3E4;  /* (A lighter, milkier version of your magic mint)*/
+  --thistle: #D8BFD8;    /* (A pale purple that leans toward grey)*/
+  --skyMist: #E0FFFF;    /* (A very light, "icy" blue)*/
   --softGold  : #b9be81;
   --beige : #d1bda0;
   --teal  : #3ae1e1;
@@ -16,6 +29,9 @@
   --dark : #202124;
   --nextTextColor : #848588;
   --softLavander  : #d3d3ff4d;
+
+  --braveConsole : #282828;
+  --atomWorkspace : #21252b;
 }
 *   { font-family: Menlo; }
 html{ min-height: 100%;   }
@@ -23,7 +39,7 @@ body{
     min-height: 100%;
     width: 100%;
     position: fixed;
-    background: var(--dark);
+    background: var(--atomWorkspace);
     color: var(--nextTextColor);
     margin: 0;
     cursor: default;
@@ -46,6 +62,8 @@ select {
   border: none;
   outline: none;
   color: inherit;
+  font-size: inherit;
+  max-width: 110px;
 }
 select>option {}
 .btn{
@@ -67,7 +85,16 @@ select>option {}
   filter: brightness(50%);
 }
 .back{ -webkit-text-security: disc;}
-.top-form { display: none; margin: 4px;  justify-content: space-evenly; }
+.top-form {
+  display: none;
+  margin: 4px;
+  justify-content: space-evenly;
+  overflow-x: scroll;
+  gap: 10px;
+}
+.top-form > input{
+  font-size: min(4vw, 1rem);
+}
 .modified-date{float:right; font-size: 11px; padding-right: 5px;}
 .main-div { animation: slideFromLeft .5s;}
 .main-list{ padding-top: 5%; }
@@ -99,6 +126,36 @@ select>option {}
   min-height: calc(46vh);
   max-height: calc(100vh / 5);
 }
+.sub-li > div{
+  display: grid;
+  overflow: scroll;
+  max-height: -webkit-fill-available;
+}
+.grid-view{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-auto-rows: min-content;
+}
+.grid-view > li > .to-edit{
+  overflow: scroll;
+  max-height: calc(100vh / 2.5);
+  border-radius: 10px;
+}
+
+.table-view{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-auto-rows: min-content;
+  /* grid-auto-rows: minmax(200px, auto); */
+  /* grid-auto-flow: dense; */
+}
+.table-view > .sub-li{
+  min-height: 200px;
+  height: 200px;
+}
+.is-done{
+  padding-left: 10px;
+}
 .done{
   text-decoration: line-through;
   filter: opacity(0.35);
@@ -108,6 +165,8 @@ select>option {}
   width: 75%;
   text-shadow: 0px 0px 0.5px;
   overflow-wrap: anywhere;
+  padding: 5vh 0px;
+  text-indent: 10px;
 }
 .copy-task-text{
    position: absolute;
@@ -131,20 +190,21 @@ select>option {}
   animation: slideFromBottom 1s;
   display: none;
 }
-.sub-li > div{
-  display: grid;
-  overflow: scroll;
-  max-height: -webkit-fill-available;
-}
 .controls{
   display: flex;
   justify-content: space-between;
   width: 98%;
   padding: 0 10px;
+  position: fixed;
+  bottom: 10px;
 }
 .controls > input{ font-size: xx-large; }
 
-.delete-me{ font-size: 33px; text-shadow: none; }
+.delete-me{
+  font-size: 33px;
+  text-shadow: none;
+  padding-right: 10px;
+}
 
 [contenteditable='true']{
   outline: none;
@@ -154,26 +214,6 @@ select>option {}
   background: #d3d3ff4d;
   color: #0b0b0b;
 }
-
-.grid-view{
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-}
-.grid-view > li > .to-edit{
-  overflow: scroll;
-  max-height: calc(100vh / 2.5);
-  border-radius: 10px;
-}
-
-.table-view{
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-}
-.table-view > .sub-li{
-  min-height: 25vw;
-}
-
 .micro-holder{
   justify-content: center;
   display: grid;
@@ -191,6 +231,7 @@ select>option {}
 }
 .task-colors-holder{
   display: flex;
+  align-items: center;
 }
 .color-div{
   height: 15px;
@@ -223,6 +264,9 @@ select>option {}
   font-size: 100px;
   color: var(--textColor);
 }
+/* SCROLLBARS */
+::-webkit-scrollbar { width: 2.5px; height: 2.5px; }
+::-webkit-scrollbar-corner { background: transparent;}
 
 #pop{
   position: fixed;

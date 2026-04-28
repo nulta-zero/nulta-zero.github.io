@@ -13,7 +13,19 @@ const $$ = {
       LISTE : {},
       activeListName : null,
       FILE : 'list.json',
-      colors  : ['', '--mint', '--teal','--babyBlue','--magicMint','--earth','--lavander','--beige', '--softGold'],
+      colors  : ['','--earth', '--teal','--babyBlue','--magicMint', '--mint','--lavander','--beige', '--softGold',
+                '--apricot',
+                '--lemonChiffon',
+                '--peach',
+                '--roseQuartz',
+                '--dustyRose',
+                '--sage',
+                '--linen',
+                '--paleAqua',
+                '--pistachio',
+                '--thistle',
+                '--skyMist',
+      ],
       activeTask : null, //will be index
 
       list_views : {
@@ -37,6 +49,7 @@ const $$ = {
               noti      : qu('.noti'),
             }
           },
+  getIndex : (el)=> parseInt(el.getAttribute('data')) || 0,        
   taskIs : function(state, el ){
             let myTask = el.parentElement.querySelector('.to-edit');
              switch(state){
@@ -95,6 +108,12 @@ const $$ = {
               text_div.addEventListener('dragover',  $$.quickDragOverHandler );
               text_div.addEventListener('dragleave', $$.quickDragLeave       );
               text_div.addEventListener('dragenter', $$.quickDragEnter       );
+
+              li.addEventListener('dblclick', e=>{
+                 if(li.parentElement.classList.contains('table-view') == false) return false;
+                 $$.extendGridTableColumn(li);
+                 // (li.classList.contains('extended') == false) ? li.classList.add('extended') : li.classList.remove('extended');
+              });
 
               // STATUS OF TASK, DONE or NOT
           let square = dce('div');
@@ -272,6 +291,18 @@ const $$ = {
                     for(let i =0; i< OK.length; i++){
                         $$.addTask(OK[i], OV[i].content, OV[i].status );     //OK[i].split(/\s/)[1]
                     }
+   },
+   extendGridTableColumn : function(el){
+        if(el == null) return false;
+        let rowMax = Math.floor(window.innerWidth / 200);
+        let index = Math.floor(el.getBoundingClientRect().x / 200);
+        let divider = parseInt(el.getAttribute('extended') || 1);
+            divider+=1;
+        if(divider > rowMax-Math.abs(index%rowMax) ) divider = null;      //7-(4 % 7)
+        if(divider == null) { el.removeAttribute('extended'); return el.style.gridColumn = ''; }
+
+        el.style.gridColumn = `span ${divider}`;
+        el.setAttribute('extended', divider);
    },
    //RECREATE LISTS FROM .json file
   recreateLists : function( obj ){
@@ -483,6 +514,8 @@ const main = function(){
     $$.addTaskColoring();
     $$.createPresets();
     window.addEventListener('mousedown', e=>{
+         if(e.detail > 1){ e.preventDefault(); }// Prevents selection on double-click and beyond
+
          let the_class = e.target.classList[0];
           switch(the_class){
                case "plus-list":   $$.addList();              break;
