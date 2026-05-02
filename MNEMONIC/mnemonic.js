@@ -4,6 +4,7 @@ const doc = document,
       dce   = (x)=>    doc.createElement(x),
       qu    = (Q)=>    doc.querySelector(Q),
       quAll = (Q)=>    doc.querySelectorAll(Q),
+      appendAll = (arr, parent)=> arr.map( x=> parent.appendChild(x) ),
       show_this = (it, mechanism)=> { (mechanism) ? it.style.display = mechanism || 'block' : it.style.display = 'none'; }; //EXAMPLE OF USING THIS FUNC      show_this( invertory_holder, true/false )
 
 const $$ = {
@@ -13,7 +14,7 @@ const $$ = {
       LISTE : {},
       activeListName : null,
       FILE : 'list.json',
-      colors  : ['','--earth', '--teal','--babyBlue','--magicMint', '--mint','--lavander','--beige', '--softGold',
+      colors  : ['--atomWorkspace','--earth', '--teal','--babyBlue','--magicMint', '--mint','--lavander','--beige', '--softGold',
                 '--apricot',
                 '--lemonChiffon',
                 '--peach',
@@ -37,6 +38,11 @@ const $$ = {
           },
       },
 
+      dragged : {
+        source : { item : null, index : null, },
+        target : { item : null, index : null }
+      }
+
   },
   query : {},
   collectQuery : function(){
@@ -47,9 +53,10 @@ const $$ = {
               mainList  : qu('.main-list'),
               subList   : qu('.sub-list'),
               noti      : qu('.noti'),
+              skeletonHolder : qu('.skeleton-holder'),
             }
           },
-  getIndex : (el)=> parseInt(el.getAttribute('data')) || 0,        
+  getIndex : (el)=> parseInt(el.getAttribute('data')) || 0,
   taskIs : function(state, el ){
             let myTask = el.parentElement.querySelector('.to-edit');
              switch(state){
@@ -58,32 +65,106 @@ const $$ = {
              }
           return state;
   },
-  updateListState : function(e, data){
-        let inc = e.target.parentElement.getAttribute('data');
+  updateListState : function(provided, data){
+        let inc = provided.parentElement.getAttribute('data') || 0;
         if( $$.vars.LISTE[$$.vars.activeListName][ inc ] == null)  $$.vars.LISTE[$$.vars.activeListName][ inc ] = {}; //if it does not exist create new
 
-        $$.vars.LISTE[$$.vars.activeListName][ inc ].content = data || e.target.innerText; //data is used when droping file
+        $$.vars.LISTE[$$.vars.activeListName][ inc ].content = data || provided.querySelector('.to-edit').textContent; //data is used when droping file
+  },
+  fullListUpdate : function(){
+        let list = $$.vars.LISTE[$$.vars.activeListName];
+        let arr = quAll('.sub-li');
+        for(let i=0;i<arr.length;i++){
+            if(list[i] == null) list[i] = {};
+            list[i].content = arr[i].querySelector('.to-edit').textContent;
+            list[i].color   = arr[i].style.background.replaceAll(/var\(|\)/gi, '');
+            list[i].size    = arr[i].style.gridColumn;
+        }
   },
   copyEvent : async function(btn, textToCopy){
           try {
             await navigator.clipboard.writeText(textToCopy);
-            $$.notification('Copied to clipboard!');
+            await $$.notification('Copied to clipboard!');
           } catch (err) {
             $$.notification('Failed to copy...');
           }
   },
-  notification : function(text){
-       let noti = $$.query.noti;
-           noti.textContent = text;
-       show_this(noti, 'block');
-
-       setTimeout(t=> show_this(noti, 'none'), 5 * 1000);
-  },
   randomEmoji : function(index=null){
-    let emojis = ['o_o', '-_-', '  +_+', '  * ^ *', '  #_#', '  0_o', '  `_`', '  ~_~', '  :=_=:',' ♥︎_♥︎', '⧸⧸⧼⧽⋰', '౨ৎ', '୨ৎ', '𝒢𑄺', '𝜗⍴', '𝜗ৎ', '𝜗𐑞', '𝜗𝜚'];
+    let emojis = ['o_o', '-_-', '  +_+', '  * ^ *', '  #_#', '  0_o', '  `_`', '  ~_~', '  :=_=:',' ♥︎_♥︎', '⧸⧸⧼⧽⋰', '౨ৎ', '୨ৎ', '𝒢𑄺', '𝜗⍴', '𝜗ৎ', '𝜗𐑞', '𝜗𝜚', '>_<', "'_'" ,'x_x'
+, '._.' ,'.__.', '•_•', 'ˆ_ˆ', ];
     if(index && emojis[index] != null) return emojis[index];  //you can pass desired emoji index
     return emojis[Math.ceil(Math.random() * emojis.length)] || emojis[0]; 
   },
+  addReorderDrag : function(item, zone){
+        // On the draggable item
+        item.addEventListener('dragstart', e => {
+          if(e.target.classList.contains('sub-li') == false) return false;
+          e.dataTransfer.effectAllowed = 'move';
+          $$.vars.dragged.source.item = e.target;
+          $$.vars.dragged.source.index = e.target.getAttribute('data');
+        });
+        item.setAttribute('draggable', true);
+  },
+  addReorderDropZone : function(zone){
+      const refresh = ()=>{
+         $$.reasignIndexes();
+         $$.fullListUpdate();
+      }
+      zone.addEventListener('dragover', e => e.preventDefault()); // required!
+      zone.addEventListener('drop', e => {
+          e.preventDefault();
+          if(e.target.classList.contains('sub-list')){
+             e.target.appendChild($$.vars.dragged.source.item);  //no children in list (all pinned) allow return to list
+             return refresh();
+          }
+          if(e.target.classList.contains('sub-li') == false) {
+             return false;
+          }
+          let dra = $$.vars.dragged;
+              dra.target.item  = e.target;
+              dra.target.index = e.target.getAttribute('data');
+
+          let targetIndex = parseInt(dra.target.index);
+          let sourceIndex = parseInt(dra.source.index);
+
+          if(sourceIndex < targetIndex) zone.insertBefore(dra.source.item, dra.target.item.nextSibling);   //drag toward (right | larger index)
+          else                          zone.insertBefore(dra.source.item, dra.target.item); //drag toward (left | smaller index)
+          refresh();
+      });
+  },
+  addPinDropZone : function(zone){
+      zone.addEventListener('dragover', e => e.preventDefault()); // required!
+      zone.addEventListener('drop', e => {
+          e.preventDefault();
+          let dra = $$.vars.dragged;
+          dra.target.item  = e.target;
+          dra.target.index = e.target.getAttribute('data');
+          e.target.appendChild(dra.source.item);
+          e.target.classList.remove('net');
+      });
+      zone.addEventListener('dragenter', $$.dropEnter);
+      zone.addEventListener('dragleave', $$.dropLeave);
+  },
+  dropEnter : async e => {
+          e.preventDefault();
+          e.stopPropagation();
+          e.target.classList.add('net');
+  },
+  dropLeave : e => { e.target.classList.remove('net') },
+
+  reasignIndexes : function(arr){
+      arr = arr || quAll('.sub-li');
+      for(let i=0;i<arr.length;i++){
+          arr[i].setAttribute('data', i);
+          arr[i].querySelector('.cal-task').textContent = $$.seeDate(i);  //reasign calendar also
+      }
+  },
+  futureDate : function(days){
+    let d = new Date();
+    // Add days to the future (milliseconds * seconds * minutes * hours * days)
+    return d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+  },
+  seeDate : (days)=> new Date($$.futureDate(days)).toDateString(), //from today
   //TASK inside LIST[?]...
   addTask : function(OK, content, status){
 
@@ -98,66 +179,54 @@ const $$ = {
 
               text_div.addEventListener('paste', $$.onlyPlainText);
 
-              if(OK == null) text_div.innerText =  '  ' + $$.randomEmoji();
-              else           text_div.innerText = content;
+              let whiteSpace = qu('.sub-list').classList.contains('table-view') ? ' ' : '  ';
 
-              //REMEMBER CONTENT
-              text_div.addEventListener('keyup', $$.updateListState );
+              if(OK == null) text_div.innerText =  whiteSpace + $$.randomEmoji();
+              else           text_div.innerText = content;
 
               text_div.addEventListener('drop',      $$.quickDropHandler     );
               text_div.addEventListener('dragover',  $$.quickDragOverHandler );
               text_div.addEventListener('dragleave', $$.quickDragLeave       );
               text_div.addEventListener('dragenter', $$.quickDragEnter       );
-
-              li.addEventListener('dblclick', e=>{
-                 if(li.parentElement.classList.contains('table-view') == false) return false;
-                 $$.extendGridTableColumn(li);
-                 // (li.classList.contains('extended') == false) ? li.classList.add('extended') : li.classList.remove('extended');
-              });
+              text_div.setAttribute('draggable', false); //prevent dragging from to-edit
 
               // STATUS OF TASK, DONE or NOT
           let square = dce('div');
               square.innerText = '◻︎';
               square.classList.add('is-done', 'btn');
 
-              square.addEventListener('mousedown', e=>{
-                     inc = li.getAttribute('data'); //RESET
-                     let status = 'done';
-                     if(text_div.classList.contains('done')) $$.taskIs('', square);
-                     else                                    $$.taskIs('done', square);
-
-                     let the_list = $$.vars.LISTE[$$.vars.activeListName][ inc ];
-                     if(the_list) the_list.status = status;
-              });
-
               //AUTO RECOGNIZE ALREADY SET COLOR, when RECREATING TASK
               let colorWas = $$.vars.LISTE[$$.vars.activeListName][ inc] != null ? $$.vars.LISTE[$$.vars.activeListName][ inc ].color : '';
-              li.style.background = (colorWas == '') ? '' : `var(${colorWas})`;
+              li.style.background = `var(${colorWas})`;
+
+              let sizeWas = $$.vars.LISTE[$$.vars.activeListName][ inc] != null ? $$.vars.LISTE[$$.vars.activeListName][ inc ].size : '';
+              li.style.gridColumn = `${sizeWas}`;
 
           let del = dce('div');
-                  del.innerText = '⤬';
-                  del.classList.add('delete-me', 'btn');
-                  //DELETE TASK
-                  del.addEventListener('mousedown', e=>{
-                      inc = li.getAttribute('data');
-                      li.style.background = 'indianred';
-                          $$.animate(li, 'deletedFromRight linear forwards', .66, true);
-                          delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
-                  });
-          let copySpan = dce('span');
-              copySpan.classList.add('copy-task-text', 'btn');
-              copySpan.textContent = "⧉";
-              copySpan.addEventListener( 'click', async e=> $$.copyEvent(copySpan, text_div.textContent ));
+              del.innerText = '⤬';
+              del.classList.add('delete-task', 'btn');
 
-            li.appendChild(copySpan);
-            li.appendChild(square);
-            li.appendChild(text_div);
-            li.appendChild(del);
+          let taskMenu = dce('div');
+              taskMenu.classList.add('task-menu');
+          let copyTask = dce('span');
+              copyTask.classList.add('copy-task', 'btn');
+              copyTask.textContent = "⧉";
+
+          let calTask = dce('span');
+              calTask.classList.add('cal-task');
+              calTask.textContent = $$.seeDate(inc);
+
+             appendAll([square, text_div, del], li);
+             appendAll([copyTask, calTask], taskMenu);
+             li.appendChild(taskMenu);
 
             $$.adjustTextSizePerLength(text_div);
+            $$.addSkeletons(Math.floor(window.innerWidth / 200));
 
          //INIT
          $$.query.subList.appendChild(li);
+         $$.addReorderDrag(li, li.parentElement);
+         $$.fullListUpdate();
 
          //RETURN STATUS
          if(status == 'done') $$.taskIs('done', square);
@@ -171,29 +240,19 @@ const $$ = {
                 li.classList.add('main-li');
 
             let list_name_span = dce('span');
-            list_name_span.innerText = data || possible_name;
+                list_name_span.classList.add('list-name');
+                list_name_span.innerText = data || possible_name;
 
             let micro_holder = dce('div');
-            micro_holder.classList.add('micro-holder');
+                micro_holder.classList.add('micro-holder');
 
             li.setAttribute('data', data || possible_name );
             let del = dce('span');
                 del.innerText = '⤬';
-                del.classList.add('delete-me');
-                //DELETE LIST
-                del.addEventListener('mousedown', e=>{
-                    li.style.background = 'indianred';
-                    $$.animate(li, 'deletedFromRight linear forwards', .66, true);  //true is remove();
-                    delete $$.vars.LISTE[ li.getAttribute('data') ]; //NEWLY FORMED TASK OBJECT
-                });
+                del.classList.add('delete-sub-list');
             li.appendChild(list_name_span);
             li.appendChild(micro_holder);
             li.appendChild(del);
-            //OPEN LIST
-            list_name_span.addEventListener('mousedown', e=>{
-                $$.vars.activeListName = e.target.parentNode.getAttribute('data');
-                $$.switchTO('sub-div');
-            });
           $$.query.mainList.appendChild(li);
 
           // ADD TO LISTE OBJECT
@@ -227,7 +286,7 @@ const $$ = {
              let inc = parseInt($$.vars.activeTask) || 0;
 
              let task = quAll('.sub-li')[inc];
-                 task.style.background = (colorIs == '') ? '' : `var(${colorIs})`;
+                 task.style.background = `var(${colorIs})`;
 
              let ToEdit = task.querySelector('.to-edit');
              if( isNaN(inc) == false && $$.vars.LISTE[$$.vars.activeListName][ inc ] == null) {
@@ -247,15 +306,15 @@ const $$ = {
          el.style.fontSize = ratio + 'px';
   },
   changeView : function(){
-       let list_views = $$.vars.list_views;
-           list_views.index +=1;
-        let map = list_views.map;
-        let OK = Object.keys(map);
-        if(list_views.index > parseInt(OK[OK.length-1]) ) list_views.index = 0;
+         let list_views = $$.vars.list_views;
+             list_views.index +=1;
+         let map = list_views.map;
+         let OK = Object.keys(map);
+         if(list_views.index > parseInt(OK[OK.length-1]) ) list_views.index = 0;
 
-        qu('.sub-list').classList.remove('grid-view', 'table-view');
-        let view = list_views.map[list_views.index];
-        if(view != '') qu('.sub-list').classList.add(view);
+         qu('.sub-list').classList.remove('grid-view', 'table-view');
+         let view = list_views.map[list_views.index];
+         if(view != '') qu('.sub-list').classList.add(view);
   },
   referenceTasksPerList : function(){
         let OK = Object.keys($$.vars.LISTE);
@@ -268,7 +327,7 @@ const $$ = {
             for(let j = 0; j < tasks.length; j++){
                 // $$.vars.LISTE[name][j];
                 let micro = dce('span');
-                micro.innerText = '·';
+                micro.innerText = '▢';
                 micro.classList.add('micro');
                 qu(`[DATA='${name}']`).querySelector('.micro-holder').appendChild(micro);
                 // qu(`[DATA='${name}']`).insertBefore(ref_span, qu(`[DATA='${name}']`).querySelector('.delete-me'));
@@ -282,7 +341,7 @@ const $$ = {
              else                                           $$.vars.LISTE = {};
             });
   },
-  //SUB LIST IS RE-READ FROM LISTE OBJECT   [different from addTask so it must be reimplemented]
+  //SUB LIST IS RE-READ FROM LISTE OBJECT   [different from addTask so it must be re-implemented]
   recreateTasks : function(){
                let active_list_name = $$.vars.activeListName;
                let Ob = $$.vars.LISTE[active_list_name];
@@ -304,6 +363,14 @@ const $$ = {
         el.style.gridColumn = `span ${divider}`;
         el.setAttribute('extended', divider);
    },
+   addSkeletons : function(rowMax){
+        for(let i=0; i<3; i++){
+            let skeleton = dce('div');
+            skeleton.classList.add('skeleton-lines');
+            $$.query.skeletonHolder.appendChild(skeleton);
+            $$.addPinDropZone(skeleton);
+         }
+   },
    //RECREATE LISTS FROM .json file
   recreateLists : function( obj ){
                let OK = Object.keys( obj );
@@ -315,17 +382,19 @@ const $$ = {
             switch(that){
               case 'main-div':  show_this( qu('.main-div'), 'block' );
                                 show_this( qu('.sub-div'), 'none' );
+                                $$.fullListUpdate(); //update before you leave
                                 qu('.sub-list').innerHTML = '';
+                                qu('.skeleton-holder').innerHTML = '';
               break;
               case 'sub-div':   show_this( qu('.main-div'), 'none' );
-                                show_this( qu('.sub-div'), 'block' );
+                                show_this( qu('.sub-div'), 'grid' );
                                 if(typeof $$.vars.LISTE == 'object' &&
                                    Object.keys($$.vars.LISTE[$$.vars.activeListName]).length > 0) $$.recreateTasks();
               break;
             }
   },
   autoShow : function(){
-          let ML = qu('.main-list').children, SL = qu('.sub-list').children
+            let ML = qu('.main-list').children, SL = quAll('.sub-li');
             if(ML.length > 0 && SL.length > 0)  show_this(qu('.top-form'), 'flex');
             else                                show_this(qu('.top-form'), 'none');
   },
@@ -415,7 +484,6 @@ const $$ = {
   quickDragEnter : async e => {
           e.preventDefault();
           e.stopPropagation();
-          // log(e);
           if(e.target.classList.contains('to-edit') == false) return false;
           e.target.classList.add('net');
   },
@@ -431,42 +499,28 @@ const $$ = {
 
           let reader = new FileReader();
 
-          if(newFile.type.search('text') < 0) return $$.popover('Wrong file format.\nOnly text files.');
+          if(newFile.type.search('text') < 0) return $$.notification('Wrong file format.\nOnly text files.');
           if(newFile) $$.whenLoaded(reader, newFile, e );
   },
   whenLoaded : function(that, file, dropEvent ){
-                //APPEND
-               that.addEventListener('load', ()=>{
-                  let _type= file.name;
+            //APPEND
+           that.addEventListener('load', ()=>{
+              let _type= file.name;
 
-                  dropEvent.target.innerText = that.result;
-                  $$.adjustTextSizePerLength(dropEvent.target);
-                  $$.updateListState(dropEvent, that.result);
-               });
-                 //READ
-                 if(file) { that.readAsText(file); } //RESET BORDER WHEN LOADED  //ONCE IN, REVEAL IT
+              dropEvent.target.innerText = that.result;
+              $$.adjustTextSizePerLength(dropEvent.target);
+              $$.updateListState(dropEvent.target, that.result);
+           });
+             //READ
+             if(file) { that.readAsText(file); } //RESET BORDER WHEN LOADED  //ONCE IN, REVEAL IT
   },
-  popover : (newContent, disappear, action)=>  {
-          if(doc.getElementById("pop") != null) doc.getElementById("pop").remove();  //ONLY ONCE pop AT THE TIME remove old
-          let pop = doc.createElement('DIV');
-          pop.id = 'pop';
-          disappear = disappear || 4130; //can be not set it will use default value
+  notification : function(text, action){
+       let noti = $$.query.noti;
+           noti.textContent = text;
+       show_this(noti, 'block');
+       // if(action && typeof action === 'function') action(); //IMIDIATLY invoked action if passed
 
-          //DEFINE INNER CONTENT OF POP DIV
-          pop.innerHTML = newContent;
-          doc.body.appendChild(pop); //ADD POP TO DOCUMENT
-
-          let hide = () => {pop.style.opacity = '0'}
-
-          setTimeout(hide, disappear) //FADE OUT EFFECT
-          setTimeout( t=> pop.remove(), disappear + 300) //REMOVE OLD POP
-
-          pop.addEventListener('click', e=>{
-            // log('he literally clicked me...');
-            if(action){
-               action();
-            }
-          });
+       setTimeout(t=> show_this(noti, 'none'), 5 * 1000);
   },
   createPresets : function(){
        let preset_holder = dce('select');
@@ -514,43 +568,86 @@ const main = function(){
     $$.addTaskColoring();
     $$.createPresets();
     window.addEventListener('mousedown', e=>{
-         if(e.detail > 1){ e.preventDefault(); }// Prevents selection on double-click and beyond
+         if(e.target.classList.contains('to-edit') == false && e.detail > 1){ e.preventDefault(); }// Prevents selection on double-click and beyond, but not on to-edit field
 
          let the_class = e.target.classList[0];
-          switch(the_class){
+         let inc = 0;
+         let parentElement = e.target.parentElement;
+         switch(the_class){
                case "plus-list":   $$.addList();              break;
-               case "plus-task":   $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );            break;
+               case "plus-task":   $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );  break;
                case "back":        $$.switchTO('main-div');   $$.referenceTasksPerList();  break;
-               case 'reload':  location.reload(); break;
+               case 'reload':      location.reload(); break;
                case 'save':
-                                   if($$.vars.SERVER == 'PHP') { $$.php_request($$.vars.LISTE , php=> $$.animate(qu('.sub-list'), 'understood ease-out', 1.5) ); log('php');}
-                                   else                        { $$.local_request('save', 'mnemonic-liste'); log('js'); }
+                           if($$.vars.SERVER == 'PHP') { $$.php_request($$.vars.LISTE , php=> $$.animate(qu('.sub-list'), 'understood ease-out', 1.5) ); log('php');}
+                           else                        { $$.local_request('save', 'mnemonic-liste'); log('js'); }
                break;
                case 'delete':
-                                  $$.popover('Confirm delete action by clicking me', 5000, action=>{
-                                     if($$.vars.SERVER == 'PHP') $$.php_request("{}" , php=> { $$.animate(doc.body, 'shake', 0.25); location.reload(); });
-                                     else                        $$.local_request('delete', 'mnemonic-liste');
-                                  });
+                            if($$.vars.SERVER == 'PHP') $$.php_request("{}" , php=> { $$.animate(doc.body, 'shake', 0.25); location.reload(); });
+                            else                        $$.local_request('delete', 'mnemonic-liste');
                break;  //transmit EMPTY OBJECT aka delete
                case 'view':        $$.changeView();           break;
 
-                case 'sub-li': case 'to-edit': case 'is-done':
+               case 'sub-li': case 'to-edit':
                       if(e.target.nodeName == "LI"){
                         $$.vars.activeTask = e.target.getAttribute('data');
                       }else{
                         $$.vars.activeTask = e.target.parentElement.getAttribute('data');
                       }
-                 break;
+               break;
+               case 'is-done':  //SET DONE
+                     inc = parentElement.getAttribute('data');
+                     let status = 'done';
+
+                     if(parentElement.querySelector('.to-edit').classList.contains('done')) $$.taskIs('', e.target);
+                     else                                                                   $$.taskIs(status, e.target);
+
+                     let the_list = $$.vars.LISTE[$$.vars.activeListName][ inc ];
+                     if(the_list) the_list.status = status;
+               break;
+               case 'delete-task':  //DELETE TASK
+                    inc = parentElement.getAttribute('data');
+                    parentElement.style.background = 'indianred';
+                    $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);
+                    delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
+               break;
+               case 'cal-task': e.target.style.opacity = (e.target.style.opacity === '0') ? '1' : '0'; break; //HIDE CAL
+
+               case 'delete-sub-list':   //DELETE LIST
+                    parentElement.style.background = 'indianred';
+                    $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);  //true is remove();
+                    delete $$.vars.LISTE[ parentElement.getAttribute('data') ]; //NEWLY FORMED TASK OBJECT
+               break;
+
+               case 'list-name': //OPEN LIST
+                   $$.vars.activeListName = e.target.parentNode.getAttribute('data');
+                   $$.switchTO('sub-div');
+               break;
+               case 'copy-task':
+                     $$.copyEvent(e.target, parentElement.parentElement.querySelector('.to-edit').textContent);
+               break;
            }
          $$.autoShow();
      });
+     window.addEventListener('dblclick', e=>{
+       let cl = e.target.classList[0];
+       switch(cl){
+         case 'sub-li':
+               if(e.target.parentElement.classList.contains('table-view') == false) return false;
+               $$.extendGridTableColumn(e.target);
+         break;
+       }
+
+     });
 
      window.addEventListener('DOMContentLoaded', e=> {
+
                                                        $$.resizeList();
                                                        $$.readHeaders();
                                                            setTimeout( t=> {
                                                              $$.autoShow();
                                                              $$.recreateLists($$.vars.LISTE);
+                                                             $$.addReorderDropZone(qu('.sub-list'));
                                                              $$.referenceTasksPerList();
                                                            }, .5* 1000);  //be late
                                                      });

@@ -22,7 +22,9 @@
   --skyMist: #E0FFFF;    /* (A very light, "icy" blue)*/
   --softGold  : #b9be81;
   --beige : #d1bda0;
-  --teal  : #3ae1e1;
+  --teal  : #55c7c7f7;
+  /* #34c1c1;  */
+   /* #3ae1e1; */
   --earth : #4d5840;
 
   --nextMint : #7dffc0d6;
@@ -43,6 +45,7 @@ body{
     color: var(--nextTextColor);
     margin: 0;
     cursor: default;
+    user-select: none;
 }
 input{ outline: none; color: inherit; }
 ol{
@@ -73,6 +76,7 @@ select>option {}
 .btn:hover{
   transition: 0.25s;
   filter: brightness(50%);
+  cursor: pointer;
 }
 /* EXTREMLY SIMPLE BUTTON */
 .minimal-btn{
@@ -87,7 +91,7 @@ select>option {}
 .back{ -webkit-text-security: disc;}
 .top-form {
   display: none;
-  margin: 4px;
+  margin-top: 1%;
   justify-content: space-evenly;
   overflow-x: scroll;
   gap: 10px;
@@ -107,13 +111,17 @@ select>option {}
 .sub-div{
   display: none;
   animation: slideFromRight .5s;
+  /* display: grid; */
+  grid-template-columns: 1fr;
+  margin: 1%;
+  overflow: scroll;
+  height: 100vh;
 }
 .sub-list{
-  overflow-y: scroll;
   height: 555px;
   overflow-x: hidden;
   transition: 1s;
-  padding: 1%;
+  padding: 0;
   height: 91vh;
 }
 .sub-li{
@@ -122,9 +130,16 @@ select>option {}
   height: fit-content;
   align-self: center;
   position: relative;
-  outline: 1px solid #84858854;
-  min-height: calc(46vh);
-  max-height: calc(100vh / 5);
+  outline: 1px solid #dddddd21;
+  outline-offset: -1px;
+  background: var(--atomWorkspace);
+  max-height: 200px;
+  /* border: .5px solid; */
+}
+.sub-li:active{
+  /* box-shadow: 0px 3px 10px 2px;
+  transform: translate(0px, -5px); */
+  cursor: grabbing;
 }
 .sub-li > div{
   display: grid;
@@ -133,23 +148,26 @@ select>option {}
 }
 .grid-view{
   display: grid;
+  grid-area: 1 / 1;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   grid-auto-rows: min-content;
 }
+.grid-view > li{
+  min-height: 400px;
+  max-height: 400px;
+}
 .grid-view > li > .to-edit{
   overflow: scroll;
-  max-height: calc(100vh / 2.5);
   border-radius: 10px;
 }
-
-.table-view{
+.table-view, .skeleton-holder{
   display: grid;
+  grid-area: 1 / 1;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-auto-rows: min-content;
-  /* grid-auto-rows: minmax(200px, auto); */
-  /* grid-auto-flow: dense; */
 }
-.table-view > .sub-li{
+.table-view > .sub-li,
+.skeleton-holder > .skeleton-lines{
   min-height: 200px;
   height: 200px;
 }
@@ -165,18 +183,35 @@ select>option {}
   width: 75%;
   text-shadow: 0px 0px 0.5px;
   overflow-wrap: anywhere;
-  padding: 5vh 0px;
+  margin: 4vh 0 10px 0;
   text-indent: 10px;
 }
-.copy-task-text{
-   position: absolute;
-   top:  0;
-   left: 4px;
+.task-menu{
+  position: absolute;
+  top:  0;
+  left: 4px;
+  grid-auto-flow: column;  /*it inherits grid so just use this*/
+  gap: 5px;
+}
+.copy-task{
    transform: rotateX(180deg) scale(.75);
 }
+.cal-task{
+  font-size: 13px;
+  align-content: center;
+}
+
+.skeleton-lines{
+  outline: 1px solid #dddddd21;
+  outline-offset: -1px;
+  background: transparent;
+  /* pointer-events: none; */
+}
 .noti{
-  position: absolute;
-  bottom: 10px;
+  position: fixed;
+  bottom: -7px;
+  height: 35px;
+  line-height: 2;
   left: 41vw;
   width: fit-content;
   max-width: 200px;
@@ -189,18 +224,30 @@ select>option {}
   font-size: 90%;
   animation: slideFromBottom 1s;
   display: none;
+  z-index: 100;
 }
-.controls{
+.lists-controls{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1%;
+  padding: 0 15px;
+}
+.tasks-controls{
   display: flex;
   justify-content: space-between;
   width: 98%;
-  padding: 0 10px;
+  height: 5vh;
   position: fixed;
-  bottom: 10px;
+  bottom: 0px;
+  background: var(--atomWorkspace);
+  border-top: 1px solid #383d44;
 }
-.controls > input{ font-size: xx-large; }
-
-.delete-me{
+.lists-controls > input,
+.tasks-controls > input{
+  font-size: xx-large;
+}
+.delete-task, .delete-sub-list{
   font-size: 33px;
   text-shadow: none;
   padding-right: 10px;
@@ -241,15 +288,14 @@ select>option {}
   align-items: self-end;
 }
 .color-div:first-child{
-  outline: 2.5px solid;
-  outline-offset: -2.5px;
+  outline: 2px solid #41444d;
+  outline-offset: -2px;
 }
 
 .net{
   background: transparent !important;
-  background-image: linear-gradient(0deg, black, transparent 1px), linear-gradient(90deg, black, transparent 1px) !important;
-  background-size: 1% 1% !important;
-  background-position: center;
+  background-image: linear-gradient(0deg, #ccccff63, transparent 2px), linear-gradient(90deg, #ccccff47, transparent 2px) !important;
+  background-size: 20.7px 20px !important;
   position: relative;
   transition: 0.5s;
 }
@@ -258,31 +304,15 @@ select>option {}
 }
 .net::after{
   content: "⬇︎";
-  top: 45%;
+  bottom: 0%;
   position: absolute;
-  left: 45%;
-  font-size: 100px;
+  right: 0;
+  font-size: 40px;
   color: var(--textColor);
 }
 /* SCROLLBARS */
 ::-webkit-scrollbar { width: 2.5px; height: 2.5px; }
 ::-webkit-scrollbar-corner { background: transparent;}
-
-#pop{
-  position: fixed;
-  top: 1%;
-  right: 1%;
-  background: #0000008f;
-  color: var(--textColor);
-  padding: 1vw 3vw;
-  outline: 2px solid #fdfdfd24;
-  border-radius: 10px;
-  font-family: Menlo, monospace;
-  font-size: 13px;
-  border-radius: 7px;
-  display: flex;
-  z-index: 100;
-}
 
 @keyframes slideFromRight {  /* SLIDE FROM RIGHT */
   from {transform: translate(300px);}
