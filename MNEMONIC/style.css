@@ -111,18 +111,13 @@ select>option {}
 .sub-div{
   display: none;
   animation: slideFromRight .5s;
-  /* display: grid; */
-  grid-template-columns: 1fr;
   margin: 1%;
-  overflow: scroll;
-  height: 100vh;
+  height: calc(100vh - 12vh);
 }
 .sub-list{
-  height: 555px;
   overflow-x: hidden;
   transition: 1s;
   padding: 0;
-  height: 91vh;
 }
 .sub-li{
   overflow-y: hidden;
@@ -146,6 +141,10 @@ select>option {}
   overflow: scroll;
   max-height: -webkit-fill-available;
 }
+.list-view{
+  /* max-height: 400px;
+  overflow-y: scroll; */
+}
 .grid-view{
   display: grid;
   grid-area: 1 / 1;
@@ -160,14 +159,18 @@ select>option {}
   overflow: scroll;
   border-radius: 10px;
 }
-.table-view, .skeleton-holder{
+.planner-holder{
+  max-height: 400px;
+  overflow-y: scroll;
+}
+.table-view, .planner-holder{
   display: grid;
   grid-area: 1 / 1;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-auto-rows: min-content;
 }
 .table-view > .sub-li,
-.skeleton-holder > .skeleton-lines{
+.planner-field{
   min-height: 200px;
   height: 200px;
 }
@@ -184,7 +187,6 @@ select>option {}
   text-shadow: 0px 0px 0.5px;
   overflow-wrap: anywhere;
   margin: 4vh 0 10px 0;
-  text-indent: 10px;
 }
 .task-menu{
   position: absolute;
@@ -192,21 +194,46 @@ select>option {}
   left: 4px;
   grid-auto-flow: column;  /*it inherits grid so just use this*/
   gap: 5px;
+  align-items: center;
 }
 .copy-task{
-   transform: rotateX(180deg) scale(.75);
+  font-size: 30px;
+  transform: rotateX(180deg) scale(.75);
 }
 .cal-task{
   font-size: 13px;
   align-content: center;
 }
+.pre-task{
+  font-size: 25px;
+  line-height: 2;
+}
+.pre-struct{
+  min-height: min-content;
+}
+.pre-struct > .to-edit{
+  white-space: pre;
+  font-size: 17px!important;
+}
 
-.skeleton-lines{
+.planner-field{
   outline: 1px solid #dddddd21;
   outline-offset: -1px;
   background: transparent;
-  /* pointer-events: none; */
+  position: relative;
 }
+.planner-field.help-field::after{
+  content: attr(help-text);
+  position: absolute;
+  bottom: 5px;
+  left: 1px;
+  font-size: 23px;
+  font-style: italic;
+  font-family: Brush Script MT;
+  padding: 8px;
+  color: #ffebcdcc;
+}
+
 .noti{
   position: fixed;
   bottom: -7px;

@@ -32,7 +32,7 @@ const $$ = {
       list_views : {
         index : 0,
         map : {
-            0 : '',
+            0 : 'list-view',
             1 : 'grid-view',
             2 : 'table-view',
           },
@@ -53,7 +53,7 @@ const $$ = {
               mainList  : qu('.main-list'),
               subList   : qu('.sub-list'),
               noti      : qu('.noti'),
-              skeletonHolder : qu('.skeleton-holder'),
+              plannerHolder : qu('.planner-holder'),
             }
           },
   getIndex : (el)=> parseInt(el.getAttribute('data')) || 0,
@@ -63,6 +63,7 @@ const $$ = {
                case 'done':  el.innerText = '◼︎';  myTask.classList.add('done');     break;
                default :     el.innerText = '◻︎';  myTask.classList.remove('done');  break;
              }
+             $$.fullListUpdate();
           return state;
   },
   updateListState : function(provided, data){
@@ -79,21 +80,22 @@ const $$ = {
             list[i].content = arr[i].querySelector('.to-edit').textContent;
             list[i].color   = arr[i].style.background.replaceAll(/var\(|\)/gi, '');
             list[i].size    = arr[i].style.gridColumn;
+            list[i].status  = arr[i].querySelector('.to-edit').classList.contains('done') ? 'done' : '';
         }
   },
   copyEvent : async function(btn, textToCopy){
-          try {
-            await navigator.clipboard.writeText(textToCopy);
-            await $$.notification('Copied to clipboard!');
-          } catch (err) {
-            $$.notification('Failed to copy...');
-          }
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          await $$.notification('Copied to clipboard!');
+        } catch (err) {
+          $$.notification('Failed to copy...');
+        }
   },
   randomEmoji : function(index=null){
-    let emojis = ['o_o', '-_-', '  +_+', '  * ^ *', '  #_#', '  0_o', '  `_`', '  ~_~', '  :=_=:',' ♥︎_♥︎', '⧸⧸⧼⧽⋰', '౨ৎ', '୨ৎ', '𝒢𑄺', '𝜗⍴', '𝜗ৎ', '𝜗𐑞', '𝜗𝜚', '>_<', "'_'" ,'x_x'
+        let emojis = ['o_o', '-_-', '  +_+', '  * ^ *', '  #_#', '  0_o', '  `_`', '  ~_~', '  :=_=:',' ♥︎_♥︎', '⧸⧸⧼⧽⋰', '౨ৎ', '୨ৎ', '𝒢𑄺', '𝜗⍴', '𝜗ৎ', '𝜗𐑞', '𝜗𝜚', '>_<', "'_'" ,'x_x'
 , '._.' ,'.__.', '•_•', 'ˆ_ˆ', ];
-    if(index && emojis[index] != null) return emojis[index];  //you can pass desired emoji index
-    return emojis[Math.ceil(Math.random() * emojis.length)] || emojis[0]; 
+        if(index && emojis[index] != null) return emojis[index];  //you can pass desired emoji index
+        return emojis[Math.ceil(Math.random() * emojis.length)] || emojis[0]; 
   },
   addReorderDrag : function(item, zone){
         // On the draggable item
@@ -115,6 +117,7 @@ const $$ = {
           e.preventDefault();
           if(e.target.classList.contains('sub-list')){
              e.target.appendChild($$.vars.dragged.source.item);  //no children in list (all pinned) allow return to list
+             $$.adjustTextSizePerLength($$.vars.dragged.source.item.querySelector('.to-edit'));
              return refresh();
           }
           if(e.target.classList.contains('sub-li') == false) {
@@ -126,6 +129,7 @@ const $$ = {
 
           let targetIndex = parseInt(dra.target.index);
           let sourceIndex = parseInt(dra.source.index);
+          if(targetIndex === sourceIndex) return false; //SAME POS, AKA sub-li did not move,  do nothing
 
           if(sourceIndex < targetIndex) zone.insertBefore(dra.source.item, dra.target.item.nextSibling);   //drag toward (right | larger index)
           else                          zone.insertBefore(dra.source.item, dra.target.item); //drag toward (left | smaller index)
@@ -133,17 +137,18 @@ const $$ = {
       });
   },
   addPinDropZone : function(zone){
-      zone.addEventListener('dragover', e => e.preventDefault()); // required!
-      zone.addEventListener('drop', e => {
-          e.preventDefault();
-          let dra = $$.vars.dragged;
-          dra.target.item  = e.target;
-          dra.target.index = e.target.getAttribute('data');
-          e.target.appendChild(dra.source.item);
-          e.target.classList.remove('net');
-      });
-      zone.addEventListener('dragenter', $$.dropEnter);
-      zone.addEventListener('dragleave', $$.dropLeave);
+          zone.addEventListener('dragover', e => e.preventDefault()); // required!
+          zone.addEventListener('drop', e => {
+              e.preventDefault();
+              let dra = $$.vars.dragged;
+              dra.target.item  = e.target;
+              dra.target.index = e.target.getAttribute('data');
+              e.target.appendChild(dra.source.item);
+              e.target.classList.remove('net');
+              $$.adjustTextSizePerLength(dra.source.item.querySelector('.to-edit'), 3); //sub-li is passed here
+          });
+          zone.addEventListener('dragenter', $$.dropEnter);
+          zone.addEventListener('dragleave', $$.dropLeave);
   },
   dropEnter : async e => {
           e.preventDefault();
@@ -153,16 +158,16 @@ const $$ = {
   dropLeave : e => { e.target.classList.remove('net') },
 
   reasignIndexes : function(arr){
-      arr = arr || quAll('.sub-li');
-      for(let i=0;i<arr.length;i++){
-          arr[i].setAttribute('data', i);
-          arr[i].querySelector('.cal-task').textContent = $$.seeDate(i);  //reasign calendar also
-      }
+          arr = arr || quAll('.sub-li');
+          for(let i=0;i<arr.length;i++){
+              arr[i].setAttribute('data', i);
+              arr[i].querySelector('.cal-task').textContent = $$.seeDate(i);  //reasign calendar also
+          }
   },
   futureDate : function(days){
-    let d = new Date();
-    // Add days to the future (milliseconds * seconds * minutes * hours * days)
-    return d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+          let d = new Date();
+          // Add days to the future (milliseconds * seconds * minutes * hours * days)
+          return d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
   },
   seeDate : (days)=> new Date($$.futureDate(days)).toDateString(), //from today
   //TASK inside LIST[?]...
@@ -215,13 +220,16 @@ const $$ = {
           let calTask = dce('span');
               calTask.classList.add('cal-task');
               calTask.textContent = $$.seeDate(inc);
+          let preSetup = dce('span');
+              preSetup.classList.add('pre-task', 'btn');
+              preSetup.textContent = "≔";
 
-             appendAll([square, text_div, del], li);
-             appendAll([copyTask, calTask], taskMenu);
-             li.appendChild(taskMenu);
+              appendAll([square, text_div, del], li);
+              appendAll([copyTask, preSetup, calTask], taskMenu);
+              li.appendChild(taskMenu);
 
             $$.adjustTextSizePerLength(text_div);
-            $$.addSkeletons(Math.floor(window.innerWidth / 200));
+            $$.addPlanner(Math.floor(window.innerWidth / 200));
 
          //INIT
          $$.query.subList.appendChild(li);
@@ -298,11 +306,13 @@ const $$ = {
 
           qu('.top-form').appendChild(myColors);
   },
-  adjustTextSizePerLength : function(el){
-         let text = el.innerText;
-         let ratio = (350 / text.length) * 100;
+  adjustTextSizePerLength : function(el, coef=1){
+         let text = el.textContent;
+         let parent = el.parentElement;
+         let W = parent.clientWidth;
+         let ratio = ((W / (text.length) || 1) * 100)/coef;
          if(ratio > 35) ratio = 35; //dont make it grande
-         if(ratio < 12) ratio = 12; //dont make it tiny
+         if(ratio < 15) ratio = 15; //dont make it tiny
          el.style.fontSize = ratio + 'px';
   },
   changeView : function(){
@@ -312,9 +322,10 @@ const $$ = {
          let OK = Object.keys(map);
          if(list_views.index > parseInt(OK[OK.length-1]) ) list_views.index = 0;
 
-         qu('.sub-list').classList.remove('grid-view', 'table-view');
+         qu('.sub-list').classList.remove('list-view', 'grid-view', 'table-view');
          let view = list_views.map[list_views.index];
-         if(view != '') qu('.sub-list').classList.add(view);
+         qu('.sub-list').classList.add(view);
+         $$.notification(view);
   },
   referenceTasksPerList : function(){
         let OK = Object.keys($$.vars.LISTE);
@@ -363,12 +374,32 @@ const $$ = {
         el.style.gridColumn = `span ${divider}`;
         el.setAttribute('extended', divider);
    },
-   addSkeletons : function(rowMax){
+   disappearingAttribute : function(el, att, content){
+      if(el.getAttribute(att) == '') el.setAttribute(att, content);
+      else                           el.setAttribute(att, "");
+   },
+   addPlanner : function(rowMax){
+        let total = quAll('.planner-field').length;
         for(let i=0; i<3; i++){
-            let skeleton = dce('div');
-            skeleton.classList.add('skeleton-lines');
-            $$.query.skeletonHolder.appendChild(skeleton);
-            $$.addPinDropZone(skeleton);
+            let plannerField = dce('div');
+            plannerField.classList.add('planner-field');
+            if(i == 0 && total < 2){
+               plannerField.classList.add('help-field');
+               plannerField.setAttribute('help-text', "Pin any task to planner (in list view)");
+               plannerField.addEventListener('click', e=>{
+                  $$.disappearingAttribute(e.target, 'help-text', "Pin any task to planner (in list view)");
+               });
+            }
+            if(total === 9){
+              plannerField.classList.add('help-field');
+              plannerField.setAttribute('help-text', "Double-tap task to expand it (in table view)");
+              plannerField.addEventListener('click', e=>{
+                 $$.disappearingAttribute(e.target, 'help-text', "Double-tap task to expand it (in table view)");
+              });
+            }
+            $$.query.plannerHolder.appendChild(plannerField);
+            $$.addPinDropZone(plannerField);
+            total = quAll('.planner-field').length;
          }
    },
    //RECREATE LISTS FROM .json file
@@ -384,7 +415,7 @@ const $$ = {
                                 show_this( qu('.sub-div'), 'none' );
                                 $$.fullListUpdate(); //update before you leave
                                 qu('.sub-list').innerHTML = '';
-                                qu('.skeleton-holder').innerHTML = '';
+                                $$.query.plannerHolder.innerHTML = '';
               break;
               case 'sub-div':   show_this( qu('.main-div'), 'none' );
                                 show_this( qu('.sub-div'), 'grid' );
@@ -555,7 +586,7 @@ const $$ = {
            let all_edits = quAll('.to-edit');
            let last_to_edit = all_edits[all_edits.length-1];
                last_to_edit.innerText = e.target.value;
-           $$.adjustTextSizePerLength(last_to_edit);
+           $$.adjustTextSizePerLength(last_to_edit, 2);
            $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );
            quAll('.preset')[0].selected = true; //Return back to default
        });
@@ -573,6 +604,7 @@ const main = function(){
          let the_class = e.target.classList[0];
          let inc = 0;
          let parentElement = e.target.parentElement;
+         let EditField = parentElement.parentElement.querySelector('.to-edit');
          switch(the_class){
                case "plus-list":   $$.addList();              break;
                case "plus-task":   $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );  break;
@@ -612,6 +644,11 @@ const main = function(){
                     delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
                break;
                case 'cal-task': e.target.style.opacity = (e.target.style.opacity === '0') ? '1' : '0'; break; //HIDE CAL
+               case 'pre-task':
+                    if(parentElement.parentElement.classList.contains('pre-struct') == false){
+                       parentElement.parentElement.classList.add('pre-struct');
+                    }else parentElement.parentElement.classList.remove('pre-struct');
+               break;
 
                case 'delete-sub-list':   //DELETE LIST
                     parentElement.style.background = 'indianred';
@@ -624,19 +661,19 @@ const main = function(){
                    $$.switchTO('sub-div');
                break;
                case 'copy-task':
-                     $$.copyEvent(e.target, parentElement.parentElement.querySelector('.to-edit').textContent);
+                     $$.copyEvent(e.target, EditField.textContent);
                break;
            }
          $$.autoShow();
      });
      window.addEventListener('dblclick', e=>{
-       let cl = e.target.classList[0];
-       switch(cl){
-         case 'sub-li':
-               if(e.target.parentElement.classList.contains('table-view') == false) return false;
-               $$.extendGridTableColumn(e.target);
-         break;
-       }
+         let cl = e.target.classList[0];
+         switch(cl){
+           case 'sub-li':
+                 if(e.target.parentElement.classList.contains('table-view') == false) return false;
+                 $$.extendGridTableColumn(e.target);
+           break;
+         }
 
      });
 
