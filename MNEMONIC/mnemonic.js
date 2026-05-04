@@ -219,7 +219,8 @@ const $$ = {
 
           let calTask = dce('span');
               calTask.classList.add('cal-task');
-              calTask.textContent = $$.seeDate(inc);
+          let date = $$.seeDate(inc);
+              calTask.textContent = date; //must be like this
           let preSetup = dce('span');
               preSetup.classList.add('pre-task', 'btn');
               preSetup.textContent = "≔";
@@ -375,27 +376,27 @@ const $$ = {
         el.setAttribute('extended', divider);
    },
    disappearingAttribute : function(el, att, content){
-      if(el.getAttribute(att) == '') el.setAttribute(att, content);
-      else                           el.setAttribute(att, "");
+        el.addEventListener('click', e=>{
+           if(el.getAttribute(att) == '') el.setAttribute(att, content);
+           else                           el.setAttribute(att, '');
+        });
    },
    addPlanner : function(rowMax){
         let total = quAll('.planner-field').length;
         for(let i=0; i<3; i++){
             let plannerField = dce('div');
             plannerField.classList.add('planner-field');
+            plannerField.setAttribute('slot', total);
+            // plannerField.textContent = total;
             if(i == 0 && total < 2){
                plannerField.classList.add('help-field');
                plannerField.setAttribute('help-text', "Pin any task to planner (in list view)");
-               plannerField.addEventListener('click', e=>{
-                  $$.disappearingAttribute(e.target, 'help-text', "Pin any task to planner (in list view)");
-               });
+               $$.disappearingAttribute(plannerField, 'help-text', "Pin any task to planner (in list view)");
             }
             if(total === 9){
               plannerField.classList.add('help-field');
               plannerField.setAttribute('help-text', "Double-tap task to expand it (in table view)");
-              plannerField.addEventListener('click', e=>{
-                 $$.disappearingAttribute(e.target, 'help-text', "Double-tap task to expand it (in table view)");
-              });
+              $$.disappearingAttribute(plannerField, 'help-text', "Double-tap task to expand it (in table view)");
             }
             $$.query.plannerHolder.appendChild(plannerField);
             $$.addPinDropZone(plannerField);
@@ -643,7 +644,7 @@ const main = function(){
                     $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);
                     delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
                break;
-               case 'cal-task': e.target.style.opacity = (e.target.style.opacity === '0') ? '1' : '0'; break; //HIDE CAL
+               case 'cal-task': e.target.style.opacity = (e.target.style.opacity === '0') ? '1' : '0'; break; //HIDE CAL if not needed by user
                case 'pre-task':
                     if(parentElement.parentElement.classList.contains('pre-struct') == false){
                        parentElement.parentElement.classList.add('pre-struct');

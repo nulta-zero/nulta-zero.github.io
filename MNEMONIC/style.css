@@ -222,6 +222,13 @@ select>option {}
   background: transparent;
   position: relative;
 }
+.planner-field::before{
+  content: attr(slot);
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-family: Brush Script MT;
+}
 .planner-field.help-field::after{
   content: attr(help-text);
   position: absolute;
