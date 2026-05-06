@@ -77,7 +77,7 @@ const $$ = {
         let arr = quAll('.sub-li');
         for(let i=0;i<arr.length;i++){
             if(list[i] == null) list[i] = {};
-            list[i].content = arr[i].querySelector('.to-edit').textContent;
+            list[i].content = $$.htmlToContent(arr[i].querySelector('.to-edit'));
             list[i].color   = arr[i].style.background.replaceAll(/var\(|\)/gi, '');
             list[i].size    = arr[i].style.gridColumn;
             list[i].status  = arr[i].querySelector('.to-edit').classList.contains('done') ? 'done' : '';
@@ -487,6 +487,16 @@ const $$ = {
                       qu('.modified-date').innerText = date;
                 });
   },
+  htmlToContent : function(from){
+        let rawHtml = from.innerHTML;
+        // Regex to replace <br>, <div> (start of new line), and <p> with \n
+        let cleanText = rawHtml
+            .replace(/<br\s*\/?>/gi, '\n')      // Replace <br> with newline
+            .replace(/<\/div><div>/gi, '\n')    // Replace div gaps with newline
+            .replace(/<div>/gi, '\n')           // Handle start of new divs
+            .replace(/<[^>]+>/g, '');           // Strip any remaining HTML tags
+        return cleanText;
+  },
   scrollIntoView : function(el){
       setTimeout( t=> el.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" }), .7 * 1000);  //CHECK IF WORKS
   },
@@ -498,19 +508,20 @@ const $$ = {
   local_request : function(mode, name){
        switch(mode){
                case 'save':
-                               $$.fullListUpdate();
-                               $$.saveToLocal(name, JSON.stringify($$.vars.LISTE), action=> {
-                                    $$.flowAnimation();
-                                    $$.vars.RESPONSE = $$.vars.LISTE;
-                               });
+                           $$.fullListUpdate();
+                           $$.saveToLocal(name, JSON.stringify($$.vars.LISTE), action=> {
+                                $$.flowAnimation();
+                                $$.vars.RESPONSE = $$.vars.LISTE;
+                           });
                break;
-               case 'delete':  $$.deleteLocal(name,  acion=> {
-                                    $$.animate(doc.body, 'shake', 0.25);
-                                });
+               case 'delete':
+                           $$.deleteLocal(name,  acion=> {
+                                $$.animate(doc.body, 'shake', 0.25);
+                           });
                break;
                case 'get':
-                            let checked = $$.checkLocal(name);
-                            (checked != null) ? $$.vars.LISTE = JSON.parse(checked) : $$.vars.LISTE = {};   break;
+                           let checked = $$.checkLocal(name);
+                           (checked != null) ? $$.vars.LISTE = JSON.parse(checked) : $$.vars.LISTE = {};   break;
        }
   },
   checkServer : async function(){
