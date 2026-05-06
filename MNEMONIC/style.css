@@ -113,15 +113,28 @@ select>option {}
   animation: slideFromRight .5s;
   margin: 1%;
   height: calc(100vh - 12vh);
+  align-content: baseline;
 }
 .sub-list{
   overflow-x: hidden;
   transition: 1s;
   padding: 0;
+  min-height: 18vh;
+  background: linear-gradient(0deg, #ccccff21, transparent 2px), linear-gradient(90deg, #ccccff1a, transparent 2px);
+  background-size: 92% 50px;
+  height: 50vh;
+  background-position: 50px;
+  overflow-y: scroll;
+  /* background-color: #292e367a;   lighter color  */
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+/* NO LINES IN GRID VIEW */
+.sub-list.grid-view{
+  background: none;
 }
 .sub-li{
   overflow-y: hidden;
-  animation: slideFromRight 1s;
   height: fit-content;
   align-self: center;
   position: relative;
@@ -129,11 +142,8 @@ select>option {}
   outline-offset: -1px;
   background: var(--atomWorkspace);
   max-height: 200px;
-  /* border: .5px solid; */
 }
 .sub-li:active{
-  /* box-shadow: 0px 3px 10px 2px;
-  transform: translate(0px, -5px); */
   cursor: grabbing;
 }
 .sub-li > div{
@@ -141,13 +151,9 @@ select>option {}
   overflow: scroll;
   max-height: -webkit-fill-available;
 }
-.list-view{
-  /* max-height: 400px;
-  overflow-y: scroll; */
-}
+.list-view{}
 .grid-view{
   display: grid;
-  grid-area: 1 / 1;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   grid-auto-rows: min-content;
 }
@@ -160,12 +166,12 @@ select>option {}
   border-radius: 10px;
 }
 .planner-holder{
+  min-height: 400px;
   max-height: 400px;
   overflow-y: scroll;
 }
 .table-view, .planner-holder{
   display: grid;
-  grid-area: 1 / 1;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-auto-rows: min-content;
 }
@@ -173,6 +179,10 @@ select>option {}
 .planner-field{
   min-height: 200px;
   height: 200px;
+}
+.planner-field > .sub-li{
+  max-height: 50%;
+  height: 50%;
 }
 .is-done{
   padding-left: 10px;
@@ -210,10 +220,13 @@ select>option {}
 }
 .pre-struct{
   min-height: min-content;
+  animation: expandHeight 1.5s;
 }
 .pre-struct > .to-edit{
   white-space: pre;
   font-size: 17px!important;
+  min-height: 40vh;
+  align-content: center;
 }
 
 .planner-field{
@@ -402,6 +415,11 @@ select>option {}
   80%  { transform: translate(-1px, -1px) rotate(1deg);                    }
   90%  { transform: translate(1px, 2px) rotate(0deg);                      }
   100% { transform: translate(1px, -2px) rotate(-1deg);                    }
+}
+
+@keyframes expandHeight {  /*EXPAND HEIGHT*/
+  0%   {height: 0;   }
+  100% {height: 100%;}
 }
 
 @media (min-width: 800px) {

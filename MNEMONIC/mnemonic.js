@@ -143,6 +143,10 @@ const $$ = {
               let dra = $$.vars.dragged;
               dra.target.item  = e.target;
               dra.target.index = e.target.getAttribute('data');
+              if(dra.target.item.classList.contains('planner-field') == false ) {    //FINISH THIS
+                  e.target.classList.remove('net');
+                 return false;  //do nothing on same point drop
+              }
               e.target.appendChild(dra.source.item);
               e.target.classList.remove('net');
               $$.adjustTextSizePerLength(dra.source.item.querySelector('.to-edit'), 3); //sub-li is passed here
@@ -231,6 +235,7 @@ const $$ = {
 
             $$.adjustTextSizePerLength(text_div);
             $$.addPlanner(Math.floor(window.innerWidth / 200));
+            $$.animate(li, 'slideFromRight', 1);
 
          //INIT
          $$.query.subList.appendChild(li);
@@ -294,7 +299,11 @@ const $$ = {
              let colorIs = e.target.getAttribute('color-data');
              let inc = parseInt($$.vars.activeTask) || 0;
 
-             let task = quAll('.sub-li')[inc];
+             let tasks = quAll('.sub-li');
+                 tasks = new Array(...tasks);
+             let task = tasks.filter( x=> x.getAttribute('data') == inc )[0];
+               if(task == '') return
+
                  task.style.background = `var(${colorIs})`;
 
              let ToEdit = task.querySelector('.to-edit');
@@ -304,14 +313,19 @@ const $$ = {
              }
              if($$.vars.LISTE[$$.vars.activeListName][ inc ] != null) $$.vars.LISTE[$$.vars.activeListName][ inc ].color = colorIs;
           });
-
           qu('.top-form').appendChild(myColors);
   },
   adjustTextSizePerLength : function(el, coef=1){
          let text = el.textContent;
          let parent = el.parentElement;
          let W = parent.clientWidth;
+         // switch(qu('.sub-list').classList[1]){
+         //     default: coef = 10;  break; //list view
+         //     case 'grid-view':  ; break;
+         //     case 'table-view': ; break;
+         // }
          let ratio = ((W / (text.length) || 1) * 100)/coef;
+
          if(ratio > 35) ratio = 35; //dont make it grande
          if(ratio < 15) ratio = 15; //dont make it tiny
          el.style.fontSize = ratio + 'px';
@@ -440,6 +454,15 @@ const $$ = {
                   that.style.animation = ''; //Always remove animation attribute
                 }, (time || 0.2) * 1000);
   },
+  flowAnimation : function(arr){
+       arr = arr || quAll('.sub-li, .planner-field');
+       let i = 0;
+       let inter = setInterval( t=>{
+           if(i > arr.length-1) { clearInterval(inter); return; }
+           if(arr[i] != null) $$.animate(arr[i], 'shake', 1);
+           i+=1;
+        }, 0.15 * 1000)
+  },
   resizeList : function(){
               // qu('.sub-list').style.height  = window.innerHeight -$$.vars.heightOffset + 'px';
               qu('.main-list').style.height = window.innerHeight -$$.vars.heightOffset * 1.5 + 'px';
@@ -464,24 +487,6 @@ const $$ = {
                       qu('.modified-date').innerText = date;
                 });
   },
-  //SEND REQUEST TO PHP
-  php_request : async function(content, callback ){
-                  let xr = new XMLHttpRequest();
-                  let link = location.href;
-                  let url =  link + "./transmiter.php"; //NOW DONT CHANGE WHEN LIVE
-                  xr.open("POST", url, true);
-                  xr.setRequestHeader("Content-Type", "application/json");
-                     xr.onreadystatechange = function () {
-                        if(xr.readyState == 4 && xr.status === 200) {
-                                // console.log('%c ->ok', 'color: darkcyan'); //ALL GOOD
-                                $$.vars.RESPONSE = xr.responseText;
-                                if(typeof callback != "undefined") callback();
-                      }else return false;   // console.log('%c _', 'color:crimson'); //REJECTED
-                   }
-                  //ALL DATA PASSED TO PHP SHOULD BE stringify IF STRING (NUMBERS CAN BE PASSED DIRECTLY)
-                  let data = JSON.stringify(content);
-                  await xr.send(data);
-                },
   scrollIntoView : function(el){
       setTimeout( t=> el.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" }), .7 * 1000);  //CHECK IF WORKS
   },
@@ -492,12 +497,17 @@ const $$ = {
 
   local_request : function(mode, name){
        switch(mode){
-               case 'save':    $$.saveToLocal(name, JSON.stringify($$.vars.LISTE), action=> {
-                                    $$.animate(qu('.sub-list'), 'understood ease-out', 1.5);
+               case 'save':
+                               $$.fullListUpdate();
+                               $$.saveToLocal(name, JSON.stringify($$.vars.LISTE), action=> {
+                                    $$.flowAnimation();
                                     $$.vars.RESPONSE = $$.vars.LISTE;
                                });
                break;
-               case 'delete':  $$.deleteLocal(name,  acion=> { $$.animate(doc.body, 'shake', 0.25); location.reload();  });          break;
+               case 'delete':  $$.deleteLocal(name,  acion=> {
+                                    $$.animate(doc.body, 'shake', 0.25);
+                                });
+               break;
                case 'get':
                             let checked = $$.checkLocal(name);
                             (checked != null) ? $$.vars.LISTE = JSON.parse(checked) : $$.vars.LISTE = {};   break;
@@ -509,8 +519,8 @@ const $$ = {
               if(promise[i] && promise[i].search(/PHP/gi) > -1) $$.vars.SERVER = 'PHP';
               else                                              $$.vars.SERVER = 'null';
             }
-    if($$.vars.SERVER == 'PHP') $$.fetchAndParse('list.json');
-    else                        $$.local_request('get', 'mnemonic-liste');
+        // if($$.vars.SERVER == 'PHP') $$.fetchAndParse('list.json');
+        $$.local_request('get', 'mnemonic-liste');
   },
   quickDragOverHandler : (e) => { e.preventDefault(); },
   quickDragEnter : async e => {
@@ -608,17 +618,11 @@ const main = function(){
          let EditField = parentElement.parentElement.querySelector('.to-edit');
          switch(the_class){
                case "plus-list":   $$.addList();              break;
-               case "plus-task":   $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );  break;
+               case "plus-task":   $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );    break;
                case "back":        $$.switchTO('main-div');   $$.referenceTasksPerList();  break;
                case 'reload':      location.reload(); break;
-               case 'save':
-                           if($$.vars.SERVER == 'PHP') { $$.php_request($$.vars.LISTE , php=> $$.animate(qu('.sub-list'), 'understood ease-out', 1.5) ); log('php');}
-                           else                        { $$.local_request('save', 'mnemonic-liste'); log('js'); }
-               break;
-               case 'delete':
-                            if($$.vars.SERVER == 'PHP') $$.php_request("{}" , php=> { $$.animate(doc.body, 'shake', 0.25); location.reload(); });
-                            else                        $$.local_request('delete', 'mnemonic-liste');
-               break;  //transmit EMPTY OBJECT aka delete
+               case 'save':        $$.local_request('save', 'mnemonic-liste');   break;
+               case 'delete':      $$.local_request('delete', 'mnemonic-liste'); break;  //transmit EMPTY OBJECT aka delete
                case 'view':        $$.changeView();           break;
 
                case 'sub-li': case 'to-edit':
@@ -648,6 +652,10 @@ const main = function(){
                case 'pre-task':
                     if(parentElement.parentElement.classList.contains('pre-struct') == false){
                        parentElement.parentElement.classList.add('pre-struct');
+                       // let w = parentElement.parentElement.clientWidth;
+                       // let textLen = EditField.textContent.length;
+                       // log(w / textLen);
+                       $$.adjustTextSizePerLength(EditField, 3);
                     }else parentElement.parentElement.classList.remove('pre-struct');
                break;
 
