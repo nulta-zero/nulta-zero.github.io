@@ -5,37 +5,63 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <link rel="shortcut icon" href="setup/icon.png" type="image/png" >
 <link rel="stylesheet" href="style.css" />
-<title>🄼nemonic</title>
+<title>Fem-Ⓨ</title>
 </head>
- <body class="no-overflow-app no-scrollbar no-selection">
+<body class="no-overflow-app no-scrollbar no-selection" style="filter:opacity(0);">
    <div class="container">
-     <div class="top-form">
-         <input type="button" class="reload minimal-btn" value="⏻"      title="RELOAD APP" />
-         <input type="button" class="save minimal-btn"   value="save"   title="SAVE LIST" />
-         <input type="button" class="delete minimal-btn" value="delete" title="DELETE [NUKE ALL LISTS]" />
-         <input type="button" class="view minimal-btn"   value="◫|◰"   title="CHANGE VIEW [LIST|GRID|TABLE]" />
-         <!-- <span class="modified-date" title="Last time of update"></span> -->
+     <!-- SIDEBAR -->
+     <div class="sidebar">
+         <div class="reload-holder"><input type="button" class="reload minimal-btn" value="⏻"  title="RELOAD APP" /></div>
+         <div class="controls-holder">
+             <div><input type="button" class="save minimal-btn matrix"   value="save"   title="SAVE LIST" /></div>
+             <div><input type="button" class="delete minimal-btn matrix" value="perish" title="DELETE [ALL LISTS]" /></div>
+         </div>
+         <div class="tools-holder">
+              <div><input type="button" class="view minimal-btn matrix"  value="◫◰"  title="CHANGE VIEW [LIST|GRID|TABLE]" /></div>
+              <div class="marker-mode-holder"><label>m</label><input type="checkbox" class="marker-mode minimal-btn matrix" title="MARKER ON/OFF" /></div>
+         </div>
+         <div class="tasks-colors-holder">
+
+         </div>
+         <div class="presets-holder">
+
+         </div>
+         <div class="switches-holder">
+              <div><input type="button" class="replacer-mode minimal-btn matrix"  value="R"  title="REPLACER ON/OFF" /></div>
+         </div>
       </div>
+   <!-- MAIN DIV  -->
      <div class="main-div">
         <ol class="main-list"></ol>
         <div class="lists-controls">
            <input type="button" class="plus-list btn" value="+" title="NEW LIST" />
         </div>
       </div>
+   <!-- SUB-DIV -->
       <div class="sub-div">
         <div class="planner-holder"></div>
         <ol class="sub-list"></ol>
            <div class="tasks-controls">
              <input type="button" class="back btn" value="<<" title="BACK" />
-             <input type="button" class="plus-task btn"      value="+"      title="ADD TASK" />
-             <!-- <input type="button" class="plus-task btn" value="+" title="NEW TASK" /> -->
+             <input type="button" class="plus-task btn"  value="+"  title="ADD TASK" />
            </div>
        </div>
   </div>
-  <div class="restovi">
-    <div class="noti"></div>
-  </div>
+    <!-- REST -->
+    <div class="restovi">
+       <div class="noti"></div>
+       <div class="replacer">
+          <div class="replacer-input"><input class="r-input" type="text" placeholder="swap this" value=""/></div>
+          <div class="replacer-output"><input class="r-output" type="text" placeholder="with that" value=""/> </div>
+       </div>
+       <div class="sub-list-adjuster">
+            <!-- <legend>Select a maintenance drone:</legend> -->
+            <input type="radio" name="sub-list-pattern" value="boxes" checked />
+            <input type="radio" name="sub-list-pattern" value="lines" />
+            <input type="radio" name="sub-list-pattern" value="dots" />
+       </div>
+    </div>
 <script src="presets.js"></script>
-<script src="mnemonic.js"></script>
+<script src="femy.js"></script>
 </body>
 </html>
