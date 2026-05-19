@@ -552,14 +552,16 @@ const $$ = {
    },
   switchTO : function(that){
             switch(that){
-              case 'main-div':  show_this( qu('.main-div'), 'block' );
-                                show_this( qu('.sub-div'), 'none' );
+              case 'main-div':  show_this( $$.query.main_div, 'block' );
+                                show_this( $$.query.sub_div, 'none' );
+                                show_this( $$.query.sub_list_adjuster, 'none' );
                                 $$.fullListUpdate(); //update before you leave
                                 qu('.sub-list').innerHTML = '';
                                 $$.query.planner_holder.innerHTML = '';
               break;
-              case 'sub-div':   show_this( qu('.main-div'), 'none' );
-                                show_this( qu('.sub-div'), 'grid' );
+              case 'sub-div':   show_this( $$.query.main_div, 'none' );
+                                show_this( $$.query.sub_div, 'grid' );
+                                show_this( $$.query.sub_list_adjuster, 'block' );
                                 if(typeof $$.vars.LISTE == 'object' &&
                                    Object.keys($$.vars.LISTE[$$.vars.activeListName]).length > 0) $$.recreateTasks();
               break;
