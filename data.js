@@ -190,9 +190,9 @@ const DATA = [
     desc : `Diagram creator | graph connections presentation`,
   },
   {
-    name : 'MNEMONIC',
-    link : '',
-    desc : `Reminder | To-Do | Lists`,
+    name : 'FEMY',
+    link : 'https://www.facebook.com/reel/1333330282091223',
+    desc : `Feminine Life Organizer | To-Do | Lists`,
   },
   {
     name : 'NULTA',
