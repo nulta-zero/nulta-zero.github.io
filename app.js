@@ -6,7 +6,7 @@ const doc = document,
 
 const $$ = {
     vars : {
-      availables : ['CALCULATOR', 'VIEWPORT', 'SOUNDPORT', 'MNEMONIC'],
+      availables : ['CALCULATOR', 'VIEWPORT', 'SOUNDPORT', 'FEMY'],
       active_program : '',
       abc   : ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'],
     },
@@ -74,7 +74,7 @@ const $$ = {
 
           if(DATA[i].break){
              tr.classList.add('segment-break');
-             td2.innerText = '-- ' + DATA[i].desc + ' --'; 
+             td2.innerText = '-- ' + DATA[i].desc + ' --';
           }
 
           if(DATA[i].power){
