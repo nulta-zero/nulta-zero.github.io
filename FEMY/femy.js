@@ -166,6 +166,7 @@ const $$ = {
   addReorderDrag : function(item, zone){
         // On the draggable item
         item.addEventListener('dragstart', e => {
+          if(item.classList.contains('full-screen')) { e.preventDefault(); return false; }
           if( $$.checkSelection() ){ e.preventDefault(); return false;   }
           if(e.target.classList.contains('sub-li') == false) return false;
              e.dataTransfer.effectAllowed = 'move';
@@ -327,7 +328,7 @@ const $$ = {
               calTask.textContent = date; //must be like this
           let preSetup = dce('span');
               preSetup.classList.add('pre-task', 'btn');
-              preSetup.textContent = "≔";
+              preSetup.textContent = "⟛";
           let fullScreen = dce('span');
               fullScreen.textContent = "⇿";
               fullScreen.classList.add('full-screen-mode', 'btn');
@@ -750,17 +751,17 @@ const $$ = {
         return Math.floor(Math.random() * (max - min + 1)) + min;
   },
   markerClipDesign : function(mark){
-       let map  = { x1:2,y1:2,  x2:100,y2:0,  x3:98,y3:100,  x4:0,y4:100 };
-       let vals = Object.values(map);
-       let keys = Object.keys(map);
+        let map  = { x1:0,y1:0,  x2:100,y2:0,  x3:100,y3:100,  x4:0,y4:100 };
+        let vals = Object.values(map);
+        let keys = Object.keys(map);
 
-       for(let i=0; i<vals.length; i++){
-           let m = vals[i];
-           if(m > 90) map[keys[i]] = $$.getRandomBetween(m, m - randomize(5) );
-           else       map[keys[i]] = $$.getRandomBetween(m, m + randomize(7) );
-       }
+        for(let i=0; i<vals.length; i++){
+            let m = vals[i];
+            if(m > 90) map[keys[i]] = $$.getRandomBetween(m, m - randomize(2) + 0.5 );
+            else       map[keys[i]] = $$.getRandomBetween(m, m + randomize(2) + 0.5 );
+        }
 
-       mark.style.clipPath = `polygon(${map.x1}% ${map.y1}%, ${map.x2}% ${map.y2}%, ${map.x3}% ${map.y3}%, ${map.x4}% ${map.y4}%)`;
+        mark.style.clipPath = `polygon(${map.x1}% ${map.y1}%, ${map.x2}% ${map.y2}%, ${map.x3}% ${map.y3}%, ${map.x4}% ${map.y4}%)`;
   },
   // SIMPLE INSPECTION
   inspectSelectionSimple : function(range){
@@ -1044,19 +1045,17 @@ const main = function(){
          }
          switch(e.target.getAttribute('name')){
            case 'sub-list-pattern':
-
                  switch(e.target.value){
-                   case 'boxes':  $$.query.sub_list.style.backgroundSize = "10px 10px, 10px 10px, 10px 10px"; break;
-                   case 'lines':  $$.query.sub_list.style.backgroundSize = "10px 10px, 0px 10px, 10px 10px"; break;
-                   case 'dots':   $$.query.sub_list.style.backgroundSize = "10px 10px, 0px 10px, 0px 10px"; break;
+                   case 'boxes':    $$.query.sub_list.style.backgroundSize = "10px 10px, 220px 200px, 220px 10px"; break;
+                   case 'columns':  $$.query.sub_list.style.backgroundSize = "10px 10px, 0px 10px, 220px 10px"; break;
+                   case 'cells':    $$.query.sub_list.style.backgroundSize = "10px 10px, 10px 50px, 220px 10px"; break;
                  }
-
             break;
          }
      });
      $$.query.r_output.addEventListener('keydown', e=>{
-           let inputText  = $$.query.r_input.value;
-           let outputText = $$.query.r_output.value;
+           let inputText  = $$.query.r_input.value.trim();
+           let outputText = $$.query.r_output.value.trim();
            let toEdit = qu(`[data="${$$.vars.activeTask}"]`).querySelector('.to-edit');
            let newText = null;
            switch(e.key){
