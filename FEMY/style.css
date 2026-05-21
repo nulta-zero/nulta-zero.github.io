@@ -455,37 +455,27 @@ input[type="radio"]:checked {
 
 .replacer{
   display: none;
-  width: 80vw;
+  width: 60vw;
   height: fit-content;
   position: fixed;
   z-index: 99;
   bottom: 0;
-  background: #92869754;
   gap: 10px;
   margin: 1%;
 }
-.replacer-input{
-  width: 80vw;
-}
-.replacer-output{
-  width: 80vw;
-}
 .r-input, .r-output{
   width: -webkit-fill-available;
-  border-radius: 5px;
-  color: var(--periwinkle);
   outline: 3px solid var(--apricot);
-  border-radius: 5px;
+  border-radius: 3px;
   border: none;
   padding: 4px;
-  background: #0000001f;
-    color: var(--periwinkle);
+  color: var(--periwinkle);
 }
-.r-input { outline: 3px solid var(--lavander); }
-.r-output{ outline: 3px solid var(--apricot);  }
+.r-input { outline: 3px solid #ff6900; background: #ff690029; }
+.r-output{ outline: 3px solid var(--apricot);  background: #ffdab938;}
 
 .r-input:not(:focus), .r-output:not(:focus){
-  filter: opacity(60%);
+  filter: opacity(70%);
 }
 
 .full-screen{
