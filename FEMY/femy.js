@@ -14,6 +14,7 @@ const $$ = {
       notiAction : null,
       mouse : {x:0, y:0},
       heightOffset : 85,
+      SESSION_HISTORY : {},
       RESPONSE : null,
       LISTE : {},
       activeListName : null,
@@ -45,8 +46,9 @@ const $$ = {
         target : { item : null, index : null }
       },
       marker_color_is : 'yellow',
-      markerColors  :  ['yellow', 'pink', 'green', 'orange'],    //['#fffacd', '#ff149370', '#a8fbba'],
+      markerColors    : ['yellow', 'pink', 'green', 'orange'],    //['#fffacd', '#ff149370', '#a8fbba'],
       MARKER : false,
+      MOUSEDOWN : false,
   },
   query : {},
 
@@ -817,18 +819,19 @@ const $$ = {
         // Filter out zero-width trailing rectangles caused by linebreaks or white space
         const visibleLines = Array.from(rects).filter(rect => rect.width > 0);
         // If the selection spans more than 1 visible line, abort and return false
-        if (visibleLines.length > 1) {
-          $$.notification("🧡: Multiline marking is prevented.");
-          return true;
+        if(visibleLines.length > 1) {
+           log($$.vars.MOUSEDOWN);
+           if($$.vars.MARKER && $$.vars.MOUSEDOWN ) { log('da ovde'); $$.notification("🧡: Multiline marking is prevented."); }
+           return true;
         }
   },
-  markSelection : function(e){
+  markSelection : function(e, backend){
         const selection = window.getSelection();
         // Ensure something is actually selected
         if (!selection.rangeCount || selection.isCollapsed) return;
-
         const range = selection.getRangeAt(0);
         if( $$.attemptedMultilineMarking(range) ) return false;
+
 
         $$.clearOldMarks(); //if existing
 
@@ -930,12 +933,12 @@ const $$ = {
        }
    },
   manuallySelectText : function(container, start, end) {
-        const range = document.createRange();
-        const sel = window.getSelection();
+        const range = doc.createRange();
+        const sel   = window.getSelection();
 
         // This helper finds the actual Text Node and local offset
         const startPos = $$.getTextNodeAtOffset(container, start);
-        const endPos = $$.getTextNodeAtOffset(container, end);
+        const endPos   = $$.getTextNodeAtOffset(container, end);
 
         range.setStart(startPos.node, startPos.offset);
         range.setEnd(endPos.node, endPos.offset);
@@ -943,13 +946,12 @@ const $$ = {
         sel.removeAllRanges();
         sel.addRange(range);
 
-        // Now call your existing mark function!
         $$.markSelection();
   },
   // Helper to navigate through child nodes to find the correct Text Node
   getTextNodeAtOffset : function(parent, targetOffset) {
         let currentOffset = 0;
-        const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
+        const walker = doc.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
         let node;
 
         while (node = walker.nextNode()) {
@@ -962,6 +964,83 @@ const $$ = {
         return { node: parent, offset: 0 };
   },
   setActiveTask : (el)=> $$.vars.activeTask = el.getAttribute('data'),
+  exportData : function(){
+        //ASSIGN FIRST
+        let file = new Blob([JSON.stringify($$.vars.LISTE)], {type: 'txt'});
+
+        //INIT LINK AND URL OBJECT
+        let a_link = dce('a');
+            a_link.href = URL.createObjectURL(file);
+
+        a_link.download = 'femy_export_'+ $$.seeDate(0).replaceAll(/ +/gi, '_');
+        a_link.hidden = true;
+        a_link.id = 'linker';
+        doc.body.appendChild(a_link);
+        //CLICK IT VIRTUALLY
+        setTimeout( t=> doc.querySelector('#linker').click(), 0.25 * 1000);
+        //CLEAN AFTER YOURSELF
+        setTimeout( t=> doc.querySelector('#linker').remove(), 1.5 * 1000);
+ },
+ //READ UPLOADED FILE
+ readUploadedFile : async function(){
+         let file = doc.querySelector('#readFile');
+
+         file.onchange = async function(){
+              //ALL GOOD NOW CREATE NEW IMAGE ON SCREEN
+              let newFile = file.files[0];
+              let reader = new FileReader();
+
+               //APPEND
+              await reader.addEventListener('load', async ()=>{
+                let _type= newFile.name;
+
+                //LOAD BY TYPE
+                if(_type.search('.txt') > -1){
+                   $$.vars.LISTE = await JSON.parse(reader.result);
+                   $$.query.main_list.innerHTML = '';
+                   $$.recreateLists($$.vars.LISTE);
+                   setTimeout( $$.referenceTasksPerList, 1*1000);
+                }else{
+                   $$.notification('❤️‍🩹: Failed to load');
+                }
+
+                file.value = ""; //CLEAN AFTER YOURSELF
+              });
+              //READ
+              if(newFile) reader.readAsText(newFile);
+          };
+   },
+ importData : function(){
+        doc.querySelector('#readFile').click();
+        $$.readUploadedFile();
+ },
+ preserveChangeHistory : function(data){
+        let actList = $$.vars.activeListName;
+        let actTask = $$.vars.activeTask;
+        let history = $$.vars.SESSION_HISTORY;
+        if(history[actList] == null) history[actList] = {};
+
+        let dataChange = data || qu(`[data="${actTask}"]`).querySelector('.to-edit').innerHTML;
+
+        if(history[actList][actTask] == null) history[actList][actTask] = [dataChange];
+        else history[actList][actTask].push(dataChange);
+ },
+ loadPreservedHistory : function(){
+       let actList = $$.vars.activeListName;
+       let actTask = $$.vars.activeTask;
+       let history = $$.vars.SESSION_HISTORY;
+       // if(history[actList] == null) history[actList] = {};
+
+       let who = qu(`[data="${actTask}"]`).querySelector('.to-edit');
+
+       if(history[actList] != null && history[actList][actTask] != null) {
+          let hist = history[actList][actTask];
+          let last = hist[hist.length-1];
+          if(last == null) return $$.notification('🧡: History empty.');  //nothing inside anymore
+          who.innerHTML = last;
+          history[actList][actTask].pop();
+       }
+ },
 } //END OF $$ OBJECT
 
 const main = function(){
@@ -971,6 +1050,7 @@ const main = function(){
     $$.addMarkerColoring();
     $$.createPresets();
     window.addEventListener('mousedown', e=>{
+         $$.vars.MOUSEDOWN = true;
          $$.captureMouse(e);
          if(e.target.classList.contains('to-edit') == false && e.detail > 1){ e.preventDefault(); }// Prevents selection on double-click and beyond, but not on to-edit field
 
@@ -979,14 +1059,17 @@ const main = function(){
          let parentElement = e.target.parentElement;
          let EditField = parentElement.parentElement?.querySelector('.to-edit');
          switch(the_class){
-               case "plus-list":   $$.addList();              break;
-               case "plus-task":   $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );    break;
-               case "back":        $$.switchTO('main-div');   $$.referenceTasksPerList();  break;
-               case 'reload':      location.reload();         break;
-               case 'save':        $$.local_request('save', 'femy-liste');   break;
-               case 'delete':      $$.local_request('delete', 'femy-liste'); break;  //transmit EMPTY OBJECT aka delete
-               case 'view':        $$.changeView();           break;
+               case "plus-list":    $$.addList();              break;
+               case "plus-task":    $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );    break;
+               case "back":         $$.switchTO('main-div');   $$.referenceTasksPerList();  break;
+               case 'reload':       location.reload();         break;
+               case 'save':         $$.local_request('save', 'femy-liste');   break;
+               case 'delete':       $$.local_request('delete', 'femy-liste'); break;  //transmit EMPTY OBJECT aka delete
+               case 'export':       $$.exportData();  break;
+               case 'import':       $$.importData();  break;
+               case 'view':         $$.changeView();  break;
                case 'replacer-mode': ($$.query.replacer.style.display == 'grid') ? show_this($$.query.replacer, 'none') : show_this($$.query.replacer, 'grid'); break;
+               case 'undo-history': $$.loadPreservedHistory(); break;
 
                case 'sub-li': case 'to-edit':
                      if(e.target.nodeName == "LI") $$.setActiveTask(e.target);
@@ -1047,8 +1130,8 @@ const main = function(){
            case 'sub-list-pattern':
                  switch(e.target.value){
                    case 'boxes':    $$.query.sub_list.style.backgroundSize = "10px 10px, 220px 200px, 220px 10px"; break;
-                   case 'columns':  $$.query.sub_list.style.backgroundSize = "10px 10px, 0px 10px, 220px 10px"; break;
-                   case 'cells':    $$.query.sub_list.style.backgroundSize = "10px 10px, 10px 50px, 220px 10px"; break;
+                   case 'columns':  $$.query.sub_list.style.backgroundSize = "10px 10px, 0px 10px, 220px 10px";    break;
+                   case 'cells':    $$.query.sub_list.style.backgroundSize = "10px 10px, 10px 50px, 220px 10px";   break;
                  }
             break;
          }
@@ -1062,7 +1145,10 @@ const main = function(){
                case 'Enter':
                     let regex = new RegExp(escapeRegex(inputText) + "(?=[^>]*?(<|$))", "g");
                     newText = toEdit.innerHTML.replaceAll(regex, outputText);
-                    if(newText) toEdit.innerHTML = newText;
+                    if(newText) {
+                      $$.preserveChangeHistory();
+                      toEdit.innerHTML = newText;
+                    }
                break;
            }
      });
@@ -1091,11 +1177,11 @@ const main = function(){
 
      // Trigger this on mouseup or a button click
      document.addEventListener('mouseup', e=>{
-        if($$.vars.MARKER) $$.markSelection(e);
+             if($$.vars.MARKER) $$.markSelection(e);
+             $$.vars.MOUSEDOWN = false;
      });
 
      Object.freeze($$);  //FREEZE FOREVER
-
 }
 
 main();

@@ -343,7 +343,6 @@ input[type="radio"]:checked {
   height: 35px;
   line-height: 2;
   width: fit-content;
-  max-width: 200px;
   overflow-y: scroll;
   background: #ccccff87;
   outline: 1px solid black;
@@ -359,7 +358,7 @@ input[type="radio"]:checked {
 .lists-controls{
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  width: 98%;
   margin-bottom: 1%;
   padding: 0 15px;
 }
@@ -462,6 +461,9 @@ input[type="radio"]:checked {
   bottom: 0;
   gap: 10px;
   margin: 1%;
+  background: #282828a6;
+  padding: 9px 9px;
+  border-radius: 10px;
 }
 .r-input, .r-output{
   width: -webkit-fill-available;
@@ -469,13 +471,19 @@ input[type="radio"]:checked {
   border-radius: 3px;
   border: none;
   padding: 4px;
-  color: var(--periwinkle);
+  color: var(--apricot);
 }
 .r-input { outline: 3px solid #ff6900; background: #ff690029; }
 .r-output{ outline: 3px solid var(--apricot);  background: #ffdab938;}
 
 .r-input:not(:focus), .r-output:not(:focus){
   filter: opacity(70%);
+}
+
+.undo-history{
+  position: absolute;
+  right: 15px;
+  color: #ff660d;
 }
 
 .full-screen{
@@ -497,6 +505,18 @@ input[type="radio"]:checked {
 .full-screen > .is-done,
 .full-screen > .delete-task{
   display: none;
+}
+.full-screen > .to-edit::before{
+  content: "";
+  background: rgb(31 29 29 / 21%);
+  display: block;
+  width: 2px;
+  height: calc(100% - 20vh);
+  position: absolute;
+  margin-left: -5px;
+  top: 12vh;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #00000059 35%, #00000017 90%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #00000059 35%, #00000017 90%, transparent);
 }
 
 .full-screen::before{
@@ -550,6 +570,14 @@ input[type="radio"]:checked {
 .controls-holder, .tools-holder{
   display: flex;
   gap: 1vw;
+}
+
+.-dark{
+  background: var(--dark);
+  border-radius: 4px;
+}
+.-large{
+  font-size: large;
 }
 
 /* REST ARE USED AS CONTAINER THAT WILL PLACE ALL ELEMENTS INSIDE OF IT DEAD CENTER OF ITS OWN WIDTH */

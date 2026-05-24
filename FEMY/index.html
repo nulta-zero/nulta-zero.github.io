@@ -13,11 +13,14 @@
      <div class="sidebar">
          <div class="reload-holder"><input type="button" class="reload minimal-btn" value="⏻"  title="RELOAD APP" /></div>
          <div class="controls-holder">
-             <div><input type="button" class="save minimal-btn matrix"   value="save"   title="SAVE LIST" /></div>
-             <div><input type="button" class="delete minimal-btn matrix" value="perish" title="DELETE [ALL LISTS]" /></div>
+             <div><input type="button" class="save minimal-btn matrix -large"   value="⛾"  title="SAVE [ALL LISTS]&#10;TO LOCAL CLOUD" /></div>
+             <div><input type="button" class="delete minimal-btn matrix -dark"  value="♥︎"  title="DELETE [ALL LISTS]" /></div>
+             <div><input type="button" class="export minimal-btn matrix -large" value="⏍"  title="EXPORT [ALL LISTS]" /></div>
+
+             <div><input type="file" class='' id="readFile"  hidden='true'  accept=".txt"  /></div>
          </div>
          <div class="tools-holder">
-              <div><input type="button" class="view minimal-btn matrix"  value="◫◰"  title="CHANGE VIEW [LIST|GRID|TABLE]" /></div>
+              <div><input type="button" class="view minimal-btn matrix"  value="◫◰"  title="CHANGE VIEW&#10;[LIST|GRID|TABLE]" /></div>
               <div class="marker-mode-holder"><label>m</label><input type="checkbox" class="marker-mode minimal-btn matrix" title="MARKER ON/OFF" /></div>
          </div>
          <div class="tasks-colors-holder">
@@ -35,6 +38,7 @@
         <ol class="main-list"></ol>
         <div class="lists-controls">
            <input type="button" class="plus-list btn" value="+" title="NEW LIST" />
+           <input type="button" class="import btn" value="🌸"   title="IMPORT LIST" />
         </div>
       </div>
    <!-- SUB-DIV -->
@@ -51,7 +55,7 @@
     <div class="restovi">
        <div class="noti"></div>
        <div class="replacer">
-          <div class="replacer-input"><input class="r-input" type="text" placeholder="swap this" value=""/></div>
+          <div class="replacer-input"><input class="r-input" type="text" placeholder="swap this" value=""/> <input class="undo-history btn" type="button" value="ⓤ" title="UNDO CHANGE" /></div>
           <div class="replacer-output"><input class="r-output" type="text" placeholder="with that" value=""/> </div>
        </div>
        <div class="sub-list-adjuster">
