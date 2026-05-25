@@ -35,13 +35,23 @@
   --softLavander  : #d3d3ff4d;
 
   --braveConsole : #282828;
+
   --atomWorkspace : #21252b;
+  --atomLines   : #dddddd21;
   /* Faint lines in app */
   --faintDark : #3b3d43;
-
   --claudAccentBlue : #3886e5;
-
   --original-marker-color : #FFFF00;
+
+  /* ALTERNATIVE MORE FEM */
+  --roseBackground : #a2656587;
+  --roseLines : #8063638a;
+  --roseText  : #21252b9c;
+
+
+  --themeBackground : var(--atomWorkspace);
+  --themeLines : var(--atomLines);
+  --themeColor : var(--nextTextColor);
 }
 *, *::after, *::before {
   font-family: Menlo;
@@ -54,8 +64,8 @@ body{
     min-height: 100%;
     width: 100%;
     position: fixed;
-    background: var(--atomWorkspace);
-    color: var(--nextTextColor);
+    background: var(--themeBackground);
+    color: var(--themeColor);
     margin: 0;
     user-select: none;
 }
@@ -170,12 +180,13 @@ input[type="radio"]:checked {
   transition: 1s;
   padding: 0;
   min-height: 18vh;
-  background: radial-gradient(circle, #ccccff21 10% 10%, transparent 20%), linear-gradient(0deg, #ccccff0d, transparent 2px), linear-gradient(90deg, #ccccff0d, transparent 2px);
-  background-size: 10px 10px, 0px 10px, 220px 10px;
+  background: radial-gradient(circle, var(--themeLines) 10% 10%, transparent 20%), linear-gradient(0deg, var(--themeLines), transparent 2px), linear-gradient(90deg, var(--themeLines), transparent 2px);
+  background-size: 10px 10px, 0px 10px, 220.8px 10px;
   height: 50vh;
   background-position: 0px 0px;
   overflow-y: scroll;
-  border-top: 2px dotted #ccccff57;
+  border-top: 2px dotted var(--themeLines);
+  /* #ccccff57; */
   border-top: 2px dotted #0000008a;
 }
 .sub-list-adjuster{
@@ -307,7 +318,7 @@ input[type="radio"]:checked {
   font-size: 17px!important;
 }
 .planner-field{
-  outline: 1px solid #dddddd21;
+  outline: 1px solid var(--themeLines);
   outline-offset: -1px;
   background: transparent;
   position: relative;
@@ -574,6 +585,11 @@ input[type="radio"]:checked {
 .controls-holder, .tools-holder{
   display: flex;
   gap: 1vw;
+}
+
+.theme-changer{
+  max-height: 100px;
+  font-size: small;
 }
 
 .-dark{

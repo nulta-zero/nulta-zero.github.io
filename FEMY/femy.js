@@ -820,9 +820,8 @@ const $$ = {
         const visibleLines = Array.from(rects).filter(rect => rect.width > 0);
         // If the selection spans more than 1 visible line, abort and return false
         if(visibleLines.length > 1) {
-           log($$.vars.MOUSEDOWN);
-           if($$.vars.MARKER && $$.vars.MOUSEDOWN ) { log('da ovde'); $$.notification("🧡: Multiline marking is prevented."); }
-           return true;
+          if($$.vars.MARKER && $$.vars.MOUSEDOWN ) { $$.notification("🧡: Multiline marking is prevented."); }
+          return true;
         }
   },
   markSelection : function(e, backend){
@@ -1041,6 +1040,25 @@ const $$ = {
           history[actList][actTask].pop();
        }
  },
+ adjustCssVarible : function(name, newValue){
+        const root = document.documentElement;
+        root.style.setProperty(name, newValue);
+ },
+ switchDesignMode : function(mode){
+        switch(mode){
+           case 'atom':
+                 $$.adjustCssVarible('--themeBackground', 'var(--atomWorkspace)');
+                 $$.adjustCssVarible('--themeLines', 'var(--atomLines)');
+                 $$.adjustCssVarible('--themeColor', 'var(--nextTextColor)');
+           break;
+           case 'gentle-rose':
+                 $$.adjustCssVarible('--themeBackground', 'var(--roseBackground)');
+                 $$.adjustCssVarible('--themeLines', 'var(--roseLines)');
+                 $$.adjustCssVarible('--themeColor', 'var(--roseText)');
+           break;
+        }
+ },
+
 } //END OF $$ OBJECT
 
 const main = function(){
@@ -1123,15 +1141,17 @@ const main = function(){
          $$.autoShow();
      });
      window.addEventListener('input', e=>{
+
          switch(e.target.classList[0]){
            case 'marker-mode':  (e.target.checked) ? $$.vars.MARKER = true : $$.vars.MARKER = false;  break;
+           case 'theme-changer': $$.switchDesignMode(e.target.value);  break;
          }
          switch(e.target.getAttribute('name')){
            case 'sub-list-pattern':
                  switch(e.target.value){
-                   case 'boxes':    $$.query.sub_list.style.backgroundSize = "10px 10px, 220px 200px, 220px 10px"; break;
-                   case 'columns':  $$.query.sub_list.style.backgroundSize = "10px 10px, 0px 10px, 220px 10px";    break;
-                   case 'cells':    $$.query.sub_list.style.backgroundSize = "10px 10px, 10px 50px, 220px 10px";   break;
+                   case 'boxes':    $$.query.sub_list.style.backgroundSize = "10px 10px, 220px 200px, 220.8px 10px";   break;
+                   case 'columns':  $$.query.sub_list.style.backgroundSize = "10px 10px, 0px 10px, 220.8px 10px";      break;
+                   case 'cells':    $$.query.sub_list.style.backgroundSize = "10px 10px, 10px 50px, 220.8px 10px";   break;
                  }
             break;
          }
@@ -1152,6 +1172,7 @@ const main = function(){
                break;
            }
      });
+
      window.addEventListener('dblclick', e=>{
          let cl = e.target.classList[0];
          switch(cl){
