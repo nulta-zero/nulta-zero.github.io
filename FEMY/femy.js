@@ -1,4 +1,5 @@
 "use strict";
+// Built over a lifetime of choosing not to collapse.
 const doc = document,
       log   = (...x)=> console.log(...x),
       dce   = (x)=>    doc.createElement(x),
@@ -30,6 +31,8 @@ const $$ = {
                 '--pistachio',
                 '--thistle',
                 '--skyMist',
+                '--japNoteBlueDark',
+                '--japNotePurple',
       ],
       activeTask : null, //will be index
 
@@ -139,7 +142,7 @@ const $$ = {
         for(let i=0; i<arr.length; i++){
             if(list[i] == null) list[i] = {};
             list[i].content = arr[i].querySelector('.to-edit').innerText;  //$$.htmlToContent(
-            list[i].color   = arr[i].style.background.replaceAll(/var\(|\)/gi, '');
+            list[i].color   = arr[i].style.backgroundColor.replaceAll(/var\(|\)/gi, '');
             list[i].size    = arr[i].style.gridColumn;
             list[i].status  = arr[i].querySelector('.to-edit').classList.contains('done') ? 'done' : '';
             list[i].pinned  = arr[i].parentElement.classList.contains('planner-field') ? arr[i].parentElement.getAttribute('slot') : '';
@@ -309,7 +312,7 @@ const $$ = {
               //AUTO RECOGNIZE ALREADY SET COLOR, when RECREATING TASK
               let historyTask = $$.vars.LISTE[$$.vars.activeListName][inc];
               let colorWas = historyTask != null ? historyTask.color : '';
-              li.style.background = `var(${colorWas})`;
+              li.style.backgroundColor = `var(${colorWas})`;
 
               let sizeWas = historyTask != null ? historyTask.size : '';
               li.style.gridColumn = `${sizeWas}`;
@@ -417,7 +420,7 @@ const $$ = {
              let task = tasks.filter( x=> x.getAttribute('data') == inc )[0];
                if(task == '') return
 
-                 task.style.background = `var(${colorIs})`;
+                 task.style.backgroundColor = `var(${colorIs})`;
                  $$.invertColorSameTone(task);
 
              let ToEdit = task.querySelector('.to-edit');
@@ -885,7 +888,7 @@ const $$ = {
         return arr.join(' ');
    },
    invertColorSameTone : function(el){
-        let varName = el.style.background.replaceAll(/var\(|\)/gi, '');
+        let varName = el.style.backgroundColor.replaceAll(/var\(|\)/gi, '');
         let hex = $$.unpackVar(varName);
         let rgb = $$.hexToRGB(hex);
         let arr = rgb.split(' ');
@@ -1058,6 +1061,23 @@ const $$ = {
            break;
         }
  },
+ resizeSubListBackground : function(e){
+       let columnWidth = Math.floor(qu('.sub-list').clientWidth / 200);  //|| 220.8;
+       let val = '';
+
+      if(e == null){
+         let arr = new Array(...quAll('[name="sub-list-pattern"]'));
+             val = arr.filter(x=> x.checked)[0].value;
+      }else{
+         val = e.target.value;
+      }
+
+       switch(val){
+         case 'boxes':    $$.query.sub_list.style.backgroundSize = `10px 10px, 220px 200px, calc(100% / ${columnWidth}) 10px`;   break;
+         case 'columns':  $$.query.sub_list.style.backgroundSize = `10px 10px, 0px 10px,    calc(100% / ${columnWidth}) 10px`;   break;
+         case 'cells':    $$.query.sub_list.style.backgroundSize = `10px 10px, 10px 50px,   calc(100% / ${columnWidth}) 10px`;   break;
+       }
+ },
 
 } //END OF $$ OBJECT
 
@@ -1105,7 +1125,7 @@ const main = function(){
                break;
                case 'delete-task':  //DELETE TASK
                      inc = parentElement.getAttribute('data');
-                     parentElement.style.background = 'indianred';
+                     parentElement.style.backgroundColor = 'indianred';
                      $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);
                      delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
                break;
@@ -1118,7 +1138,7 @@ const main = function(){
                break;
 
                case 'delete-sub-list':   //DELETE LIST
-                     parentElement.style.background = 'indianred';
+                     parentElement.style.backgroundColor = 'indianred';
                      $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);  //true is remove();
                      delete $$.vars.LISTE[ parentElement.getAttribute('data') ]; //NEWLY FORMED TASK OBJECT
                break;
@@ -1147,15 +1167,12 @@ const main = function(){
            case 'theme-changer': $$.switchDesignMode(e.target.value);  break;
          }
          switch(e.target.getAttribute('name')){
-           case 'sub-list-pattern':
-                 switch(e.target.value){
-                   case 'boxes':    $$.query.sub_list.style.backgroundSize = "10px 10px, 220px 200px, 220.8px 10px";   break;
-                   case 'columns':  $$.query.sub_list.style.backgroundSize = "10px 10px, 0px 10px, 220.8px 10px";      break;
-                   case 'cells':    $$.query.sub_list.style.backgroundSize = "10px 10px, 10px 50px, 220.8px 10px";   break;
-                 }
-            break;
+           case 'sub-list-pattern': $$.resizeSubListBackground(e);  break;
          }
      });
+     window.addEventListener('resize', e=>{
+         $$.resizeSubListBackground();
+     })
      $$.query.r_output.addEventListener('keydown', e=>{
            let inputText  = $$.query.r_input.value.trim();
            let outputText = $$.query.r_output.value.trim();

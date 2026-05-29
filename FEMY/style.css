@@ -24,10 +24,10 @@
   --softGold  : #b9be81;
   --beige : #d1bda0;
   --teal  : #65e3e3;
-  /* #55c7c7f7; */
-  /* #34c1c1;  */
-   /* #3ae1e1; */
   --earth : #4d5840;
+
+  --japNoteBlueDark : #d2eae7;
+  --japNotePurple   : #d1cad6;
 
   --nextMint : #7dffc0d6;
   --dark : #202124;
@@ -59,7 +59,7 @@
 }
 html{
   min-height: 100%;
- }
+}
 body{
     min-height: 100%;
     width: 100%;
@@ -153,7 +153,6 @@ input[type="radio"]:checked {
   display: grid;
   max-width: 35px;
   justify-content: center;
-  /* border: 1px solid #434552; */      /*Just for testing */
   align-content: end;
   padding-bottom: 15px;
 }
@@ -186,7 +185,6 @@ input[type="radio"]:checked {
   background-position: 0px 0px;
   overflow-y: scroll;
   border-top: 2px dotted var(--themeLines);
-  /* #ccccff57; */
   border-top: 2px dotted #0000008a;
 }
 .sub-list-adjuster{
@@ -203,18 +201,24 @@ input[type="radio"]:checked {
 
 .sub-li{
   overflow-y: hidden;
-  height: fit-content;
+  /* height: fit-content; */
   align-self: center;
   position: relative;
-  outline: 1px solid #dddddd21;
   outline-offset: -1px;
   background: var(--noneColor);
   max-height: 100px;
   outline: 2px solid #96a0ae21;
-  outline-offset: -2px;
 
   animation: expandHeight 0.5s cubic-bezier(0.56, 0.55, 0.74, 0.05);
   animation-direction: reverse;
+
+  transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* transform: scale(1);
+  transform-origin: center center;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease; */
 }
 .sub-li:active:not(:has(*:active)) {}
 .sub-li > div{
@@ -277,9 +281,6 @@ input[type="radio"]:checked {
 [done="true"] > .to-edit{
   text-decoration: line-through;
   filter: opacity(0.5);
-  /* background: #00000012;
-  border-radius: 4%;
-  padding: 0 22px; */
 }
 .to-edit{
   white-space: pre-wrap;
@@ -295,8 +296,9 @@ input[type="radio"]:checked {
   left: 4px;
   gap: 8px;
   align-items: center;
-  height: 30px;
+  height: 40px;
   display: flex;
+  overflow-y: hidden !important;
 }
 .copy-task{
   font-size: 30px;
@@ -382,8 +384,6 @@ input[type="radio"]:checked {
   bottom: 0px;
   left: 0;
   padding: 0 10px;
-  /* background: var(--atomWorkspace);
-  border-top: 1px solid #383d44; */
 }
 .lists-controls > input,
 .tasks-controls > input{
@@ -399,10 +399,6 @@ input[type="radio"]:checked {
   outline: none;
 }
 ::selection{
-  /* background: #d3d3ff4d;  /* SOFT-lavander */
-  /* background: #d3d3ff4d;
-  color: #0b0b0b; */
-  /* context-menu; */
   background: var(--claudAccentBlue);
   color: var(--periwinkle);
 }
@@ -422,7 +418,6 @@ input[type="radio"]:checked {
   border-radius: 100px;
 }
 .tasks-colors-holder, .marker-colors-holder{
-  /* display: flex; */
   align-items: center;
 }
 .color-div, .marker-color-div{
@@ -436,6 +431,8 @@ input[type="radio"]:checked {
   outline: 2px solid #41444d;
   outline-offset: -2px;
 }
+
+/* MARKERS */
 .marker-colors-holder{
   width: fit-content;
   background: snow;
@@ -463,6 +460,7 @@ input[type="radio"]:checked {
 .marker-green  {background: #a8fbba;    border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
 .marker-orange {background: #ff783382;  border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
 
+/* REPLACER */
 .replacer{
   display: none;
   width: 60vw;
@@ -494,13 +492,14 @@ input[type="radio"]:checked {
 .r-input:not(:focus), .r-output:not(:focus){
   filter: opacity(70%);
 }
-
+/* SMALL UNDO BUTTON IN r-input */
 .undo-history{
   position: absolute;
   right: 15px;
   color: #ff660d;
 }
 
+/* FULL-SCREEN */
 .full-screen{
   min-height: min-content;
   height: 100vh !important;
@@ -508,11 +507,18 @@ input[type="radio"]:checked {
   animation: expandHeight 0.5s cubic-bezier(0.56, 0.55, 0.74, 0.05) forwards;
   transform-origin: center;
   width: 100%;
+  max-height: 100vh;
   max-height: 100vh!important;
   transition: 0.75s;
   z-index: 1;
-}
 
+  background-image: radial-gradient(circle, #282c320f 7% 7%, transparent 5%);
+  background-size: 30px 30px;
+  border-bottom-left-radius: 29px;
+  /* clip-path: polygon(0 0, 100% 0, 100% 100%, 3% 100%, 0 96%); */
+  mask: url(#dynamic-serrated-mask);
+  -webkit-mask: url(#dynamic-serrated-mask);
+}
 .full-screen-mode{
   transform: rotate(45deg);
   font-size: 30px;
@@ -521,36 +527,8 @@ input[type="radio"]:checked {
 .full-screen > .delete-task{
   display: none;
 }
-.full-screen > .to-edit::before{
-  content: "";
-  background: rgb(31 29 29 / 21%);
-  display: block;
-  width: 2px;
-  height: calc(100% - 20vh);
-  position: absolute;
-  margin-left: -5px;
-  top: 12vh;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #00000059 35%, #00000017 90%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #00000059 35%, #00000017 90%, transparent);
-}
-
-.full-screen::before{
-  content: "⢸";
-  position: absolute;
-  left: -11px;
-  bottom: 0vh;
-  background: linear-gradient(90deg, #00000030, transparent) !important;
-  width: 30px;
-  height: 58px;
-  color: #00000026;
-  /* box-shadow: 0px -2px 7px; */
-  line-height: 1.5;
-  text-indent: 5px;
-  border-bottom-right-radius: 10px;
-  border-top-right-radius: 10px;
-  transform: rotate(-45deg) translate(-7px, 13px);
-}
-.full-screen::after{
+/* SIDE LINE */
+/* .full-screen::after{
   content: "";
   position: absolute;
   left: -1px;
@@ -560,8 +538,20 @@ input[type="radio"]:checked {
   height: 35vh;
   color: #00000069;
   box-shadow: 0px -2px 7px;
-}
+} */
 
+/* SPECIAL WHITISH DOTS ADDITION TO SVG CUT-OUT */
+.full-screen::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50px;
+  height: 52px;
+  transform: rotate(48deg) translate(1px, 38px);
+  background: #00000054;
+}
+/* ACTIVE */
 .active{}
 .active::after{
   content: "●";
@@ -591,7 +581,7 @@ input[type="radio"]:checked {
   max-height: 100px;
   font-size: small;
 }
-
+/* SIMPLE CLASSES for HTML */
 .-dark{
   background: var(--dark);
   border-radius: 4px;
@@ -609,7 +599,8 @@ input[type="radio"]:checked {
 
 .net{
   background: transparent !important;
-  background-image: linear-gradient(0deg, #ccccff63, transparent 2px), linear-gradient(90deg, #ccccff47, transparent 2px) !important;
+  background-image: linear-gradient(0deg, var(--themeLines), transparent 2px), linear-gradient(90deg, var(--themeLines), transparent 2px) !important;
+  /* #ccccff63 */
   background-size: 20.7px 20px !important;
   position: relative;
   transition: 0.5s;
