@@ -8,10 +8,17 @@ const doc = document,
       appendAll = (arr, parent)=> arr.map( x=> parent.appendChild(x) ),
       randomize = (to)=> Math.floor(Math.random() * to),
       escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-      show_this = (it, mechanism)=> { (mechanism) ? it.style.display = mechanism || 'block' : it.style.display = 'none'; }; //EXAMPLE OF USING THIS FUNC      show_this( invertory_holder, true/false )
+      camelCase = (str) => str[0].toUpperCase() + str.slice(1),
+      acronym = (str, deli=' ')=> str.split(deli).map(x=> x[0]).join(''),
+      show_this = (it, mechanism)=> { (mechanism) ? it.style.display = mechanism || 'block' : it.style.display = 'none'; };
 
 const $$ = {
   vars : {
+      mover : {
+        holding    : null,
+        placing_at : null
+      },
+      resizeTimer : null,
       notiAction : null,
       mouse : {x:0, y:0},
       heightOffset : 85,
@@ -19,7 +26,7 @@ const $$ = {
       RESPONSE : null,
       LISTE : {},
       activeListName : null,
-      colors  : ['--atomWorkspace','--earth', '--teal','--babyBlue','--magicMint', '--mint','--lavander','--beige', '--softGold',
+      colors  : ['--atomWorkspace','--glassAtomBack','--earth', '--teal','--babyBlue','--magicMint', '--mint','--lavander','--beige', '--softGold',
                 '--apricot',
                 '--lemonChiffon',
                 '--peach',
@@ -39,9 +46,9 @@ const $$ = {
       list_views : {
         index : 0,
         map : {
-            0 : 'list-view',
-            1 : 'grid-view',
-            2 : 'table-view',
+            0 : 'table-view',
+            1 : 'pillar-view',
+            2 : 'list-view',
           },
       },
       dragged : {
@@ -60,13 +67,13 @@ const $$ = {
       // 1. Grab every element with a class and count them
       document.querySelectorAll('[class]').forEach(el => {
         el.classList.forEach(className => {
-          classCounts[className] = (classCounts[className] || 0) + 1;
+           classCounts[className] = (classCounts[className] || 0) + 1;
         });
       });
 
       // 2. Filter for classes that appear exactly 1 time
       const originalUniqueClasses = Object.keys(classCounts).filter(
-        className => classCounts[className] === 1
+            className => classCounts[className] === 1
       );
 
       return originalUniqueClasses;
@@ -89,6 +96,12 @@ const $$ = {
              }
              $$.fullListUpdate();
           return state;
+  },
+  debouncer : function(func){
+      clearTimeout( $$.vars.resizeTimer );
+      $$.vars.resizeTimer = setTimeout( t => {
+          if(typeof func === 'function' ) func();
+      }, 250);
   },
   updateListState : function(provided, data){
         let inc = provided.parentElement.getAttribute('data') || 0;
@@ -115,10 +128,6 @@ const $$ = {
             const end = start + textInside.length;
 
             marks.push({ start, end });
-
-            // Crucial: The TreeWalker will now enter the text inside the <mark>.
-            // We don't add to currentTextLength here because the next loop
-            // will catch the text node INSIDE the mark and add it there.
         }
     }
     return marks;
@@ -136,17 +145,23 @@ const $$ = {
         }
         return output;
   },
+  collectEditsAndClones : function(from, type){
+     let arr = from.querySelectorAll('.to-edit');
+     let map = [];
+     arr.forEach( x=> map.push(type == 'HTML' ? x.innerHTML : x.innerText) );
+     return map;
+  },
   fullListUpdate : function(){
         let list = $$.vars.LISTE[$$.vars.activeListName];
         let arr  = quAll('.sub-li');
         for(let i=0; i<arr.length; i++){
             if(list[i] == null) list[i] = {};
-            list[i].content = arr[i].querySelector('.to-edit').innerText;  //$$.htmlToContent(
+            list[i].content = $$.collectEditsAndClones(arr[i], 'text'); //you could grab HTML if needed
             list[i].color   = arr[i].style.backgroundColor.replaceAll(/var\(|\)/gi, '');
             list[i].size    = arr[i].style.gridColumn;
             list[i].status  = arr[i].querySelector('.to-edit').classList.contains('done') ? 'done' : '';
             list[i].pinned  = arr[i].parentElement.classList.contains('planner-field') ? arr[i].parentElement.getAttribute('slot') : '';
-            list[i].markers = $$.markerDataMap(arr[i].querySelector('.to-edit'));
+            list[i].markers = $$.markerDataMap( arr[i].querySelector('.to-edit') );  //this should collect from all .to-edits ! Fix this!
         }
   },
   copyEvent : async function(btn, textToCopy){
@@ -227,10 +242,10 @@ const $$ = {
           dragPreview.style.position = 'absolute';
           dragPreview.style.top = '-9999px';
           dragPreview.style.left = '-9999px';
-          document.body.appendChild(dragPreview);
+          doc.body.appendChild(dragPreview);
 
           // 4. Set the exact coordinates of the mouse click point
-          e.dataTransfer.setDragImage(dragPreview, e.offsetX, e.offsetY);
+          e.dataTransfer.setDragImage(dragPreview, e.offsetX, e.offsetY - item.offsetHeight/2 );  //its need this additional offset on Y axis     //+ qu('.planner-holder').getBoundingClientRect().bottom
 
           // 5. Clean up the DOM immediately after the frame renders
           setTimeout( t => {
@@ -238,38 +253,65 @@ const $$ = {
           }, 0);
   },
   addPinDropZone : function(zone){
-          zone.addEventListener('dragover', e => e.preventDefault()); // required!
+          zone.addEventListener('dragover', e => {
+            e.preventDefault();  //required
+          });
           zone.addEventListener('drop', e => {
               e.preventDefault();
               let dra = $$.vars.dragged;
               dra.target.item  = e.target;
               dra.target.index = e.target.getAttribute('data');
-              if(dra.target.item.classList.contains('planner-field') == false ) {    //FINISH THIS
-                  e.target.classList.remove('net');
+              let attemptedStacking = false;
+              let addTo = e.target;
+              // CONDENSE SPACE TO PLACE MORE SUB-LI's into planner-field
+              if(dra.target.item && dra.target.item.classList.contains('sub-li')){
+                 attemptedStacking = true;
+                 addTo = e.target.parentElement;
+                 e.target.classList.remove('net');
+              }
+              if(dra.target.item.classList.contains('planner-field') == false && attemptedStacking == false){
+                 e.target.classList.remove('net');
                  return false;  //do nothing on same point drop
               }
-              e.target.appendChild(dra.source.item);
-              e.target.classList.remove('net');
+              addTo.appendChild(dra.source.item);
+              // if(addTo.children.length > 2){
+                // addTo.classList.add('super-condense');
+                $$.condensePlannerField(dra.target.item.parentElement);
+              // }
+              addTo.classList.remove('net');
               $$.adjustTextSizePerLength(dra.source.item.querySelector('.to-edit'), 3); //sub-li is passed here
+              // ASSIGN DATE ON PIN
+              $$.addDateToTask(dra.target.item, dra.source.item);
           });
           zone.addEventListener('dragstart', e => {
               $$.deepCloneDraggedImage(e);
+              if(e.target.parentElement.classList.contains('super-condense')){
+                if(e.target.parentElement.children.length == 3){
+                  e.target.parentElement.classList.remove('super-condense');
+                }
+              }
           });
-          zone.addEventListener('dragenter', $$.dropEnter);
-          zone.addEventListener('dragleave', $$.dropLeave);
+          zone.addEventListener('dragenter', $$.elementDropEnter );
+          zone.addEventListener('dragleave', $$.elementDropLeave );
   },
-  dropEnter : async e => {
+  addDateToTask : function(holded, placed_at){
+         let slot = placed_at.getAttribute('slot');
+         let date = $$.seeDate(slot);
+             holded.querySelector('.cal-task').textContent = date;
+  },
+  elementDropEnter : async e => {
           e.preventDefault();
           e.stopPropagation();
+          if(e.target.classList.contains('to-edit') == false) return false; //skip this drop on
           e.target.classList.add('net');
   },
-  dropLeave : e => { e.target.classList.remove('net') },
+  elementDropLeave : e => { e.target.classList.remove('net') },
 
   reasignIndexes : function(arr){
           arr = arr || quAll('.sub-li');
           for(let i=0;i<arr.length;i++){
-              arr[i].setAttribute('data', i);
-              arr[i].querySelector('.cal-task').textContent = $$.seeDate(i);  //reasign calendar also
+              arr[i].setAttribute('data', i);  //this must happen
+              // arr[i].querySelector('.cal-task').textContent = $$.seeDate(i);  //reasign calendar also , this is optional
           }
   },
   futureDate : function(days){
@@ -279,20 +321,19 @@ const $$ = {
   },
   seeDate : (days)=> new Date($$.futureDate(days)).toDateString(), //from today
   //TASK inside LIST[?]...
-  addTask : function(OK, content, status){
-
+  addTask : function(blueprint){
           let li = dce('li');
               li.classList.add('sub-li');
           let inc = quAll('.sub-li').length || 0;
 
               li.setAttribute('data', inc);
+          let editableWrapper = dce('div');
+              editableWrapper.classList.add('editable-wrapper');
           let text_div = dce('div');
               text_div.classList.add('to-edit');
               text_div.setAttribute('contenteditable', 'plaintext-only');
+              text_div.setAttribute('placeholder', 'Start your magical journey here...');
           let whiteSpace = qu('.sub-list').classList.contains('table-view') ? '\u200B ' : '\u200B  ';
-
-              if(OK == null) text_div.innerText =  whiteSpace + $$.randomEmoji();
-              else           text_div.innerText = content;
 
               text_div.addEventListener('paste',     $$.onlyPlainText        );
               text_div.addEventListener('drop',      $$.quickDropHandler     );
@@ -310,11 +351,12 @@ const $$ = {
               square.classList.add('is-done', 'btn');
 
               //AUTO RECOGNIZE ALREADY SET COLOR, when RECREATING TASK
-              let historyTask = $$.vars.LISTE[$$.vars.activeListName][inc];
-              let colorWas = historyTask != null ? historyTask.color : '';
+              let colorWas = (blueprint && blueprint.color != null) ? blueprint.color : '--atomWorkspace';
               li.style.backgroundColor = `var(${colorWas})`;
 
-              let sizeWas = historyTask != null ? historyTask.size : '';
+              if(colorWas == '--glassAtomBack') li.classList.add('glass');
+
+              let sizeWas = (blueprint && blueprint.size != null) ? blueprint.size : '';
               li.style.gridColumn = `${sizeWas}`;
 
           let del = dce('div');
@@ -323,35 +365,204 @@ const $$ = {
 
           let taskMenu = dce('div');
               taskMenu.classList.add('task-menu');
-          let copyTask = dce('span');
+
+          let copyTask = dce('div');
               copyTask.classList.add('copy-task', 'btn');
               copyTask.textContent = "⧉";
-
-          let calTask = dce('span');
-              calTask.classList.add('cal-task');
-          let date = $$.seeDate(inc);
-              calTask.textContent = date; //must be like this
-          let preSetup = dce('span');
+              copyTask.title= "COPY TASK CONTENT";
+          let duplicate = dce('div');
+              duplicate.classList.add('duplicate-task', 'btn');
+              duplicate.textContent = "❑²";
+              duplicate.title = "DUPLICATE TASK";
+          let calTask = dce('div');
+              calTask.classList.add('cal-task');  //create just slot
+              calTask.textContent = ''; //date;
+              calTask.title = "CALENDAR FOR PINED TASKS";
+          let preSetup = dce('div');
               preSetup.classList.add('pre-task', 'btn');
               preSetup.textContent = "⟛";
-          let fullScreen = dce('span');
+              preSetup.title = "PRE FORMAT";
+          let fullScreen = dce('div');
               fullScreen.textContent = "⇿";
+              fullScreen.title = "FULL-SCREEN";
               fullScreen.classList.add('full-screen-mode', 'btn');
+          let monther = dce('div');
+              monther.textContent = '⠾⠿⠇';
+              monther.classList.add('monther', 'btn');
+              monther.title = "PRINT MONTH CALENDAR TO TEXT";
+          let markedList = dce('div');
+              markedList.classList.add('marked-list');
+              markedList.textContent = "≔";
+              markedList.title = "SUM ALL MARKED TEXT";
+          let bulletSelection = dce('div');
+              bulletSelection.classList.add('bullet-selection');
+              bulletSelection.textContent = "✻✻";
+              bulletSelection.title = "BULLET THE SELECTION";
 
-              appendAll([square, text_div, del], li);
-              appendAll([copyTask, preSetup, calTask, fullScreen], taskMenu);
+              editableWrapper.appendChild(text_div);
+              appendAll([square, editableWrapper, del], li);
+              appendAll([copyTask, duplicate, preSetup, calTask, monther, markedList, bulletSelection,, fullScreen], taskMenu);
               li.appendChild(taskMenu);
-
-            $$.adjustTextSizePerLength(text_div);
-            $$.addPlanner(Math.floor(window.innerWidth / 200));
-            // $$.animate(li, 'slideFromRight', 1);
 
          //INIT
          $$.query.sub_list.appendChild(li);
          $$.addReorderDrag(li, li.parentElement);
+         $$.invertColorSameTone(li);
 
          //RETURN STATUS
-         if(status == 'done') $$.taskIs('done', square);
+         if(blueprint && blueprint.status) $$.taskIs(blueprint.status, square);
+         $$.adjustTextSizePerLength(text_div);
+
+        // CONTENT
+        if(blueprint == null) text_div.innerText = whiteSpace + $$.randomEmoji();
+        else{
+          let content = blueprint.content;
+          text_div.innerText = content.join('\n');
+          if(Array.isArray(content) && content.length > 1) $$.spreadContentToColumns(text_div, content.length-1);
+        }
+  },
+  getLevenshteinDistance : function(a, b) {
+          let matrix = [];
+          for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+          for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+          for (let i = 1; i <= b.length; i++) {
+
+          for(let j = 1; j <= a.length; j++) {
+              if(b.charAt(i - 1) === a.charAt(j - 1)) {
+                 matrix[i][j] = matrix[i - 1][j - 1];
+              }else{
+                 matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+              }
+            }
+          }
+          return matrix[b.length][a.length];
+  },
+  cleanString : function(str) {
+      let cleaned = str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      cleaned = cleaned.replace(/[^a-z0-9\s]/g, "");
+      cleaned = cleaned.replace(/\b(professional makeup|makeup|cosmetics|london|paris|beauty|naturkosmetik|collection|professionals)\b/g, "");
+      return cleaned.replace(/\s+/g, " ").trim();
+  },
+  findBrand : function(userInput) {
+        let cleanInput = $$.cleanString(userInput);
+        let inputWords = cleanInput.split(" ");
+        let db_brands = MAKEUP_BRANDS;
+
+        for(let i = 0; i < db_brands.length; i++) {
+          let currentBrand = db_brands[i];
+          let cleanBrand = $$.cleanString(currentBrand);
+
+          if (cleanBrand.length === 0) continue;
+
+          // Step 1: Strict Exact Word Regex Test (Safe from typos)
+          let regex = new RegExp("\\b" + cleanBrand + "\\b", "i");
+          if (regex.test(cleanInput)) {
+            return currentBrand;
+          }
+
+          // Step 2: Strict Levenshtein Backup Layer
+          for(let w = 0; w < inputWords.length; w++) {
+            let currentWord = inputWords[w];
+
+            // Strict Guards: Words must be similar lengths, and must share the same starting letter
+            if (currentWord.length < 4 || currentWord[0] !== cleanBrand[0]) continue;
+
+            let distance = $$.getLevenshteinDistance(currentWord, cleanBrand);
+            let maxLength = Math.max(currentWord.length, cleanBrand.length);
+            let similarity = (maxLength - distance) / maxLength;
+
+            // Must be at least 75% identical to be considered a match
+            if(similarity >= 0.75) {
+              return currentBrand;
+            }
+          }
+        }
+        return null;
+  },
+  detectLinewithMarkedContent : function(parent, this_mark){
+        let marks = parent.querySelectorAll('mark');
+        let map = {};
+        let arr = parent.innerHTML.split(/<br>|<br\/>|<br \/>/);  //<br>, <br/>, or <br />
+
+        for(let i = 0; i< arr.length; i++){
+            if(this_mark == null){
+              // FULL SEARCH
+                for(let j= 0; j < marks.length; j++){
+                    if(arr[i].includes( marks[j].outerHTML)){
+                       map[marks[j].innerText] = i;
+                    }
+                }
+            }else{
+              // MARKED PROVIDED, limited search
+              if(arr[i].includes( this_mark.outerHTML )){
+                 map[this_mark.innerText] = i;
+              }
+            }
+        }
+        return map;
+  },
+  detectBrands : function(parent){
+        if(parent == null) return;
+        let arr = parent.innerHTML.split(/<br>|<br\/>|<br \/>/);
+        let brand_map = [];
+        for(let i = 0; i< arr.length; i++){
+            let brandCosmeticRecognized = $$.findBrand(arr[i]);
+            if(brandCosmeticRecognized != null){
+               brand_map.push(brandCosmeticRecognized);
+            }
+        }
+        return brand_map;
+  },
+  generateMarkedList : function(el){
+      let marked = el.querySelectorAll('mark');
+      let ul = $$.query.for_marked_list_ul;
+          $$.clearNode(ul);  //clear old nodes
+      for(let i = 0; i< marked.length; i++){
+          let li = dce('li');
+          let info_span = dce('span');
+              info_span.classList.add('info-span');
+          let line_map = $$.detectLinewithMarkedContent(marked[i].parentElement, marked[i]);
+              li.innerText = marked[i].innerText;
+              li.classList.add('marker-list-li');
+          info_span.innerText = 'Line:' + line_map[marked[i].innerText];
+              li.style.backgroundColor = $$.extractCss(marked[i], 'backgroundColor');
+              li.appendChild(info_span);
+              if(marked[i].parentElement.getAttribute('clone') === "true"){
+                 let info_span_2 = dce('span');
+                     info_span_2.classList.add('info-span');
+                     info_span_2.textContent = 'Clone';
+                     li.appendChild(info_span_2);
+              }
+          ul.appendChild(li);
+      }
+
+     // DETECT ANY COSMETICS USER WROTE, OFFER HEALTH CHECK
+      let brand_map = $$.detectBrands(el);
+      if(brand_map.length > 0){
+        let cosmetics = dce('div');
+            cosmetics.textContent = "Cosmetics detected: ";
+            cosmetics.title = "Research cosmetics for toxic ingredients";
+        for(let i = 0;i< brand_map.length; i++){
+            let info_span_3 = dce('a');
+                info_span_3.classList.add('info-link');
+                info_span_3.textContent = brand_map[i];
+                info_span_3.setAttribute('target','_blank');
+                info_span_3.href = `https://www.ewg.org/skindeep/search/?search=${ brand_map[i] }`;
+                cosmetics.appendChild(info_span_3);
+        }
+        ul.appendChild(cosmetics);
+      }
+
+      show_this(ul.parentElement, 'block');
+      ul.parentElement.style.left = $$.vars.mouse.x + 'px';
+      ul.parentElement.style.top  = $$.vars.mouse.y+20 + 'px';
+      let parentBack = el.style.backgroundColor;
+      // log(parentBack);
+      ul.parentElement.style.backgroundColor = parentBack;
+  },
+  extractCss : function(el, property){
+      let style = window.getComputedStyle(el);
+      return style[property];
   },
   repinTasks : function(){
          let arr = quAll('.sub-li');
@@ -360,8 +571,71 @@ const $$ = {
              let inc = LISTE[i].pinned;
              let pinField = qu(`[slot="${inc}"]`);
              if(arr[i].querySelector('.to-edit').innerText != LISTE[i].content) continue;  //missmatch, test this
-             if(inc != '' && pinField) pinField.appendChild(arr[i]);
+             if(inc != '' && pinField) {
+                pinField.appendChild(arr[i]);
+                // ASSIGN DATE ON PIN
+                let date = $$.seeDate(inc);
+                    arr[i].querySelector('.cal-task').textContent = date;
+              }
          }
+  },
+  // USE OFFSET if YOU WANT NEXT MONTH OR ANY INLCUDING PREVIOUS  -1,-2, 1,2...
+  createMonthTextCalendar : function(offset=0){
+       let date = new Date();
+       // Month is 0-indexed, so getMonth() + 1 moves to the next month.
+       // Day 0 returns the last day of the previous month (the current month).
+       let y = date.getFullYear();
+       let m = date.getMonth();
+       let d = date.getDate();
+       const daysInLastMonth = new Date(y, m + offset, 0).getDate();
+       const daysInMonth = new Date(y, m + 1+offset, 0).getDate();
+       let previousMonthLastDay = new Date(`${y}-${m+offset}-${daysInLastMonth}`);
+       let dayName = previousMonthLastDay.toString().split(' ')[0];
+
+       let map = {'Mon' : 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 5, 'Sun': 6 };
+       let firstWeekSpace = map[dayName];
+
+       let output =`Mo Tu We Th Fr Sa Su\n....................\n`;
+
+       function markToday(x){
+           return (x == d) ? '['+x+']' : x.toString();
+       }
+
+        // ADD one week from prior month
+        for(let j = 0; j<firstWeekSpace; j++){
+            output += '   '; //spaces from previous month last week
+        }
+        let base = 7 - (firstWeekSpace+1);
+                       output += daysInLastMonth; //add last day from previous month
+        if(base === 0) output += '\n';  //only if 0 IMIDIATLY end week with new line
+
+        for(let i = 1; i<daysInMonth+1; i++){
+            switch( i.toString().length){
+                 case 2:  output += markToday(i) + ' ';       break;
+                 case 1:
+                      let today = markToday(i);
+                      if(today.search(/\[/gi) > -1) output += today;
+                      else                          output += ' ' + today + ' ';
+                 break;
+             }
+
+         if(i === base) { output += '\n'; continue; }
+         if( (i-base) % (7) == 0 & i != 0) output += ' ' + '\n';
+        }
+        output += '\n';
+        return output;
+  },
+  insertTextAtCursor : function(text) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+        let range = selection.getRangeAt(0);
+        range.deleteContents();
+        let textNode = doc.createTextNode(text);
+        range.insertNode(textNode);
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        selection.removeAllRanges();
+        selection.addRange(range);
   },
   //ADD LIST1, LIST2, LIST3...
   addList : function( data ){
@@ -408,28 +682,31 @@ const $$ = {
               small_div.style.background = `var(${$$.vars.colors[i]})`;
               small_div.setAttribute('color-data' , `${$$.vars.colors[i]}`);
               small_div.classList.add('color-div', 'minimal-btn');
+              small_div.title = `${camelCase($$.vars.colors[i].replaceAll(/\-/gi, ''))}`;
               $$.query.tasks_colors_holder.appendChild(small_div);
           }
+  },
+  changeTaskColor : function(e){
+      let colorIs = e.target.getAttribute('color-data');
+      let inc = parseInt($$.vars.activeTask) || 0;
 
-          $$.query.tasks_colors_holder.addEventListener('click', e=>{
-             let colorIs = e.target.getAttribute('color-data');
-             let inc = parseInt($$.vars.activeTask) || 0;
+      // let tasks = quAll(`[data="${inc}"]`);
+      let task = qu(`[data="${inc}"]`);
+          if(task == '') return
 
-             let tasks = quAll('.sub-li');
-                 tasks = new Array(...tasks);
-             let task = tasks.filter( x=> x.getAttribute('data') == inc )[0];
-               if(task == '') return
+          task.style.backgroundColor = `var(${colorIs})`;
+          $$.invertColorSameTone(task);
+      // SPECIAL GLASS MODE
+      if(colorIs == '--glassAtomBack') task.classList.add('glass');
+      else                             task.classList.remove('glass');
 
-                 task.style.backgroundColor = `var(${colorIs})`;
-                 $$.invertColorSameTone(task);
 
-             let ToEdit = task.querySelector('.to-edit');
-             if( isNaN(inc) == false && $$.vars.LISTE[$$.vars.activeListName][ inc ] == null) {
-                 $$.vars.LISTE[$$.vars.activeListName][ inc ] = {};
-                 if( ToEdit.innerText.length > 1 ) $$.vars.LISTE[$$.vars.activeListName][ inc ].content =  ToEdit.innerText;   //ALTERNATIVE TO UPDATE LIST STATE
-             }
-             if($$.vars.LISTE[$$.vars.activeListName][ inc ] != null) $$.vars.LISTE[$$.vars.activeListName][ inc ].color = colorIs;
-          });
+      let ToEdit = task.querySelector('.to-edit');
+      // if( isNaN(inc) == false && $$.vars.LISTE[$$.vars.activeListName][ inc ] == null) {
+      //     $$.vars.LISTE[$$.vars.activeListName][ inc ] = {};
+      //     if( ToEdit.innerText.length > 1 ) $$.vars.LISTE[$$.vars.activeListName][ inc ].content =  ToEdit.innerText;   //ALTERNATIVE TO UPDATE LIST STATE
+      // }
+      if($$.vars.LISTE[$$.vars.activeListName][ inc ] != null) $$.vars.LISTE[$$.vars.activeListName][ inc ].color = colorIs;
   },
   addMarkerColoring : function(){
       let markerColorsHolder = dce('div');
@@ -452,12 +729,14 @@ const $$ = {
   },
   adjustTextSizePerLength : function(el, coef=1){
          let text = el.textContent;
+
          let parent = el.parentElement;
          let W = parent.clientWidth;
          let ratio = ((W / (text.length) || 1) * 100)/coef;
 
-         if(ratio > 35) ratio = 35; //dont make it grande
+         if(ratio > 25) ratio = 25; //dont make it grande
          if(ratio < 15) ratio = 15; //dont make it tiny
+
          el.style.fontSize = ratio + 'px';
   },
   changeView : function(){
@@ -467,7 +746,7 @@ const $$ = {
          let OK = Object.keys(map);
          if(list_views.index > parseInt(OK[OK.length-1]) ) list_views.index = 0;
 
-         qu('.sub-list').classList.remove('list-view', 'grid-view', 'table-view');
+         qu('.sub-list').classList.remove('list-view', 'pillar-view', 'table-view');
          let view = list_views.map[list_views.index];
          qu('.sub-list').classList.add(view);
          $$.notification(view);
@@ -478,7 +757,7 @@ const $$ = {
             let name = OK[i];
             let tasks = Object.values($$.vars.LISTE[name]);
 
-            qu(`[DATA='${name}']`).querySelector('.micro-holder').innerHTML = '';  //CLEAR OLD
+            qu(`[DATA='${name}']`).querySelector('.micro-holder').textContent = '';  //CLEAR OLD
             // tasks.length
             for(let j = 0; j < tasks.length; j++){
                 // $$.vars.LISTE[name][j];
@@ -495,26 +774,29 @@ const $$ = {
                let active_list_name = $$.vars.activeListName;
                let Ob = $$.vars.LISTE[active_list_name];
                     let OK = Object.keys(Ob); //['A', 'B']
-                    let OV = Object.values(Ob); //[{}, {}]
+                    // let OV = Object.values(Ob); //[{}, {}]
                     for(let i =0; i< OK.length; i++){
-                        $$.addTask(OK[i], OV[i].content, OV[i].status );     //OK[i].split(/\s/)[1]
+                        $$.addTask(Ob[i]);     //OK[i].split(/\s/)[1]
                         let markers = Ob[i].markers;
                         if(markers != ''){
                           let markersArr = Object.values(markers);
                           for(let j=0; j<markersArr.length; j++){
+                              $$.vars.MARKER = true;
                               qu('.marker-color-div.' + markersArr[j].class).click();
                               $$.manuallySelectText(quAll('.sub-li')[i].querySelector('.to-edit'), markersArr[j].startIndex, markersArr[j].endIndex);
                            }
                         }
                     }
                 $$.repinTasks();  //if it was pinned, pin again
+                $$.vars.MARKER = false;
    },
-   extendGridTableColumn : function(el){
+   extendGridTableColumn : function(el, dir=1){
             if(el == null) return false;
             let rowMax = Math.floor(window.innerWidth / 200);
-            let index = Math.floor(el.getBoundingClientRect().x / 200);
+            let index  = Math.floor(el.getBoundingClientRect().x / 200);
             let divider = parseInt(el.getAttribute('extended') || 1);
-                divider+=1;
+                divider += (dir || 1);
+                divider = divider || 1; //dont let it go bellow 0
             if(divider > rowMax-Math.abs(index%rowMax) ) divider = null;      //7-(4 % 7)
             if(divider == null) { el.removeAttribute('extended'); return el.style.gridColumn = ''; }
 
@@ -527,47 +809,88 @@ const $$ = {
                else                           el.setAttribute(att, '');
             });
    },
-   addPlanner : function(rowMax){
+   clearNode: function(node) {
+            if(node == null) return;
+            if(node.replaceChildren) return node.replaceChildren();
+            while(node.lastChild) {
+                  node.removeChild(node.lastChild);
+            }
+   },
+   addPlanner : function(len){
+        //FIRST CLEAR OLD ONE
+        let oldOccupied = quAll('.planner-field > .sub-li');
+        if(oldOccupied.length > 0){
+          for(let i = 0; i< oldOccupied.length; i++){
+              $$.query.sub_list.appendChild(oldOccupied[i]);  //drop them all to not get destroyed
+          }
+        }
+        $$.clearNode($$.query.planner_holder);  //clear old nodes
+
+        // START BUILDING NEW PLANNER
+        let rands = {};
+        let helps = ['Double-tap task to expand', "Pin any task to planner...", "Move: ◀︎ ▶︎ ▲ ▼",
+                     "\"=shrink, |=expand", "?=hold, shift=place-at", "Esc=Exit full-screen", "Shift=Open full-screen",
+                     'Double-tap(2) marked to clear',
+                     "Double-double-tap(4) to select entire text",
+                     "Tap help=(hide/show)",
+                     "Fem-y knows cosmetics brands",
+                    ];
+        for(let i = 0; i<helps.length; i++){
+            rands[Math.floor(Math.random() * len)] = helps[i];
+        }
+
+        function implementHelp(to, helpText){
+                 to.classList.add('help-field');
+                 to.setAttribute('help-text', helpText);
+                 $$.disappearingAttribute(to, 'help-text', helpText);
+                 to.title = "Click to hide help-text";
+        }
+        let OK = Object.keys(rands);
         let total = quAll('.planner-field').length;
-        for(let i=0; i<3; i++){
+        for(let i=0; i<len; i++){
             let plannerField = dce('div');
+
             plannerField.classList.add('planner-field');
             plannerField.setAttribute('slot', total);
-            // plannerField.textContent = total;
-            if(i == 0 && total < 2){
-               plannerField.classList.add('help-field');
-               plannerField.setAttribute('help-text', "Pin any task to planner...");
-               $$.disappearingAttribute(plannerField, 'help-text', "Pin any task to planner...");
-            }
-            if(total === 9){
-              plannerField.classList.add('help-field');
-              plannerField.setAttribute('help-text', "Double-tap task to expand it (in table view)");
-              $$.disappearingAttribute(plannerField, 'help-text', "Double-tap task to expand it (in table view)");
+            if(rands[i]){
+               implementHelp(plannerField, rands[i] );
             }
             $$.query.planner_holder.appendChild(plannerField);
             $$.addPinDropZone(plannerField);
             total = quAll('.planner-field').length;
          }
+         $$.determinePlannerHeight();
    },
-   //RECREATE LISTS FROM .json file
+   //RECREATE LISTS
   recreateLists : function( obj ){
                let OK = Object.keys( obj );
                if(typeof obj != 'object') return false; //SAFE
 
                for(let i = 0;i<OK.length; i++) { $$.addList(OK[i]); }
    },
+   plannerSpace : function(){
+         let holder = qu('.planner-holder');
+         if(holder == null) return;
+         let rows = holder.clientHeight / 200;
+         let columns = Math.floor(holder.clientWidth / 200);
+         return { rows:rows, columns:columns, total : rows*columns }
+  },
   switchTO : function(that){
             switch(that){
-              case 'main-div':  show_this( $$.query.main_div, 'block' );
+              case 'main-div':  $$.fullListUpdate(); //update before you leave, and update first before 'none'
+                                show_this( $$.query.main_div, 'block' );
                                 show_this( $$.query.sub_div, 'none' );
                                 show_this( $$.query.sub_list_adjuster, 'none' );
-                                $$.fullListUpdate(); //update before you leave
-                                qu('.sub-list').innerHTML = '';
-                                $$.query.planner_holder.innerHTML = '';
+
+                                $$.clearNode($$.query.sub_list);  //clear old nodes
+                                $$.clearNode($$.query.planner_holder);  //clear old nodes
               break;
               case 'sub-div':   show_this( $$.query.main_div, 'none' );
                                 show_this( $$.query.sub_div, 'grid' );
                                 show_this( $$.query.sub_list_adjuster, 'block' );
+                                let space = $$.plannerSpace();
+                                $$.addPlanner(space.total);
+                                $$.resizeMovingWindow();
                                 if(typeof $$.vars.LISTE == 'object' &&
                                    Object.keys($$.vars.LISTE[$$.vars.activeListName]).length > 0) $$.recreateTasks();
               break;
@@ -594,7 +917,7 @@ const $$ = {
           const activeAnims = el.getAnimations();
           activeAnims.forEach(anim => anim.cancel());
 
-          // 2. Play your temporary animation via JS
+          // 2. Temporary animation via JS
           const tempAnim = el.animate(
             [ { transform: 'translate(1px, 1px) rotate(0deg)',    offset : 0 },
               { transform: 'translate(-1px, -2px) rotate(-1deg)', offset : 0.1 },
@@ -610,7 +933,7 @@ const $$ = {
             ],{ duration: 900, iterations: 1 }
           );
 
-          // 3. Wait for the temporary animation to finish, then safely allow future interactions
+          // 3. Safely allow future interactions
           // tempAnim.onfinish = () => {
             // The element is now clear. Future interactions will trigger the original CSS animation fresh.
           // };
@@ -624,10 +947,6 @@ const $$ = {
                if(arr[i] != null) { $$.tempShakeAnimation(arr[i]); }
                i+=1;
             }, 0.1 * 1000);
-  },
-  resizeList : function(){
-              // qu('.sub-list').style.height  = window.innerHeight -$$.vars.heightOffset + 'px';
-              qu('.main-list').style.height = window.innerHeight -$$.vars.heightOffset * 1.5 + 'px';
   },
   htmlToContent : function(from){
         let rawHtml = from.innerHTML;
@@ -650,20 +969,21 @@ const $$ = {
   local_request : function(mode, name){
        switch(mode){
                case 'save':
-                           $$.fullListUpdate();
-                           $$.saveToLocal(name, JSON.stringify($$.vars.LISTE), action=> {
-                                $$.flowAnimation();
-                                $$.vars.RESPONSE = $$.vars.LISTE;
-                           });
+                     $$.fullListUpdate();
+                     $$.saveToLocal(name, JSON.stringify($$.vars.LISTE), action=> {
+                          $$.flowAnimation();
+                          $$.vars.RESPONSE = $$.vars.LISTE;
+                     });
                break;
                case 'delete':
-                           $$.deleteLocal(name,  acion=> {
-                                $$.animate(doc.body, 'shake', 0.25);
-                           });
+                     $$.deleteLocal(name,  acion=> {
+                          $$.animate(doc.body, 'shake', 0.25);
+                     });
                break;
                case 'get':
-                           let checked = $$.checkLocal(name);
-                           (checked != null) ? $$.vars.LISTE = JSON.parse(checked) : $$.vars.LISTE = {};   break;
+                     let checked = $$.checkLocal(name);
+                     (checked != null) ? $$.vars.LISTE = JSON.parse(checked) : $$.vars.LISTE = {};
+               break;
        }
   },
   quickDragOverHandler : (e) => { e.preventDefault(); },
@@ -682,10 +1002,9 @@ const $$ = {
           let newFile = e.dataTransfer.files[0];
           if(newFile == null ) return false;
           if(e.target.classList.contains('to-edit') == false) return false; //only allow on to-edit
+          if(newFile.type.search('text') < 0)                 return $$.notification('Wrong file format.\nOnly text files.');
 
           let reader = new FileReader();
-
-          if(newFile.type.search('text') < 0) return $$.notification('Wrong file format.\nOnly text files.');
           if(newFile) $$.whenLoaded(reader, newFile, e );
   },
   whenLoaded : function(that, file, dropEvent ){
@@ -733,20 +1052,34 @@ const $$ = {
            let preset_content = PRESETS[preset_name];
 
                option.value = preset_content;
-               option.innerText = preset_name;
+               option.innerText = acronym(preset_name, '_');
+               option.title = preset_name;
                preset_selector.appendChild(option);
        }
        $$.query.presets_holder.appendChild(preset_selector);
-       //PRESET EVENT
-       preset_selector.addEventListener('input', e=>{
-           $$.addTask();
-           let all_edits = quAll('.to-edit');
-           let last_to_edit = all_edits[all_edits.length-1];
-               last_to_edit.innerText = e.target.value;
-           $$.adjustTextSizePerLength(last_to_edit, 2);
-           $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );
-           quAll('.preset')[0].selected = true; //Return back to default
-       });
+  },
+  createColumnsMode : function(){
+    let columns_selector = dce('select');
+        columns_selector.name = 'columns-mode';
+        columns_selector.classList.add('columns-selector', 'matrix');
+        columns_selector.title = 'EDITABLE COLUMNS';
+        //ADD DISABLED OPTION
+        let first_option = dce('option');
+            first_option.classList.add('columns');
+            first_option.value = '';
+            first_option.disabled = true;
+            first_option.selected = true;
+            first_option.innerText = '𐌎';
+            columns_selector.appendChild(first_option);
+        for(let i = 1; i< 10; i++){
+             let option = dce('option');
+             option.classList.add('columns');
+
+             option.value = i;
+             option.innerText = i;
+             columns_selector.appendChild(option);
+        }
+      $$.query.columns_holder.appendChild(columns_selector);
   },
   getRandomBetween : function(x, y) {  //you can flip, x=more, y =less
         const min = Math.min(x, y);
@@ -832,8 +1165,7 @@ const $$ = {
         // Ensure something is actually selected
         if (!selection.rangeCount || selection.isCollapsed) return;
         const range = selection.getRangeAt(0);
-        if( $$.attemptedMultilineMarking(range) ) return false;
-
+        if(backend == null && $$.attemptedMultilineMarking(range) ) return false;
 
         $$.clearOldMarks(); //if existing
 
@@ -843,8 +1175,8 @@ const $$ = {
               mark.title = '💜: DOUBLE CLICK ME TO UNMARK';
 
         if(e){
-          if(e.clientX > $$.vars.mouse.x) mark.style.backgroundImage = `linear-gradient(${45}deg, rgb(198 172 172 / 26%), transparent)`;  //toward right marking
-          else                            mark.style.backgroundImage = `linear-gradient(${-45}deg, rgb(198 172 172 / 26%), transparent)`;   //toward left marking
+          if(e.clientX > $$.vars.mouse.x) mark.style.backgroundImage = `linear-gradient(${45}deg, rgb(198 172 172 / 26%), transparent)`;  //toward right marking by user
+          else                            mark.style.backgroundImage = `linear-gradient(${-45}deg, rgb(198 172 172 / 26%), transparent)`;   //toward left marking by user
         }
 
         $$.markerClipDesign(mark);  //randomize clip design for human messy effect
@@ -934,6 +1266,7 @@ const $$ = {
          }
        }
    },
+   // USED FOR RE-MARKING of data upon re-creation of tasks, so we pass empty object and true
   manuallySelectText : function(container, start, end) {
         const range = doc.createRange();
         const sel   = window.getSelection();
@@ -948,7 +1281,7 @@ const $$ = {
         sel.removeAllRanges();
         sel.addRange(range);
 
-        $$.markSelection();
+        $$.markSelection({}, true);  //
   },
   // Helper to navigate through child nodes to find the correct Text Node
   getTextNodeAtOffset : function(parent, targetOffset) {
@@ -965,7 +1298,20 @@ const $$ = {
         }
         return { node: parent, offset: 0 };
   },
-  setActiveTask : (el)=> $$.vars.activeTask = el.getAttribute('data'),
+  setActiveTask : function(el){
+        $$.stripClass(quAll('.active-task'), 'active-task');
+        el.classList.add('active-task');
+        $$.vars.activeTask = el.getAttribute('data');
+        $$.readColumnsCounter();
+  },
+  readColumnsCounter : function(){   //old solution, you could now just read clones if any
+        let activeLi = quAll('.sub-li')[$$.vars.activeTask];
+        if(activeLi != null ){
+           let cc = activeLi.getAttribute('columns-counter');
+           if(cc) qu('.columns-selector').value = Math.floor(cc);
+           else   qu('.columns-selector').value = 1;
+        }
+  },
   exportData : function(){
         //ASSIGN FIRST
         let file = new Blob([JSON.stringify($$.vars.LISTE)], {type: 'txt'});
@@ -999,7 +1345,7 @@ const $$ = {
                 //LOAD BY TYPE
                 if(_type.search('.txt') > -1){
                    $$.vars.LISTE = await JSON.parse(reader.result);
-                   $$.query.main_list.innerHTML = '';
+                   $$.clearNode($$.query.main_list);  //clear old nodes
                    $$.recreateLists($$.vars.LISTE);
                    setTimeout( $$.referenceTasksPerList, 1*1000);
                 }else{
@@ -1031,7 +1377,6 @@ const $$ = {
        let actList = $$.vars.activeListName;
        let actTask = $$.vars.activeTask;
        let history = $$.vars.SESSION_HISTORY;
-       // if(history[actList] == null) history[actList] = {};
 
        let who = qu(`[data="${actTask}"]`).querySelector('.to-edit');
 
@@ -1078,7 +1423,293 @@ const $$ = {
          case 'cells':    $$.query.sub_list.style.backgroundSize = `10px 10px, 10px 50px,   calc(100% / ${columnWidth}) 10px`;   break;
        }
  },
+ resizeMovingWindow : function(){
+       $$.query.moving_window.style.width = qu('.planner-field').clientWidth + 'px';
+ },
+ forceReflow : function(arr){
+    for(let i = 0;i< arr.length;i++){
+        let el = arr[i];
+        if(el) {
+         //force the browser to recalculate column positions
+           el.style.display = 'none';
+           el.offsetHeight; // Triggers a forced reflow
+           el.style.display = 'block';
+       }
+    }
+},
+ cornersActions : function(e){
+     let m = $$.vars.mouse;
+     let limit = 30;
+     if(qu('.full-screen') == null) return;  //ONLY IN FULL SCREEN MODE
+     if(m.x < limit && m.y > window.innerHeight - limit){
+        $$.notification('💜');
+        // if(qu('.full-screen') != null) qu('.full-screen').classList.toggle('full-screen');
+     }else if(m.x > window.innerWidth - limit && m.y > window.innerHeight - limit){
+        $$.notification('🧡');
+     }
+ },
+ splitInnerHTML : function(html, splits){
+     let arr = html.split('<br>');
+     let segment = Math.floor(arr.length / splits);
+     let sliced = [];
+     for(let i = 0; i<splits; i++){
+         sliced.push( arr.slice(i*segment, (i+1)*segment) );
+     }
+     return sliced;
+ },
+ cloneNode : function(originalElement){
+     const duplicate = originalElement.cloneNode(true);
+          duplicate.setAttribute('clone', true);
+     return originalElement.parentNode.insertBefore(duplicate, originalElement.nextSibling);
+ },
+ spreadContentToColumns : function(originalElement, times){
+     let parentWrapper = originalElement.parentElement;
+     let clones = parentWrapper.querySelectorAll('[clone="true"]');
+     let Data = {
+         0 : parentWrapper.querySelectorAll('[contenteditable="plaintext-only"]')[0].innerHTML,
+     };
+     clones.forEach( (x, i)=> Data[i+1] = x.innerHTML );
+     if(clones.length > 0) $$.removeClones(originalElement);
 
+     for(let i = 0; i<times; i++){
+         $$.cloneNode(originalElement);
+     }
+     let OV = Object.values(Data);
+     let joined = OV.join('<br>');
+     let sliced = $$.splitInnerHTML(joined, times+1);
+
+     let all = parentWrapper.querySelectorAll('[contenteditable="plaintext-only"]');
+     for(let i = 0;i< all.length;i++){
+         $$.clearNode(all[i]);  //clear old nodes
+         all[i].innerHTML = sliced[i].join('<br>'); //update
+     }
+ },
+ removeClones : function(originalElement){
+      let parentWrapper = originalElement.parentElement;
+      let clones = parentWrapper.querySelectorAll('[clone="true"]');
+      for(let i = 0;i< clones.length;i++){
+          clones[i].remove();
+      }
+ },
+ trackDoubleClicks : function(e){
+     const clickCount = e.detail;
+     if(e.target.classList[0] != 'to-edit') return;
+
+     switch(clickCount){
+       case 2:  ;  break;  //ordinary double click
+       case 4:  $$.notification("Double-double-click detected! (4 clicks) : Selecting entire element text.");  $$.selectText(e.target); break;
+       case 6:  ;  break;  //Triple-double-click detected! (6 clicks);
+     }
+ },
+ selectText : function(element) {
+      const selection = window.getSelection();    // 1. Get the global selection object
+      const range = doc.createRange();      // 2. Create a new visual range
+      range.selectNodeContents(element);    // 3. Set the boundaries of the range to cover the element
+      selection.removeAllRanges();    // 4. Clear any existing user selections
+      selection.addRange(range);  // 5. Apply the new selection to the screen
+ },
+ movingWindowControls : function(e, control_type){
+     if(e.target.nodeName != 'BODY') return;
+     let m_win = qu('.moving-window');
+     if(qu('.full-screen')) return false;  //dont allow in full-screen
+     if(qu('.main-div').style.display == 'block') return false;
+
+     let map = {
+         y : m_win.offsetTop,
+         x : m_win.offsetLeft,
+         h : m_win.clientHeight,
+         w : m_win.clientWidth,
+         max_rows : Math.floor(window.innerHeight / m_win.clientHeight),
+         max_columns : Math.floor(window.innerWidth / m_win.clientWidth),
+     }
+
+     let detected = null;
+     let mover = $$.vars.mover;
+
+     let minVertical = ()=> { if(map.y < map.h) return m_win.style.top = 0 +'px'; }
+     let maxVertical = ()=> { if(map.y >= (map.max_rows-1) * map.h) return m_win.style.top = (map.max_rows-1) * map.h +'px'; }
+
+     let minHorizontal = ()=> { if(map.x < map.w) return m_win.style.left = 0 + 'px'; }
+     let maxHorizontal = ()=> { if(map.x >= (map.max_columns-1) * map.w) return m_win.style.left = (map.max_columns-1) * map.w +'px'; }
+
+     switch(control_type){
+       case 'movements':
+          switch(e.key){
+             case 'ArrowUp':     m_win.style.top  = (map.y - map.h) + 'px';  minVertical();    break;
+             case 'ArrowDown':   m_win.style.top  = (map.y + map.h) + 'px';  maxVertical();    break;
+             case 'ArrowLeft':   m_win.style.left = (map.x - map.w)  + 'px'; minHorizontal();  break;
+             case 'ArrowRight':  m_win.style.left = (map.x + map.w)  + 'px'; maxHorizontal();  break;
+          }
+       break;
+
+       case 'controls':
+           switch(e.key){
+             case '/':
+                   let old = qu('[holded="true"]');
+                   if(old) old.removeAttribute('holded'); //remove old if existing
+                   $$.underMovingWindow('pick-up');
+                   if(mover.holding) mover.holding.setAttribute('holded', true);
+             break;
+             case 'Shift':
+                   $$.underMovingWindow('put-down');
+                   if(mover.placing_at != null && mover.holding != null) {
+                      $$.moverHandling();
+                      mover.holding.removeAttribute('holded');
+                      mover.placing_at = null;
+                      mover.holding    = null;
+                      $$.reasignIndexes();
+                    }
+                   if(mover.placing_at != null && mover.placing_at.classList[0] == 'sub-li' && mover.holding == null){
+                      mover.placing_at.querySelector('.full-screen-mode').click();
+                   }
+             break;
+             case 'Backspace':
+                   $$.underMovingWindow('pick-up');
+                   if(mover.holding) mover.holding.querySelector('.delete-task').click();
+
+             break;
+             case "'":
+                   if(qu('.sub-list').classList.contains('table-view') == false) return false;
+                   $$.underMovingWindow('pick-up');
+                   if(mover.holding) $$.extendGridTableColumn(mover.holding, -1);
+             break;
+             case "\\":
+                   if(qu('.sub-list').classList.contains('table-view') == false) return false;
+                   $$.underMovingWindow('pick-up');
+                   if(mover.holding) $$.extendGridTableColumn(mover.holding);
+             break;
+           }
+       break;
+     }
+ },
+ condensePlannerField : function(field){
+       if(field == null) return;
+       if(field.classList.contains('planner-field') && field.children.length > 2){
+          field.classList.add('super-condense');
+          $$.query.moving_window.classList.add('micro-window');
+          $$.query.moving_window.style.top = field.offsetTop + 'px';
+       }else{
+          field.classList.remove('super-condense');
+          $$.query.moving_window.classList.remove('micro-window');
+       }
+ },
+ moverHandling : function(){
+      let mover = $$.vars.mover;
+      if(mover.placing_at == null && mover.holding == null) return;
+      let plannerField = null;
+
+      if(mover.placing_at.classList[0] == 'planner-field'){
+        mover.placing_at.appendChild(mover.holding);
+        $$.addDateToTask(mover.placing_at, mover.holding);
+        $$.condensePlannerField(mover.placing_at);
+
+      }else if(mover.placing_at.classList[0] == 'sub-list'){
+        plannerField = mover.holding.parentElement;
+        mover.placing_at.appendChild(mover.holding);
+        $$.condensePlannerField(plannerField);
+      }else if(mover.placing_at.classList[0] == 'sub-li'){
+        let sourceIndex = parseInt(mover.holding.getAttribute('data'));
+        let targetIndex = parseInt(mover.placing_at.getAttribute('data'));;
+        if(sourceIndex < targetIndex) qu('.sub-list').insertBefore(mover.holding, mover.placing_at.nextSibling);
+        else                          qu('.sub-list').insertBefore(mover.holding, mover.placing_at);
+      }
+      // log(mover.placing_at, mover.holding);
+ },
+ underMovingWindow : function(mode){
+     let all = quAll('.sub-li');
+     let moving_window = qu('.moving-window');
+     let m_win_rect = moving_window.getBoundingClientRect();
+     let output = null;
+     switch(mode){
+       case 'pick-up':
+             for(let i = 0; i<all.length; i++){
+                 let rect = all[i].getBoundingClientRect();
+                 if(m_win_rect.x > rect.x - 10 && m_win_rect.x < rect.x + rect.width - 10 &&
+                    m_win_rect.y > rect.y - 10 && m_win_rect.y < rect.y + rect.height - 10){
+                    $$.vars.mover.holding = all[i];
+                    break;
+                 }
+             }
+       break;
+       case 'put-down':
+             all = quAll('.planner-field, .sub-list > .sub-li, .sub-list');
+             for(let i = 0; i<all.length;i++){
+                 let rect = all[i].getBoundingClientRect();
+                 if(m_win_rect.x > rect.x - 10 && m_win_rect.x < rect.x + rect.width - 10 &&
+                    m_win_rect.y > rect.y - 10 && m_win_rect.y < rect.y + rect.height - 10){
+                    $$.vars.mover.placing_at = all[i];
+                 }
+             }
+       break
+     }
+   return output;
+ },
+ determinePlannerHeight : function(){
+     let sample = qu('.planner-field');
+     let rows = Math.ceil( (window.innerHeight/ 2) / sample.clientHeight);
+     qu('.planner-holder').style.height = rows * sample.clientHeight + 'px';
+
+     let spaceForSubList = window.innerHeight - (rows * sample.clientHeight);
+     qu('.sub-list').style.height = spaceForSubList + 'px';
+ },
+ findObjectMinMax : function(ob, mode){
+     let OV = Object.values(ob);
+     let OK = Object.keys(ob);
+     let index = null;
+     switch(mode){
+       case 'max': default:
+             let maxIndex = Math.max(...OV);
+             index = OV.indexOf(maxIndex);
+             return OK[index];
+       break;
+       case 'min':
+             let minIndex = Math.min(...OV);
+             index = OV.indexOf(minIndex);
+             return OK[index];
+       break;
+     }
+     return index;
+ },
+ bulletTextSelection : function(){
+      let map = {};
+      let selection = window.getSelection();
+      let sel_text = selection.toString();
+      let edit = null;
+
+      if(selection.anchorNode.nodeName == '#text' ) edit = selection.anchorNode.parentElement;
+      else if(selection.anchorNode.nodeName == 'DIV' && selection.anchorNode.classList.contains('.to-edit')) edit = selection.anchorNode;
+
+      let selArr = sel_text.split('\n');
+          selArr = selArr.filter(x=> x.length > 0 ); //reject empty lines to not found them on every line in double loop
+      for(let i=0; i<selArr.length; i++){
+          let prep = selArr[i].trim();
+          let char = prep[0];
+          if(char == "" || char == " " || char == null) continue;
+          let code = char.charCodeAt(0);
+          if(char && code >= 65) continue; //allow only special chars to be recognized bellow Alphabet
+          if(char && code >= 48 && code <= 57 ) { char = 'numbers'; }
+          if(map[char] == null) map[char] = 1;
+          else map[char] += 1;
+      }
+      let commonBullet = $$.findObjectMinMax(map, 'max') || '◼︎';
+      let arr = edit.innerHTML.split(/<br>|<br\/>|<br \/>/);
+
+      for(let i = 0; i < arr.length;i++){
+          for(let j = 0; j< selArr.length;j++){
+            if(selArr[j].length < 1 ) continue;
+            if(arr[i].includes(selArr[j])){
+              let line_arr = arr[i].trim().split(' ');
+              if(line_arr[0] != commonBullet && commonBullet != 'numbers') line_arr.unshift(commonBullet);
+              if(commonBullet == 'numbers') {
+                let line_index = j+1;
+                line_arr[0].search(/[0-9]|\S/) > -1 ? line_arr[0] = line_index + '.' : line_arr.unshift(line_index + '.');
+               }
+              arr[i] = line_arr.join(' ');
+            }
+          }
+      }
+      edit.innerHTML = arr.join('<br>');
+ }
 } //END OF $$ OBJECT
 
 const main = function(){
@@ -1087,9 +1718,88 @@ const main = function(){
     $$.addTaskColoring();
     $$.addMarkerColoring();
     $$.createPresets();
+    $$.createColumnsMode();
+
+    window.addEventListener('click', e=> {
+      let parentElement = e.target.parentElement;
+      let grandParent   = parentElement.parentElement;
+      let EditField = (parentElement) ? parentElement.parentElement?.querySelector('.to-edit') : null;
+      let inc = 0;
+      switch(e.target.classList[0]){
+              case 'delete-task':  //DELETE TASK
+                    inc = parentElement.getAttribute('data');
+                    parentElement.style.backgroundColor = 'indianred';
+                    $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);
+                    delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
+              break;
+              case 'is-done':  //SET DONE
+                    inc = parentElement.getAttribute('data');
+                    let status = 'done';
+
+                    if(parentElement.getAttribute('done') == 'true') $$.taskIs('', e.target);
+                    else                                             $$.taskIs(status, e.target);
+
+                    let the_list = $$.vars.LISTE[$$.vars.activeListName][ inc ];
+                    if(the_list) the_list.status = status;
+              break;
+              case 'copy-task':
+                    $$.copyEvent(e.target, EditField.textContent);
+              break;
+              case 'duplicate-task':
+                    $$.addTask($$.vars.LISTE[$$.vars.activeListName][grandParent.getAttribute('data')]);
+                    $$.fullListUpdate();
+              break;
+              case 'cal-task': e.target.style.opacity = (e.target.style.opacity === '0') ? '1' : '0'; break; //HIDE CAL if not needed by user
+              case 'pre-task':
+                    if(grandParent.classList.contains('pre-struct') == false) grandParent.classList.add('pre-struct');
+                    else                                                      grandParent.classList.remove('pre-struct');
+              break;
+              case 'monther':
+                    e.preventDefault();
+                    $$.insertTextAtCursor( $$.createMonthTextCalendar() );
+              break;
+              case 'marked-list':
+                    $$.generateMarkedList(e.target.parentElement.parentElement);
+              break;
+              case 'full-screen-mode':
+                    grandParent.classList.toggle('full-screen');
+                    if(grandParent.classList.contains('full-screen')){
+                       $$.setActiveTask(grandParent);
+                       show_this( $$.query.moving_window, 'none');
+                    }else{
+                       show_this( $$.query.moving_window, 'block');
+                    }
+              break;
+              case 'bullet-selection': $$.bulletTextSelection();  break;
+              case 'delete-sub-list':   //DELETE LIST
+                    parentElement.style.backgroundColor = 'indianred';
+                    $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);  //true is remove();
+                    delete $$.vars.LISTE[ parentElement.getAttribute('data') ]; //NEWLY FORMED TASK OBJECT
+              break;
+              case 'color-div': $$.changeTaskColor(e); break;
+      }
+      $$.trackDoubleClicks(e);
+    });
+
+    window.addEventListener('dblclick', e=>{
+        let cl = e.target.classList[0];
+        switch(cl){
+          case 'sub-li':
+                if(e.target.parentElement.classList.contains('table-view') == false) return false;
+                $$.extendGridTableColumn(e.target);
+          break;
+          // Strip marker
+          case 'marker-yellow': case 'marker-pink': case 'marker-green': case 'marker-orange':
+               $$.stripMarked(e);
+          break;
+          case 'body': ; break;
+        }
+    });
+
     window.addEventListener('mousedown', e=>{
          $$.vars.MOUSEDOWN = true;
          $$.captureMouse(e);
+         $$.cornersActions(e);
          if(e.target.classList.contains('to-edit') == false && e.detail > 1){ e.preventDefault(); }// Prevents selection on double-click and beyond, but not on to-edit field
 
          let the_class = e.target.classList[0];
@@ -1106,73 +1816,56 @@ const main = function(){
                case 'export':       $$.exportData();  break;
                case 'import':       $$.importData();  break;
                case 'view':         $$.changeView();  break;
-               case 'replacer-mode': ($$.query.replacer.style.display == 'grid') ? show_this($$.query.replacer, 'none') : show_this($$.query.replacer, 'grid'); break;
+               case 'replacer-mode':($$.query.replacer.style.display == 'grid') ? show_this($$.query.replacer, 'none') : show_this($$.query.replacer, 'grid'); break;
                case 'undo-history': $$.loadPreservedHistory(); break;
 
-               case 'sub-li': case 'to-edit':
-                     if(e.target.nodeName == "LI") $$.setActiveTask(e.target);
-                     else                          $$.setActiveTask(e.target.parentElement);
-               break;
-               case 'is-done':  //SET DONE
-                     inc = parentElement.getAttribute('data');
-                     let status = 'done';
+               case 'sub-li': case 'editable-wrapper': case 'to-edit': case 'task-menu':
 
-                     if(parentElement.getAttribute('done') == 'true') $$.taskIs('', e.target);
-                     else                                             $$.taskIs(status, e.target);
-
-                     let the_list = $$.vars.LISTE[$$.vars.activeListName][ inc ];
-                     if(the_list) the_list.status = status;
+                     switch(the_class){
+                       case 'sub-li':            $$.setActiveTask(e.target); break;
+                       case 'editable-wrapper':  $$.setActiveTask(e.target.parentElement); break;
+                       case 'to-edit':           $$.setActiveTask(e.target.parentElement.parentElement); break;
+                       case 'task-menu':         $$.setActiveTask(e.target.parentElement); break;
+                     }
+                         // log('active', $$.vars.activeTask);
                break;
-               case 'delete-task':  //DELETE TASK
-                     inc = parentElement.getAttribute('data');
-                     parentElement.style.backgroundColor = 'indianred';
-                     $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);
-                     delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
-               break;
-               case 'cal-task': e.target.style.opacity = (e.target.style.opacity === '0') ? '1' : '0'; break; //HIDE CAL if not needed by user
-               case 'pre-task':
-                     if(parentElement.parentElement.classList.contains('pre-struct') == false){
-                        parentElement.parentElement.classList.add('pre-struct');
-                        $$.adjustTextSizePerLength(EditField, 3);
-                     }else parentElement.parentElement.classList.remove('pre-struct');
-               break;
-
-               case 'delete-sub-list':   //DELETE LIST
-                     parentElement.style.backgroundColor = 'indianred';
-                     $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);  //true is remove();
-                     delete $$.vars.LISTE[ parentElement.getAttribute('data') ]; //NEWLY FORMED TASK OBJECT
-               break;
-
                case 'list-name': //OPEN LIST
                      $$.vars.activeListName = e.target.parentNode.getAttribute('data');
                      $$.switchTO('sub-div');
                break;
-               case 'copy-task':
-                     $$.copyEvent(e.target, EditField.textContent);
-               break;
-               case 'full-screen-mode':
-                     parentElement.parentElement.classList.toggle('full-screen');
-                     if(parentElement.parentElement.classList.contains('full-screen')){
-                        $$.setActiveTask(parentElement.parentElement);
-                     }
-               break;
+
                case 'noti': if($$.vars.notiAction != null && typeof $$.vars.notiAction == 'function') $$.vars.notiAction();  break;
            }
          $$.autoShow();
+
+         let allowedForMarkerList = ['marker-list-li', 'marked-list', 'for-marked-list', 'for-marked-list-ul', 'info-span', 'info-link'];
+         if(allowedForMarkerList.includes(the_class) == false ){
+            show_this($$.query.for_marked_list, 'none');
+         }
      });
      window.addEventListener('input', e=>{
+        let subLi = qu(`[data="${$$.vars.activeTask}"]`);
+        let toEdit = (subLi != null) ? subLi.querySelector('.to-edit') : null;
 
          switch(e.target.classList[0]){
-           case 'marker-mode':  (e.target.checked) ? $$.vars.MARKER = true : $$.vars.MARKER = false;  break;
-           case 'theme-changer': $$.switchDesignMode(e.target.value);  break;
+           case 'marker-mode':    (e.target.checked) ? $$.vars.MARKER = true : $$.vars.MARKER = false;  break;
+           case 'theme-changer':  $$.switchDesignMode(e.target.value);  break;
+           case 'columns-selector':
+                 let val = e.target.value;
+                 switch(val){
+                   case '1':  subLi.classList.remove('book-pager'); $$.spreadContentToColumns(toEdit, 0);  $$.notification(`🧡: No columns`);     subLi.removeAttribute('columns-counter');   break;
+                   default:   subLi.classList.add('book-pager');    $$.spreadContentToColumns(toEdit, val-1);  $$.notification(`🧡: ${val} columns`); subLi.setAttribute('columns-counter', val); break;
+                 }
+           break;
+           case 'preset-selector': $$.insertTextAtCursor(e.target.value); break;
+           case 'to-edit':   if( e.target.textContent.length === 0) e.target.classList.add('is-empty')
+                             else                                   e.target.classList.remove('is-empty');
+           break;
          }
          switch(e.target.getAttribute('name')){
            case 'sub-list-pattern': $$.resizeSubListBackground(e);  break;
          }
      });
-     window.addEventListener('resize', e=>{
-         $$.resizeSubListBackground();
-     })
      $$.query.r_output.addEventListener('keydown', e=>{
            let inputText  = $$.query.r_input.value.trim();
            let outputText = $$.query.r_output.value.trim();
@@ -1189,29 +1882,41 @@ const main = function(){
                break;
            }
      });
-
-     window.addEventListener('dblclick', e=>{
-         let cl = e.target.classList[0];
-         switch(cl){
-           case 'sub-li':
-                 if(e.target.parentElement.classList.contains('table-view') == false) return false;
-                 $$.extendGridTableColumn(e.target);
-           break;
-           // Strip marker
-           case 'marker-yellow': case 'marker-pink': case 'marker-green': case 'marker-orange':
-                $$.stripMarked(e);
-           break;
+     window.addEventListener('keyup', e=>{
+         $$.movingWindowControls(e, 'controls');
+         switch(e.key){
+           case 'Escape': if(qu('.full-screen')) qu('.full-screen').querySelector('.full-screen-mode').click();  break;
          }
      });
+     window.addEventListener('keydown', e=>{
+       switch(e.target.classList[0]){
+         case 'body':
+              switch(e.key){
+                  case 'ArrowUp':   case "ArrowDown":
+                  case 'ArrowLeft': case 'ArrowRight':
+                        e.preventDefault(); $$.movingWindowControls(e, 'movements');
+                  break;
+               }
+         break;
+       }
+     });
      window.addEventListener('DOMContentLoaded', e=> {
-                               $$.resizeList();
                                $$.autoShow();
                                $$.recreateLists($$.vars.LISTE);
                                $$.addReorderDropZone(qu('.sub-list'));
                                $$.referenceTasksPerList();
+                               $$.resizeSubListBackground();
                                setTimeout( t=> {$$.animate($$.query.main_list, 'expandHeight', 0.5); doc.body.style.filter = ""; },  1*1000);
                             });
-     window.addEventListener('resize', e=> $$.resizeList() );
+     window.addEventListener('resize', e=> {
+            $$.resizeSubListBackground();
+            $$.resizeMovingWindow();
+            $$.debouncer(  t=>{
+               let space = $$.plannerSpace();
+               $$.addPlanner(space.total);
+            });
+
+     });
 
      // Trigger this on mouseup or a button click
      document.addEventListener('mouseup', e=>{

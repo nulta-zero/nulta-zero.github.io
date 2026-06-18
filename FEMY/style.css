@@ -37,7 +37,9 @@
   --braveConsole : #282828;
 
   --atomWorkspace : #21252b;
-  --atomLines   : #dddddd21;
+  --atomLines     : #dddddd21;
+  --glassAtomBack : #21252ba8;
+    /* backdrop-filter: blur(31px); */
   /* Faint lines in app */
   --faintDark : #3b3d43;
   --claudAccentBlue : #3886e5;
@@ -54,20 +56,24 @@
   --themeColor : var(--nextTextColor);
 }
 *, *::after, *::before {
+  box-sizing: border-box;
   font-family: Menlo;
+  caret-shape: block;
+  caret-color: orangered;
+  caret-animation: manual;
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' stroke='%233886e5' stroke-width='1' fill='%233886e5' fill-opacity='0.2'/%3E%3C/svg%3E") 16 16, none !important;
 }
 html{
   min-height: 100%;
 }
 body{
-    min-height: 100%;
-    width: 100%;
-    position: fixed;
-    background: var(--themeBackground);
-    color: var(--themeColor);
-    margin: 0;
-    user-select: none;
+  min-height: 100%;
+  width: 100%;
+  position: fixed;
+  background: var(--themeBackground);
+  color: var(--themeColor);
+  margin: 0;
+  user-select: none;
 }
 input{
   outline: none;
@@ -92,15 +98,13 @@ select {
   outline: none;
   color: inherit;
   font-size: inherit;
-  max-height: 50px;
   display: grid;
   justify-self: center;
 }
-select>option {}
 mark{
   clip-path: polygon(2% 2%, 100% 0%, 98% 100%, 0% 100%);
+  text-shadow: none;
 }
-
 input[type="radio"] {
   width: 10px;
   height: 10px;
@@ -115,7 +119,19 @@ input[type="radio"]:checked {
   background-color: var(--atomWorkspace);
   box-shadow: inset 0 0 0 5px #ccccff;
 }
-
+input[type="radio"]:hover {
+  outline: 6px solid var(--themeLines);
+  outline-offset: 4px;
+  transform: rotate(45deg);
+}
+[contenteditable='true']{
+  outline: none;
+}
+::selection{
+  background: var(--claudAccentBlue);
+  color: var(--periwinkle);
+}
+/* REGULAR SIMPLLE BUTTON OFTEN TEXT/SYMBOL/CHAR */
 .btn{
   background: transparent;
   border: none;
@@ -134,14 +150,14 @@ input[type="radio"]:checked {
   transition: 0.25s;
   filter: brightness(50%);
 }
-.back{ -webkit-text-security: disc;}
+/* SIDEBAR WHERE additional controls exist as marker, task-back-colors ... */
 .sidebar{
   display: none;
   width: 35px;
   position: fixed;
   right: 0;
   top: 0;
-  height: 95vh;
+  height: 99vh;
   display: grid;
   z-index: 100;
   background: #383d4570;
@@ -154,48 +170,102 @@ input[type="radio"]:checked {
   max-width: 35px;
   justify-content: center;
   align-content: end;
-  padding-bottom: 15px;
 }
-.modified-date{float:right; font-size: 11px; padding-right: 5px;}
+.reload{
+  background: #d45151;
+  color: black;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  line-height: 2.3;
+  width: 26px;
+  right: 4px;
+}
+.controls-holder, .tools-holder{
+  display: flex;
+  gap: 1vw;
+}
+.controls-holder{
+  justify-items: center;
+}
+.theme-changer{
+  max-height: 100px;
+  font-size: small;
+}
+/* MAIN-DIV HOLDS LIST & LIST-CONTROLS */
 .main-div { animation: slideFromLeft .5s;}
-.main-list{ padding-top: 5%; }
-.main-li  { }
+.main-list{ padding-top: 5%; min-height: 87vh; height: calc(100vh - 70px); }
 .main-li > span:first-child:hover{
   text-shadow: 0px 0px 0px var(--softLavander);
   color: transparent;
   transition: .25s;
 }
+/* SUB-DIV HOLDS PLANNER-FIELD, SUB-LIST, TASKS-CONTROLS ... */
 .sub-div{
   display: none;
   animation: slideFromRight .5s;
-  margin: 1%;
+  margin: 20px;
   height: calc(100vh - 12vh);
   align-content: baseline;
   max-width: 95%;
-  margin-top: 5%;
+  position: relative;
+  margin-top: 40px;
 }
 .sub-list{
   overflow-x: hidden;
   transition: 1s;
-  padding: 0;
   min-height: 18vh;
   background: radial-gradient(circle, var(--themeLines) 10% 10%, transparent 20%), linear-gradient(0deg, var(--themeLines), transparent 2px), linear-gradient(90deg, var(--themeLines), transparent 2px);
   background-size: 10px 10px, 0px 10px, 220.8px 10px;
-  height: 50vh;
+  height: 400px;
   background-position: 0px 0px;
   overflow-y: scroll;
   border-top: 2px dotted var(--themeLines);
   border-top: 2px dotted #0000008a;
+  box-sizing: border-box;
+  padding-bottom: 30px;
 }
+.sub-list:not(.list-view) > .sub-li:not(.full-screen) > .task-menu{
+  width: -webkit-fill-available;
+  justify-content: space-around;
+}
+
+/* LISTS & TASKS CONTROLS */
+.lists-controls{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 15px;
+}
+.tasks-controls{
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  top : 0;
+  width: 48.5vw;
+}
+.lists-controls > input,
+.tasks-controls > input{
+  font-size: 3vh;
+}
+.plus-task{
+  color: #e4b4b4;
+  filter: brightness(1.1);
+  text-shadow: 0px 1px 2px #0000005e;
+}
+
+/* SMALL RIGHT BOTTOM ELEMENT CONTROLLING SUB-LIST background style */
 .sub-list-adjuster{
   display: none;
   width: 100px;
   font-size: 12px;
   outline: none;
   border: none;
-  right: 28px;
+  right: 22px;
   position: fixed;
-  bottom: 54px;
+  bottom: 0;
   transform: scale(0.55);
 }
 
@@ -206,6 +276,7 @@ input[type="radio"]:checked {
   outline-offset: -1px;
   background: var(--noneColor);
   max-height: 100px;
+  height: 100px;
   outline: 2px solid #96a0ae21;
 
   animation: expandHeight 0.5s cubic-bezier(0.56, 0.55, 0.74, 0.05);
@@ -214,29 +285,68 @@ input[type="radio"]:checked {
   transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1),
               width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
               height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-}
-.sub-li:active:not(:has(*:active)) {}
-.sub-li > div{
-  overflow: scroll;
-  max-height: -webkit-fill-available;
-}
-.list-view{}
-.grid-view{
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap:  10px;
+  grid-template-columns: 1fr 7fr 1fr;
+  align-content: center;
+  justify-items: anchor-center;
+}
+.editable-wrapper{
+  grid-column: 2;
+  display: flex;
+  gap: 8px;
+  height: 70%;
+  max-height: 70%;
+  align-self: end;
+  min-height: 0;
+  min-width: 0;
+  box-sizing: border-box;
+  justify-self: stretch;
+  width: 100%;
+  margin-bottom: 5px;
+  overflow: scroll;
+}
+/* PLACEHOLDER FOR SUB-LI WHEN THERE IS NO TEXT IN IT */
+.is-empty::before {
+  content: attr(placeholder);
+  color: inherit;
+  pointer-events: none;
+  font-weight: 100;
+  font-family: Brush Script MT;
+  letter-spacing: 3px;
+  filter: opacity(0.5);
+  font-size: 25px;
+}
+/* Hide it immediately when the user clicks inside to type */
+.is-empty:focus::before {
+  content: "";
+}
+/* DIFFERENT VIEWS OF SUB-LIST */
+.list-view{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: baseline;
+}
+.list-view > .sub-li:not(.full-screen) > .editable-wrapper{
+    height: 60%;
+}
+.pillar-view{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-auto-rows: min-content;
 }
-.grid-view > li{
+.pillar-view > li{
   min-height: 400px;
   max-height: 400px;
+  height: 400px;
 }
-.grid-view > li > .to-edit{
+.pillar-view > li > .to-edit{
   overflow: scroll;
   border-radius: 10px;
 }
 .planner-holder{
-  min-height: 400px;
-  max-height: 400px;
+  min-height: 600px;
+  max-height: 600px;
   overflow-y: scroll;
 }
 .table-view, .planner-holder{
@@ -244,15 +354,36 @@ input[type="radio"]:checked {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-auto-rows: min-content;
 }
-.table-view > .sub-li,
+.table-view > .sub-li{
+  min-height: 200px;
+  height: 200px;
+  max-height: 200px;
+}
+/* PLANNER-HOLDER & PLANNER-FIELDS (top part where you can pin tasks) */
+.planner-field > .sub-li:not(.full-screen) > .editable-wrapper{
+  height: 60%;
+}
 .planner-field{
   min-height: 200px;
   height: 200px;
+  max-height: 200px;
 }
+ /* REGULAR PLANNER FIELD > SUB-li takes 50% of height aka 2 can be set */
 .planner-field > .sub-li{
   max-height: 50%;
   height: 50%;
   outline: 0px solid #96a0ae21;
+}
+.planner-field.super-condense > .sub-li{
+  max-height: 20%;
+  height: 20%;
+}
+.planner-field.super-condense > .sub-li:not(.full-screen) > .task-menu{
+  background: inherit;
+  z-index: 1;
+  width: -webkit-fill-available;
+  justify-content: space-between;
+  gap : 4px;
 }
 .planner-field > .sub-li:not(.full-screen):after{
   content: "";
@@ -267,52 +398,9 @@ input[type="radio"]:checked {
   line-height: 1.3;
   box-shadow: 1px 1px 14px;
 }
-.is-done{
-  padding-left: 10px;
-}
-[done="true"]{
-
-}
-[done="true"] > .to-edit{
-  text-decoration: line-through;
-  filter: opacity(0.5);
-}
-.to-edit{
-  white-space: pre-wrap;
-  width: 75%;
-  text-shadow: 0px 0px 0.5px;
-  overflow-wrap: anywhere;
-  margin: 4vh 0 10px 0;
-  outline: none;
-}
-.task-menu{
-  position: absolute;
-  top: 0;
-  left: 4px;
-  gap: 8px;
-  align-items: center;
-  height: 40px;
-  display: flex;
-  overflow-y: hidden !important;
-}
-.copy-task{
-  font-size: 30px;
-  transform: rotateX(180deg) scale(.75);
-}
-.cal-task{
-  font-size: 13px;
-  align-content: center;
-}
-.pre-task{
-  font-size: 25px;
-  line-height: 2;
-}
-.pre-struct{
-  min-height: min-content;
-}
-.pre-struct > .to-edit{
-  white-space: pre;
-  font-size: 17px!important;
+.planner-field > .sub-li > .task-menu > .cal-task{
+  max-height: 25px;
+  width: 47px;
 }
 .planner-field{
   outline: 1px solid var(--themeLines);
@@ -343,8 +431,149 @@ input[type="radio"]:checked {
   font-family: Brush Script MT;
   padding: 8px;
   color: #ffebcdcc;
+  z-index: -1;
 }
 
+/* TASK THAT IS DONE */
+.is-done{
+  padding-left: 10px;
+}
+[done="true"] > .editable-wrapper > .to-edit{
+  text-decoration: line-through;
+  filter: opacity(0.5);
+}
+
+/* SUB-LI elements */
+.delete-task, .delete-sub-list{
+  font-size: 33px;
+  text-shadow: none;
+  padding-right: 10px;
+}
+.to-edit{
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  outline: none;
+  flex: 1;
+  height: 100%;
+  max-height: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-y: scroll;
+  text-align: left;
+  min-height: fit-content;
+}
+.task-menu{
+  position: absolute;
+  top: 0;
+  left: 4px;
+  gap: 6px;
+  align-items: center;
+  height: 40px;
+  display: flex;
+  overflow-y: hidden !important;
+  overflow-x: hidden;
+  font-size: 18px;
+}
+.copy-task{
+  font-size: 30px;
+  transform: rotateX(180deg) scale(.75);
+}
+.cal-task{
+  font-size: 13px;
+  align-content: center;
+}
+.monther{
+  font-size: 15px;
+  align-content: center;
+  letter-spacing: -3px;
+}
+.pre-task{
+  font-size: 25px;
+  line-height: 2;
+}
+.pre-struct{
+  min-height: min-content;
+}
+.pre-struct > .editable-wrapper > .to-edit{
+  white-space: pre-wrap;
+  font-size: 17px !important;
+  word-break: break-word;
+  max-width: 100%;
+}
+.for-marked-list{
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  padding: 5px 5px 5px 5px;
+  border-radius: 5px;
+  border: 2px solid #9286864d;
+  background: #e4b4b4;
+  color: black;
+  box-shadow: 0px 3px 6px #0000008f;
+}
+/* MARKED-LIST ELEMENT THAT HAS TO BE CREATED */
+.for-marked-list-ul > li::before{
+  content: "♥︎";
+  width: 25px;
+}
+.marked-list{
+  font-size: 25px;
+}
+.for-marked-list-ul > div{
+  color : palevioletred;
+}
+/* INFO SPANS ALSO BELONG TO MARKED-LIST */
+.info-span{
+  user-select: none;
+  pointer-events: none;
+  margin: 5px 20px;
+  background: rgb(111 95 95 / 69%);
+  color: snow;
+  padding: 0 5px;
+  border-radius: 5px;
+  font-size: 15px;
+}
+.info-link{
+  color: deeppink;
+  text-decoration: none;
+  margin: 0 5px;
+  padding: 0 2px;
+  outline: 2px solid;
+  border-radius: 5px;
+  font-size: 13px;
+}
+.info-link:hover{
+  filter: opacity(0.6);
+}
+.for-marked-list-ul{
+  list-style: circle;
+  color: snow;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  filter: saturate(.85) opacity(0.95);
+  animation: expandHeight 0.5s cubic-bezier(0.56, 0.55, 0.74, 0.05);
+  animation-direction: reverse;
+}
+.for-marked-list-ul > li{
+  font-size: 20px;
+  list-style: circle !important;
+  outline: 1px solid #312b2b5e;
+  border-radius: 5px;
+  padding: 0 10px;
+  width: -webkit-fill-available;
+  color: black;
+  margin: 3px 0;
+  display: grid;
+  grid-template-columns: .1fr 2fr .1fr .1fr;
+  user-select: all;
+  pointer-events: all;
+}
+
+/* NOTIFICATION  */
 .noti{
   position: fixed;
   bottom: -7px;
@@ -363,40 +592,7 @@ input[type="radio"]:checked {
   display: none;
   z-index: 100;
 }
-.lists-controls{
-  display: flex;
-  justify-content: space-between;
-  width: 98%;
-  margin-bottom: 1%;
-  padding: 0 15px;
-}
-.tasks-controls{
-  display: flex;
-  justify-content: space-between;
-  width: 95%;
-  height: 5vh;
-  position: fixed;
-  bottom: 0px;
-  left: 0;
-  padding: 0 10px;
-}
-.lists-controls > input,
-.tasks-controls > input{
-  font-size: xx-large;
-}
-.delete-task, .delete-sub-list{
-  font-size: 33px;
-  text-shadow: none;
-  padding-right: 10px;
-}
-
-[contenteditable='true']{
-  outline: none;
-}
-::selection{
-  background: var(--claudAccentBlue);
-  color: var(--periwinkle);
-}
+/* WHEN IN MAIN-DIV LOOKING AT LISTS, MICRO OFFERS INFO OF HOW MANY TASKS ARE INSIDE */
 .micro-holder{
   justify-content: center;
   display: grid;
@@ -412,6 +608,8 @@ input[type="radio"]:checked {
   background: var(--nextTextColor);
   border-radius: 100px;
 }
+
+/* TASK COLORING ELEMENTS */
 .tasks-colors-holder, .marker-colors-holder{
   align-items: center;
 }
@@ -425,6 +623,9 @@ input[type="radio"]:checked {
 .color-div:first-child{
   outline: 2px solid #41444d;
   outline-offset: -2px;
+}
+[color-data="--glassAtomBack"]{
+  background-image: linear-gradient(116deg, #7cd3faba, transparent) !important;
 }
 
 /* MARKERS */
@@ -444,18 +645,18 @@ input[type="radio"]:checked {
 .marker-mode{
   display: block;
 }
+.marker-yellow {background: #fffacd;    border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
+.marker-pink   {background: #ff14937d;  border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
+.marker-green  {background: #a8fbba;    border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
+.marker-orange {background: #ff783382;  border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
+
 /* LETTER LIKE IN MATRIX */
 .matrix{
   text-orientation: upright;
   writing-mode: vertical-lr;
 }
 
-.marker-yellow {background: #fffacd;    border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
-.marker-pink   {background: #ff14937d;  border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
-.marker-green  {background: #a8fbba;    border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
-.marker-orange {background: #ff783382;  border-radius: 10%;  background-image: linear-gradient(45deg, rgb(198 172 172 / 26%), transparent); position: relative; }
-
-/* REPLACER */
+/* REPLACER OF TEXT IN TASKS */
 .replacer{
   display: none;
   width: 60vw;
@@ -494,7 +695,7 @@ input[type="radio"]:checked {
   color: #ff660d;
 }
 
-/* FULL-SCREEN */
+/* FULL-SCREEN MODE */
 .full-screen{
   min-height: min-content;
   height: 100vh !important;
@@ -505,13 +706,10 @@ input[type="radio"]:checked {
   max-height: 100vh;
   max-height: 100vh!important;
   transition: 0.75s;
-  z-index: 1;
+  z-index: 3;
 
   background-image: radial-gradient(circle, #282c320f 7% 7%, transparent 5%);
   background-size: 30px 30px;
-  border-bottom-left-radius: 29px;
-  mask: url(#dynamic-serrated-mask);
-  -webkit-mask: url(#dynamic-serrated-mask);
 }
 .full-screen-mode{
   transform: rotate(45deg);
@@ -521,47 +719,96 @@ input[type="radio"]:checked {
 .full-screen > .delete-task{
   display: none;
 }
-/* SPECIAL WHITISH DOTS ADDITION TO SVG CUT-OUT */
-.full-screen::before{
-  content: "";
+.full-screen > .editable-wrapper{
+  height: 98%;
+  max-height: 98%;
+  padding: 3vw;
+}
+
+/* BOOK PAGER ALLOWS YOU TO SPLIT TEXT INTO MULTIPLE .to-edits */
+.book-pager > .editable-wrapper{
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  grid-column: 4;
+}
+.book-pager > .editable-wrapper > .to-edit {
+  height: 100%;
+  border-right: 3px dashed;
+  padding-left: 15px;
+  padding-right: 15px;
+  white-space: pre-wrap;
+}
+.book-pager > .to-edit:first-child{
+  padding-left: 10%;
+}
+.book-pager > .editable-wrapper > .to-edit:last-child{
+  border-right: none;
+}
+
+/* MOVING-WINDOW */
+.moving-window{
+  background: transparent;
+  background: #f15f6761;
+  outline: 5px solid #f15f67;
+  outline-offset: -3px;
+  border-radius: 6px;
+  width: 219px;
+  height: 100px;
   position: absolute;
   left: 0;
-  bottom: 0;
-  width: 50px;
-  height: 52px;
-  transform: rotate(48deg) translate(1px, 38px);
-  background: #00000054;
+  top : 0;
+  z-index: 99;
+  pointer-events: none;
+  user-select: none;
 }
-/* ACTIVE */
-.active{}
+/* SUPER CONDENSD VIEW OF STACKED TASKS INISDE ONE PLANNER-FIELD */
+.micro-window{
+  height: 40px;
+}
+/* ONCE HOLDED BY MOVING WINDOW TASKS WILL HAVE STYLE UNTIL DROPPED */
+[holded="true"]{
+  background: #1950b463 !important;
+  outline: 4px dashed #1950b4 !important;
+  outline-offset: -4px;
+  z-index: 5;
+}
+
+/* ACTIVE-TASK  */
+.active-task:not(.full-screen):after{
+  content: "♥︎";
+  position: absolute;
+  bottom: -26px;
+  left: -9px;
+  font-size: 45px;
+  text-shadow: 0px -20px 0px #ff14936b;
+  transform: rotate(38deg);
+  animation: expandHeight 0.5s cubic-bezier(0.56, 0.55, 0.74, 0.05);
+  animation-direction: reverse;
+
+  transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+                width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+                height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* COFFEE OPTION */
+  /* content: "⛾";
+  position: absolute;
+  bottom: -19px;
+  left: -3px;
+  font-size: 45px;
+  animation: expandHeight 0.5s cubic-bezier(0.56, 0.55, 0.74, 0.05);
+  animation-direction: reverse;
+  transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1), width 0.5s cubic-bezier(0.25, 1, 0.5, 1), height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  color: #00000069; */
+}
+
+/* ACTIVE FOR MARKER color choice*/
 .active::after{
   content: "●";
   position: absolute;
   color: #4e42423b;
 }
 
-.reload{
-  background: #d45151;
-  color: black;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  line-height: 2.3;
-  width: 26px;
-  right: 4px;
-}
-
-.controls-holder, .tools-holder{
-  display: flex;
-  gap: 1vw;
-}
-
-.theme-changer{
-  max-height: 100px;
-  font-size: small;
-}
 /* SIMPLE CLASSES for HTML */
 .-dark{
   background: var(--dark);
@@ -570,7 +817,6 @@ input[type="radio"]:checked {
 .-large{
   font-size: large;
 }
-
 /* REST ARE USED AS CONTAINER THAT WILL PLACE ALL ELEMENTS INSIDE OF IT DEAD CENTER OF ITS OWN WIDTH */
 .restovi{
   display: flex;
@@ -578,10 +824,17 @@ input[type="radio"]:checked {
   width: calc(100% - 35px);
 }
 
+.glass{
+  backdrop-filter: blur(30px);
+}
+.glass > .editable-wrapper > .to-edit{
+  text-shadow: 0px .75px .8px #fdfdfd99;
+}
+
+/* FOR DRAG AND DROP REF .net class */
 .net{
   background: transparent !important;
   background-image: linear-gradient(0deg, var(--themeLines), transparent 2px), linear-gradient(90deg, var(--themeLines), transparent 2px) !important;
-  /* #ccccff63 */
   background-size: 20.7px 20px !important;
   position: relative;
   transition: 0.5s;
@@ -601,6 +854,7 @@ input[type="radio"]:checked {
 ::-webkit-scrollbar { width: 2.5px; height: 2.5px; }
 ::-webkit-scrollbar-corner { background: transparent;}
 
+/* ANIMATIONS */
 @keyframes slideFromRight {  /* SLIDE FROM RIGHT */
   from {transform: translate(300px);}
   to   {transform: translate(0);}
@@ -644,20 +898,18 @@ input[type="radio"]:checked {
   100% { mix-blend-mode: normal; transform: translate(0px, 0px); }
 }
 @keyframes shake {
-  0%   { transform: translate(1px, 1px) rotate(0deg); }
-  /* filter:opacity(30%); */
-  10%  { transform: translate(-1px, -2px) rotate(-1deg);                   }
-  20%  { transform: translate(-3px, 0px) rotate(1deg);                     }
-  30%  { transform: translate(3px, 2px) rotate(0deg);                      }
-  40%  { transform: translate(1px, -1px) rotate(1deg);                     }
-  50%  { transform: translate(-1px, 2px) rotate(-1deg);                    }
-  60%  { transform: translate(-3px, 1px) rotate(0deg);                     }
-  70%  { transform: translate(3px, 1px) rotate(-1deg);                     }
-  80%  { transform: translate(-1px, -1px) rotate(1deg);                    }
-  90%  { transform: translate(1px, 2px) rotate(0deg);                      }
-  100% { transform: translate(1px, -2px) rotate(-1deg);                    }
+  0%   { transform: translate(1px, 1px) rotate(0deg);      }
+  10%  { transform: translate(-1px, -2px) rotate(-1deg);   }
+  20%  { transform: translate(-3px, 0px) rotate(1deg);     }
+  30%  { transform: translate(3px, 2px) rotate(0deg);      }
+  40%  { transform: translate(1px, -1px) rotate(1deg);     }
+  50%  { transform: translate(-1px, 2px) rotate(-1deg);    }
+  60%  { transform: translate(-3px, 1px) rotate(0deg);     }
+  70%  { transform: translate(3px, 1px) rotate(-1deg);     }
+  80%  { transform: translate(-1px, -1px) rotate(1deg);    }
+  90%  { transform: translate(1px, 2px) rotate(0deg);      }
+  100% { transform: translate(1px, -2px) rotate(-1deg);    }
 }
-
 @keyframes expandHeight {  /*EXPAND HEIGHT*/
   0%   { transform: scaleY(0.5);  }
   100% { transform: scaleY(1); top: 0; left: 0; }

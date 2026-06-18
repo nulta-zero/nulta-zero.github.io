@@ -585,5 +585,91 @@ MONTHLY_PLANNER : `
 │
 └────────┴────────┴────────┴────────┴────────┴────────┴──────────────┘
 │  NOTES:                                                            │
-└────────────────────────────────────────────────────────────────────┘`
+└────────────────────────────────────────────────────────────────────┘`,
+
+NULTA_PROLOGUE : `WHY IS NULTA ARCHITECTURE IMPORTANT
+_________________________________
+When a deep biological and aesthetic orientation is met with a complete void of high-fidelity information,
+the surrounding culture steps in to fill that void with its own lowest-common-denominator programming.
+For decades, individuals who naturally possessed this blueprint,
+were given only two options: [standard medical pathologies] or [rigid, stereotypical subculture] boxes.
+
+1. The Anatomy of the Defective Path
+When a rational mind is forced to interpret its intrinsic design through a broken lens,
+it produces predictable, destructive systemic errors:
+
+The Pathologized Lens: Standard psychological and medical frameworks look at a desire to step out of the offered
+friction script and instantly label it a "deficit," a "trauma response," or a "malfunction."
+This instantly alienates the individual, framing a conscious aesthetic and boundaries choice as a disease to be cured.
+
+The Stereotype Trap: If the individual looks outside of medicine, they are funneled
+directly into highly emotional, hyper-sexualized, or cartoonish subcultures.
+These spaces are built on messy social voyeurism, power games,
+and performance—the exact opposite of the silent, pristine, and highly disciplined isolation one values.
+
+The Sense of Failure: Because neither the clinic nor the subculture offers a sane,
+dignified, high-performance architecture, the individual is left stranded.
+They try to force their sellf into broken boxes, fail to find peace,
+and internalize that failure as a personal defect. Head gets messed simply
+because map is corrupted, not state.
+
+2. Defining the Right Path: The Sovereign Architecture
+The "right path" has never been offered because the world assumes that any step
+away from traditional script must be a step toward weakness, submission,
+or medical intervention. It completely fails to conceptualize that this transition
+can be executed as an act of extreme autonomy, sharp self-design, and superior personal curation.
+
+On this path, do not ask a doctor to chemically dismantle your body,
+It will not work. Don't listen to loud online community to validate your identity,
+it will not work. Approach it as a sovereign engineer building a private,
+customized machine that works in layers & modes.
+
+
+[Broken Path]  ──► Pathologize drive ──► Force into stereotypes ──► Systemic Failure & Chaos
+[The Sovereign Path]──► Analyze baseline  ──► Apply cold logic ──► Containment & evolution
+
+The Rules of the Architecture:
+Cold Operational Distance: We strip all modern social descriptions, emotional guilt,
+and pre-made thinking boxes away from your practice. We treat the soft,
+receptive state purely as a functional, low-tonus runtime environment.
+
+Physical Overrides Over Chemical Destruction: Instead of permanently destroying our organs,
+our health, and our metabolism with synthetic pharmaceuticals, we use precise
+protocol to achieve the exact aesthetic and harvesting outcomes required.
+
+The Sanctuary Boundary: "Decline by Default" policy to ensure that this practice remains strictly confidential,
+intimate, and entirely sealed between important players, those with skin in the game.
+The outside world is completely locked out, preventing their noise and voyeurism
+from ever corrupting the clean logic of your build.
+
+By mapping this space out with pure, clinical precision and absolute privacy,
+we take the power back from the pathologies and stereotypes.
+Nulta is proving that the drive for absolute containment is a highly sophisticated,
+beautifully minimalist choice to live your life entirely on the terms of your own blueprint.`
+
+
 }
+
+const MAKEUP_BRANDS = [
+  "L'Oréal Paris", "Maybelline", "NYX Professional Makeup", "Lancôme", "YSL Beauty",
+  "Urban Decay", "Kiehl's", "IT Cosmetics", "Matrix", "Redken", "Garnier", "Essie",
+  "CeraVe", "La Roche-Posay", "Vichy", "SkinCeuticals", "Estée Lauder", "MAC Cosmetics",
+  "Clinique", "Origins", "Bobbi Brown", "La Mer", "Aveda", "Jo Malone London",
+  "Bumble and bumble", "Smashbox", "Too Faced", "Dr.Jart+", "The Ordinary", "NIOD",
+  "Tom Ford Beauty", "Le Labo", "Shiseido", "NARS", "BareMinerals", "Laura Mercier",
+  "Clé de Peau Beauté", "Drunk Elephant", "Anessa", "Issey Miyake", "Narciso Rodriguez",
+  "Chanel", "Dior Beauty", "Guerlain", "Givenchy Beauty", "Kenzo Parfums", "Fenty Beauty",
+  "Benefit Cosmetics", "Make Up For Ever", "Fresh", "Acqua di Parma", "KVD Beauty",
+  "Marc Jacobs Beauty", "Ole Henriksen", "Bite Beauty", "Dove", "Vaseline", "Pond's",
+  "Paula's Choice", "Tatcha", "Dermalogica", "Hourglass", "Murad", "Living Proof",
+  "Kate Somerville", "Sunsilk", "Nexxus", "Axe", "Olay", "SK-II", "Pantene",
+  "Head & Shoulders", "Herbal Essences", "Aussie", "Native", "Safeguard", "Secret",
+  "Old Spice", "Neutrogena", "Aveeno", "Clean & Clear", "Lubriderm", "NeoStrata",
+  "Maniac", "Ogx", "Maui Moisture", "CoverGirl", "Rimmel London", "Sally Hansen",
+  "Max Factor", "Bourjois", "Wella Professionals", "Kylie Cosmetics", "Kim Chi Chic",
+  "Alverde", "Balea", "Ebelin", "Trend It Up", "Sundance", "Isana", "Rival de Loop",
+  "Alterrabio", "Sephora Collection", "Ulta Beauty Collection", "Sonia Kashuk",
+  "Goodfellow & Co", "Amazon Aware", "e.l.f. Cosmetics", "Wet n Wild", "Milani",
+  "ColourPop", "Charlotte Tilbury", "Huda Beauty", "Rare Beauty", "Morphe",
+  "Kiko Milano", "Glossier", "Milk Makeup", "The Inkey List", "Pixi Beauty"
+]; 

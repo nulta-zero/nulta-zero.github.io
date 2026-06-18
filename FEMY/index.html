@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css" />
 <title>Fem-Ⓨ</title>
 </head>
-<body class="no-overflow-app no-scrollbar no-selection" style="filter:opacity(0);">
+<body class="body no-overflow-app no-scrollbar no-selection" style="filter:opacity(0);">
    <div class="container">
      <!-- SIDEBAR -->
      <div class="sidebar">
@@ -23,12 +23,11 @@
               <div><input type="button" class="view minimal-btn matrix"  value="◫◰"  title="CHANGE VIEW&#10;[LIST|GRID|TABLE]" /></div>
               <div class="marker-mode-holder"><label>m</label><input type="checkbox" class="marker-mode minimal-btn matrix" title="MARKER ON/OFF" /></div>
          </div>
-         <div class="tasks-colors-holder">
+         <!-- TO BE FILLED -->
+         <div class="tasks-colors-holder"></div>
+         <div class="presets-holder"></div>
+         <div class="columns-holder"></div>
 
-         </div>
-         <div class="presets-holder">
-
-         </div>
          <div class="theme-holder">
            <select class="theme-changer matrix">
              <option value="atom" selected>Atom</option>
@@ -49,17 +48,26 @@
       </div>
    <!-- SUB-DIV -->
       <div class="sub-div">
+        <div class="moving-window"></div>
         <div class="planner-holder"></div>
-        <ol class="sub-list"></ol>
-           <div class="tasks-controls">
-             <input type="button" class="back btn" value="<<" title="BACK" />
-             <input type="button" class="plus-task btn"  value="+"  title="ADD TASK" />
-           </div>
+        <ol class="sub-list table-view"></ol>
+          <div class="tasks-controls">
+            <input type="button" class="back btn" value="⌫" title="GO BACK TO LISTS" />
+            <input type="button" class="plus-task btn"  value="♥︎"  title="ADD TASK" />
+          </div>
        </div>
   </div>
     <!-- REST -->
     <div class="restovi">
        <div class="noti"></div>
+       <div class="for-marked-list">
+         <legend>
+           Marked-text:
+         </legend>
+         <ul class="for-marked-list-ul">
+
+         </ul>
+       </div>
        <div class="replacer">
           <div class="replacer-input"><input class="r-input" type="text" placeholder="swap this" value=""/> <input class="undo-history btn" type="button" value="ⓤ" title="UNDO CHANGE" /></div>
           <div class="replacer-output"><input class="r-output" type="text" placeholder="with that" value=""/> </div>
@@ -70,20 +78,6 @@
             <input type="radio" name="sub-list-pattern" value="columns" checked />
             <input type="radio" name="sub-list-pattern" value="cells" />
        </div>
-
-
-<!-- SVG CUT-OUT-->
-<svg width="0" height="0" style="position: absolute;">
-  <defs>
-    <mask id="dynamic-serrated-mask" maskContentUnits="objectBoundingBox">
-      <polygon points="0 0, 1 0, 1 1, 0.025 1, 0 0.97" fill="white"></polygon>
-      <path d="M -0.0018,0.97 L 0.023,1" fill="none" stroke="black"
-            stroke-width="0.016" stroke-dasharray="0.09 0.06"
-            stroke-linecap="mitter" pathLength="0.85">
-      </path>
-    </mask>
-  </defs>
-</svg>
 
     </div>
 <script src="presets.js"></script>
