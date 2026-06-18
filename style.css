@@ -72,7 +72,7 @@ hr{
   grid-template-columns: repeat(2, 1fr);
 }
 .grid-split-window > .program{
-  height: 100vh;
+  /* height: 100vh; */
 }
 .grid-split-window > .super-container{
   height: 100vh;
