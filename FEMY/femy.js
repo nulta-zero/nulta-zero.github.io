@@ -15,7 +15,7 @@ const doc = document,
 const $$ = {
   vars : {
       mover : {
-        holding    : null,
+        holding    : [],
         placing_at : null
       },
       resizeTimer : null,
@@ -146,14 +146,15 @@ const $$ = {
         return output;
   },
   collectEditsAndClones : function(from, type){
-     let arr = from.querySelectorAll('.to-edit');
-     let map = [];
-     arr.forEach( x=> map.push(type == 'HTML' ? x.innerHTML : x.innerText) );
-     return map;
+       let arr = from.querySelectorAll('.to-edit');
+       let map = [];
+       arr.forEach( x=> map.push(type == 'HTML' ? x.innerHTML : x.innerText) );
+       return map;
   },
   fullListUpdate : function(){
         let list = $$.vars.LISTE[$$.vars.activeListName];
         let arr  = quAll('.sub-li');
+
         for(let i=0; i<arr.length; i++){
             if(list[i] == null) list[i] = {};
             list[i].content = $$.collectEditsAndClones(arr[i], 'text'); //you could grab HTML if needed
@@ -161,13 +162,20 @@ const $$ = {
             list[i].size    = arr[i].style.gridColumn;
             list[i].status  = arr[i].querySelector('.to-edit').classList.contains('done') ? 'done' : '';
             list[i].pinned  = arr[i].parentElement.classList.contains('planner-field') ? arr[i].parentElement.getAttribute('slot') : '';
-            list[i].markers = $$.markerDataMap( arr[i].querySelector('.to-edit') );  //this should collect from all .to-edits ! Fix this!
+            let els = arr[i].querySelectorAll('.to-edit');
+            let allEditsMap = [];
+            for(let j = 0; j<els.length; j++){
+                let marker_map = $$.markerDataMap(els[j]);
+                if(marker_map != "") allEditsMap.push( marker_map );
+            }
+            (allEditsMap.length > 0) ? list[i].markers = allEditsMap : list[i].markers = "";
+            list[i].data    = arr[i].getAttribute('data') || i; //hold i
         }
   },
-  copyEvent : async function(btn, textToCopy){
+  copyEvent : async function(textToCopy){
         try {
           await navigator.clipboard.writeText(textToCopy);
-          await $$.notification('Copied to clipboard!');
+          await $$.notification('Copied to clipboard! Paste [⌘+V] to another Fem-y or here');
         } catch (err) {
           $$.notification('Failed to copy...');
         }
@@ -276,7 +284,7 @@ const $$ = {
               addTo.appendChild(dra.source.item);
               // if(addTo.children.length > 2){
                 // addTo.classList.add('super-condense');
-                $$.condensePlannerField(dra.target.item.parentElement);
+                $$.condensePlannerFields();
               // }
               addTo.classList.remove('net');
               $$.adjustTextSizePerLength(dra.source.item.querySelector('.to-edit'), 3); //sub-li is passed here
@@ -366,43 +374,21 @@ const $$ = {
           let taskMenu = dce('div');
               taskMenu.classList.add('task-menu');
 
-          let copyTask = dce('div');
-              copyTask.classList.add('copy-task', 'btn');
-              copyTask.textContent = "⧉";
-              copyTask.title= "COPY TASK CONTENT";
-          let duplicate = dce('div');
-              duplicate.classList.add('duplicate-task', 'btn');
-              duplicate.textContent = "❑²";
-              duplicate.title = "DUPLICATE TASK";
-          let calTask = dce('div');
-              calTask.classList.add('cal-task');  //create just slot
-              calTask.textContent = ''; //date;
-              calTask.title = "CALENDAR FOR PINED TASKS";
-          let preSetup = dce('div');
-              preSetup.classList.add('pre-task', 'btn');
-              preSetup.textContent = "⟛";
-              preSetup.title = "PRE FORMAT";
-          let fullScreen = dce('div');
-              fullScreen.textContent = "⇿";
-              fullScreen.title = "FULL-SCREEN";
-              fullScreen.classList.add('full-screen-mode', 'btn');
-          let monther = dce('div');
-              monther.textContent = '⠾⠿⠇';
-              monther.classList.add('monther', 'btn');
-              monther.title = "PRINT MONTH CALENDAR TO TEXT";
-          let markedList = dce('div');
-              markedList.classList.add('marked-list');
-              markedList.textContent = "≔";
-              markedList.title = "SUM ALL MARKED TEXT";
-          let bulletSelection = dce('div');
-              bulletSelection.classList.add('bullet-selection');
-              bulletSelection.textContent = "✻✻";
-              bulletSelection.title = "BULLET THE SELECTION";
+          let taskMenuButtons = [ ['copy-task', '⧉'], ['pre-task', '⟛'], ['cal-task', ''], ['monther', '⠾⠿⠇'],
+                                  ['marked-list', '≔'], ['bullet-selection', '✻✻'], ['full-screen-mode', '⇿']
+                                 ];
+          let forTaskMenu = [];
+          for(let i = 0; i<taskMenuButtons.length; i++){
+              let button = dce('div');
+              button.classList.add(taskMenuButtons[i][0] ,'btn');
+              button.textContent = taskMenuButtons[i][1];
+              forTaskMenu.push(button);
+          }
 
-              editableWrapper.appendChild(text_div);
-              appendAll([square, editableWrapper, del], li);
-              appendAll([copyTask, duplicate, preSetup, calTask, monther, markedList, bulletSelection,, fullScreen], taskMenu);
-              li.appendChild(taskMenu);
+          editableWrapper.appendChild(text_div);
+          appendAll([square, editableWrapper, del], li);
+          appendAll(forTaskMenu, taskMenu);      //[copyTask, preSetup, calTask, monther, markedList, bulletSelection, fullScreen]
+          li.appendChild(taskMenu);
 
          //INIT
          $$.query.sub_list.appendChild(li);
@@ -557,7 +543,6 @@ const $$ = {
       ul.parentElement.style.left = $$.vars.mouse.x + 'px';
       ul.parentElement.style.top  = $$.vars.mouse.y+20 + 'px';
       let parentBack = el.style.backgroundColor;
-      // log(parentBack);
       ul.parentElement.style.backgroundColor = parentBack;
   },
   extractCss : function(el, property){
@@ -578,6 +563,7 @@ const $$ = {
                     arr[i].querySelector('.cal-task').textContent = date;
               }
          }
+        $$.condensePlannerFields();
   },
   // USE OFFSET if YOU WANT NEXT MONTH OR ANY INLCUDING PREVIOUS  -1,-2, 1,2...
   createMonthTextCalendar : function(offset=0){
@@ -769,6 +755,18 @@ const $$ = {
             }
         }
   },
+  remarkTask : function(Ob){
+       let tasks = quAll('.sub-li');
+       let index = Ob.data;
+       for(let z = 0; z < Ob.markers.length; z++){
+           let markedEdit = Object.values( Ob.markers[z] );
+           for(let j = 0; j < markedEdit.length; j++){
+               $$.vars.MARKER = true;
+               qu('.marker-color-div.' + markedEdit[j].class).click();
+               $$.manuallySelectText(tasks[index].querySelectorAll('.to-edit')[z], markedEdit[j].startIndex, markedEdit[j].endIndex);
+          }
+      }
+  },
   //SUB LIST IS RE-READ FROM LISTE OBJECT   [different from addTask so it must be re-implemented]
   recreateTasks : function(){
                let active_list_name = $$.vars.activeListName;
@@ -777,15 +775,8 @@ const $$ = {
                     // let OV = Object.values(Ob); //[{}, {}]
                     for(let i =0; i< OK.length; i++){
                         $$.addTask(Ob[i]);     //OK[i].split(/\s/)[1]
-                        let markers = Ob[i].markers;
-                        if(markers != ''){
-                          let markersArr = Object.values(markers);
-                          for(let j=0; j<markersArr.length; j++){
-                              $$.vars.MARKER = true;
-                              qu('.marker-color-div.' + markersArr[j].class).click();
-                              $$.manuallySelectText(quAll('.sub-li')[i].querySelector('.to-edit'), markersArr[j].startIndex, markersArr[j].endIndex);
-                           }
-                        }
+                        if(Ob[i].markers == '') continue;
+                        $$.remarkTask( Ob[i] );     //quAll('.sub-li')[i], Ob[i].markers
                     }
                 $$.repinTasks();  //if it was pinned, pin again
                 $$.vars.MARKER = false;
@@ -797,6 +788,8 @@ const $$ = {
             let divider = parseInt(el.getAttribute('extended') || 1);
                 divider += (dir || 1);
                 divider = divider || 1; //dont let it go bellow 0
+
+                log(divider);
             if(divider > rowMax-Math.abs(index%rowMax) ) divider = null;      //7-(4 % 7)
             if(divider == null) { el.removeAttribute('extended'); return el.style.gridColumn = ''; }
 
@@ -819,24 +812,44 @@ const $$ = {
    addPlanner : function(len){
         //FIRST CLEAR OLD ONE
         let oldOccupied = quAll('.planner-field > .sub-li');
+        let memorized = {};
         if(oldOccupied.length > 0){
-          for(let i = 0; i< oldOccupied.length; i++){
-              $$.query.sub_list.appendChild(oldOccupied[i]);  //drop them all to not get destroyed
+           for(let i = 0; i< oldOccupied.length; i++){
+              let pl_slot = parseInt(oldOccupied[i].parentElement.getAttribute('slot'));
+              if(len < pl_slot){
+                 $$.query.sub_list.appendChild(oldOccupied[i]);    //drop them to sub-list to not get destroyed, there will be no past parent in future after resize
+                 $$.notification('All pins dropped, no space for them.');
+                 continue;
+              }
+              if(memorized[pl_slot] == null) memorized[pl_slot] = [ oldOccupied[i] ];  //save them, to not get destroyed
+              else                           memorized[pl_slot].push( oldOccupied[i] );
           }
         }
         $$.clearNode($$.query.planner_holder);  //clear old nodes
 
+        let OV = Object.values($$.vars.LISTE[$$.vars.activeListName]);
+        let takenPins = OV.filter( x=> x.pinned != '');
+            takenPins.map( (x, i)=> takenPins[i] = parseInt(x.pinned) );
+
         // START BUILDING NEW PLANNER
         let rands = {};
-        let helps = ['Double-tap task to expand', "Pin any task to planner...", "Move: ◀︎ ▶︎ ▲ ▼",
-                     "\"=shrink, |=expand", "?=hold, shift=place-at", "Esc=Exit full-screen", "Shift=Open full-screen",
+        let helps = ['Double-tap(2) task to expand', "Pin task to planner...", "Move: ◀︎ ▶︎ ▲ ▼",
+                     "[\"]=shrink [|]=expand", "[?]=hold [shift]=put", "[Esc]=Exit", "[Enter]=active|full-screen",
                      'Double-tap(2) marked to clear',
                      "Double-double-tap(4) to select entire text",
-                     "Tap help=(hide/show)",
-                     "Fem-y knows cosmetics brands",
+                     "Tap helpers=(hide/show)",
+                     "Fem-y knows cosmetics",
+                     "5 tasks per 1 planner-field",
+                     "Double-tap(2) sub-list empty space to add task",
                     ];
         for(let i = 0; i<helps.length; i++){
-            rands[Math.floor(Math.random() * len)] = helps[i];
+            let random = Math.floor(Math.random() * len);
+
+            //skip placing random helper on a pinned field
+            if(takenPins.includes(random) ){
+               random = Math.floor(Math.random() * len);
+            }
+            rands[random] = helps[i];
         }
 
         function implementHelp(to, helpText){
@@ -852,14 +865,26 @@ const $$ = {
 
             plannerField.classList.add('planner-field');
             plannerField.setAttribute('slot', total);
+
             if(rands[i]){
                implementHelp(plannerField, rands[i] );
             }
+
             $$.query.planner_holder.appendChild(plannerField);
             $$.addPinDropZone(plannerField);
             total = quAll('.planner-field').length;
+
+            //RE-ATTACH TASKS
+            if(memorized[i] != null){
+              for(let j = 0; j< memorized[i].length;j++){
+                  plannerField.appendChild( memorized[i][j] );
+              }
+            }
+
          }
+         memorized = null; //clear memory
          $$.determinePlannerHeight();
+         $$.condensePlannerFields();
    },
    //RECREATE LISTS
   recreateLists : function( obj ){
@@ -1161,29 +1186,38 @@ const $$ = {
         }
   },
   markSelection : function(e, backend){
-        const selection = window.getSelection();
-        // Ensure something is actually selected
-        if (!selection.rangeCount || selection.isCollapsed) return;
-        const range = selection.getRangeAt(0);
-        if(backend == null && $$.attemptedMultilineMarking(range) ) return false;
+       const selection = window.getSelection();
+       if (!selection.rangeCount || selection.isCollapsed) return;
+       const range = selection.getRangeAt(0);
+       if(backend == null && $$.attemptedMultilineMarking(range) ) return false;
 
-        $$.clearOldMarks(); //if existing
+       $$.clearOldMarks(); //if existing
 
-        const mark = dce('mark');
-        const name = 'marker-'+$$.vars.marker_color_is;
-              mark.classList.add(name);
-              mark.title = '💜: DOUBLE CLICK ME TO UNMARK';
+       let mark = dce('mark');
+       let name = 'marker-'+$$.vars.marker_color_is;
+             mark.classList.add(name);
+             mark.title = '💜: DOUBLE CLICK ME TO UNMARK';
 
-        if(e){
-          if(e.clientX > $$.vars.mouse.x) mark.style.backgroundImage = `linear-gradient(${45}deg, rgb(198 172 172 / 26%), transparent)`;  //toward right marking by user
-          else                            mark.style.backgroundImage = `linear-gradient(${-45}deg, rgb(198 172 172 / 26%), transparent)`;   //toward left marking by user
-        }
+       if(e){
+         if(e.clientX > $$.vars.mouse.x) mark.style.backgroundImage = `linear-gradient(${45}deg, rgb(198 172 172 / 26%), transparent)`;  //toward right marking by user
+         else                            mark.style.backgroundImage = `linear-gradient(${-45}deg, rgb(198 172 172 / 26%), transparent)`;   //toward left marking by user
+       }
 
-        $$.markerClipDesign(mark);  //randomize clip design for human messy effect
+       $$.markerClipDesign(mark);  //randomize clip design for human messy effect
 
-        mark.appendChild(range.extractContents()); // Move the selected content inside the <mark> tag
-        range.insertNode(mark);                    // Insert the mark tag back into the original spot
-        selection.removeAllRanges();               // Optional: Clear selection highlight after marking
+       mark.appendChild(range.extractContents()); // Move the selected content inside the <mark> tag
+
+       // --- SOLUTION ADDITION ---
+       // Find if a swallowed <br> exists inside our new mark element
+       const trappedBr = mark.querySelector('br');
+       range.insertNode(mark);                    // Insert the mark tag back into the original spot
+       // If a <br> was swallowed, evict it from the mark and place it safely *before* the mark
+       // because the user was highlighting backwards towards the start of the line!
+       if (trappedBr) {
+           trappedBr.remove();
+           mark.before(dce('br'));
+       }
+       selection.removeAllRanges();               // Optional: Clear selection highlight after marking
    },
    stripMarked : function(e){
         if(e.target.tagName === 'MARK') {
@@ -1270,7 +1304,6 @@ const $$ = {
   manuallySelectText : function(container, start, end) {
         const range = doc.createRange();
         const sel   = window.getSelection();
-
         // This helper finds the actual Text Node and local offset
         const startPos = $$.getTextNodeAtOffset(container, start);
         const endPos   = $$.getTextNodeAtOffset(container, end);
@@ -1307,7 +1340,7 @@ const $$ = {
   readColumnsCounter : function(){   //old solution, you could now just read clones if any
         let activeLi = quAll('.sub-li')[$$.vars.activeTask];
         if(activeLi != null ){
-           let cc = activeLi.getAttribute('columns-counter');
+           let cc = activeLi.querySelector('.editable-wrapper').children.length;
            if(cc) qu('.columns-selector').value = Math.floor(cc);
            else   qu('.columns-selector').value = 1;
         }
@@ -1420,11 +1453,13 @@ const $$ = {
        switch(val){
          case 'boxes':    $$.query.sub_list.style.backgroundSize = `10px 10px, 220px 200px, calc(100% / ${columnWidth}) 10px`;   break;
          case 'columns':  $$.query.sub_list.style.backgroundSize = `10px 10px, 0px 10px,    calc(100% / ${columnWidth}) 10px`;   break;
-         case 'cells':    $$.query.sub_list.style.backgroundSize = `10px 10px, 10px 50px,   calc(100% / ${columnWidth}) 10px`;   break;
+         case 'cells':    $$.query.sub_list.style.backgroundSize = `10px 10px, 10px 40px,   calc(100% / ${columnWidth}) 10px`;   break;
        }
  },
  resizeMovingWindow : function(){
-       $$.query.moving_window.style.width = qu('.planner-field').clientWidth + 'px';
+       $$.query.moving_window.style.left = 0;
+       $$.query.moving_window.style.top  = 0;
+       if(qu('.planner-field')) $$.query.moving_window.style.width = qu('.planner-field').clientWidth + 'px';
  },
  forceReflow : function(arr){
     for(let i = 0;i< arr.length;i++){
@@ -1511,6 +1546,7 @@ const $$ = {
  movingWindowControls : function(e, control_type){
      if(e.target.nodeName != 'BODY') return;
      let m_win = qu('.moving-window');
+     let taskControls = qu('.tasks-controls');
      if(qu('.full-screen')) return false;  //dont allow in full-screen
      if(qu('.main-div').style.display == 'block') return false;
 
@@ -1519,18 +1555,18 @@ const $$ = {
          x : m_win.offsetLeft,
          h : m_win.clientHeight,
          w : m_win.clientWidth,
-         max_rows : Math.floor(window.innerHeight / m_win.clientHeight),
+         max_rows : Math.floor( (window.innerHeight - taskControls.clientHeight) / m_win.clientHeight),
          max_columns : Math.floor(window.innerWidth / m_win.clientWidth),
      }
 
      let detected = null;
      let mover = $$.vars.mover;
 
-     let minVertical = ()=> { if(map.y < map.h) return m_win.style.top = 0 +'px'; }
-     let maxVertical = ()=> { if(map.y >= (map.max_rows-1) * map.h) return m_win.style.top = (map.max_rows-1) * map.h +'px'; }
+     let minVertical = ()=> { if(map.y < map.h) return m_win.style.top = (map.max_rows-1) * map.h  +'px'; }
+     let maxVertical = ()=> { if(map.y >= (map.max_rows-1) * map.h) return m_win.style.top = 0 +'px'; }  //(map.max_rows-1) * map.h  //last
 
-     let minHorizontal = ()=> { if(map.x < map.w) return m_win.style.left = 0 + 'px'; }
-     let maxHorizontal = ()=> { if(map.x >= (map.max_columns-1) * map.w) return m_win.style.left = (map.max_columns-1) * map.w +'px'; }
+     let minHorizontal = ()=> { if(map.x < map.w) return m_win.style.left = (map.max_columns-1) * map.w + 'px'; }
+     let maxHorizontal = ()=> { if(map.x >= (map.max_columns-1) * map.w) return m_win.style.left = 0+'px'; } //(map.max_columns-1) * map.w  //last
 
      switch(control_type){
        case 'movements':
@@ -1545,75 +1581,94 @@ const $$ = {
        case 'controls':
            switch(e.key){
              case '/':
-                   let old = qu('[holded="true"]');
-                   if(old) old.removeAttribute('holded'); //remove old if existing
                    $$.underMovingWindow('pick-up');
-                   if(mover.holding) mover.holding.setAttribute('holded', true);
+                   if(mover.holding.length > 0) mover.holding[mover.holding.length-1].setAttribute('holded', true);
              break;
              case 'Shift':
                    $$.underMovingWindow('put-down');
-                   if(mover.placing_at != null && mover.holding != null) {
-                      $$.moverHandling();
-                      mover.holding.removeAttribute('holded');
+                   if(mover.placing_at != null && mover.holding.length > 0) {
+                      $$.moverHandleHolded();
                       mover.placing_at = null;
-                      mover.holding    = null;
+                      mover.holding    = [];
                       $$.reasignIndexes();
                     }
-                   if(mover.placing_at != null && mover.placing_at.classList[0] == 'sub-li' && mover.holding == null){
-                      mover.placing_at.querySelector('.full-screen-mode').click();
-                   }
+             break;
+             case 'Enter':
+                   $$.underMovingWindow('select');
+                   if(mover.selecting == null) return;
+                   if(mover.selecting.classList.contains('active-task') == false) $$.setActiveTask(mover.selecting);
+                   else mover.selecting.querySelector('.full-screen-mode').click();
              break;
              case 'Backspace':
                    $$.underMovingWindow('pick-up');
-                   if(mover.holding) mover.holding.querySelector('.delete-task').click();
-
+                   $$.moverBunchOperations('delete');
              break;
              case "'":
                    if(qu('.sub-list').classList.contains('table-view') == false) return false;
                    $$.underMovingWindow('pick-up');
-                   if(mover.holding) $$.extendGridTableColumn(mover.holding, -1);
+                   $$.moverBunchOperations('de-extend');
              break;
              case "\\":
                    if(qu('.sub-list').classList.contains('table-view') == false) return false;
                    $$.underMovingWindow('pick-up');
-                   if(mover.holding) $$.extendGridTableColumn(mover.holding);
+                   $$.moverBunchOperations('extend');
              break;
            }
        break;
      }
  },
- condensePlannerField : function(field){
-       if(field == null) return;
-       if(field.classList.contains('planner-field') && field.children.length > 2){
-          field.classList.add('super-condense');
-          $$.query.moving_window.classList.add('micro-window');
-          $$.query.moving_window.style.top = field.offsetTop + 'px';
-       }else{
-          field.classList.remove('super-condense');
-          $$.query.moving_window.classList.remove('micro-window');
-       }
+ condensePlannerFields : function(){
+       let allFields = quAll('.planner-field');
+       let arr = new Array(...allFields);
+           arr = arr.filter( x=> x.children.length > 1);
+
+       if(arr.length < 1) return;
+       let shrinkMover = false;
+
+        for(let i = 0; i<arr.length; i++){
+            let field = arr[i];
+            if(field.children.length > 2){
+               field.classList.add('super-condense');  shrinkMover = true;
+            }else{
+               field.classList.remove('super-condense');
+            }
+        }
+     if(shrinkMover) $$.query.moving_window.classList.add('micro-window');
+     else            $$.query.moving_window.classList.remove('micro-window');
+     $$.query.moving_window.style.top = arr[arr.length-1].offsetTop + 'px'; //always move to field where you attached a task
  },
- moverHandling : function(){
-      let mover = $$.vars.mover;
-      if(mover.placing_at == null && mover.holding == null) return;
-      let plannerField = null;
+ moverHandleHolded : function(){
+     let mover = $$.vars.mover;
+     let holderArr = mover.holding;
+     if(mover.placing_at == null && mover.holding.length < 1) return;
+     let placing_at_next_sibling = mover.placing_at.nextSibling;  //capture here to not change
+     for(let i=0; i< holderArr.length; i++){
+         let placeClass = mover.placing_at.classList[0];
+         switch(placeClass){
+           case 'sub-li':
+                 let sourceIndex = parseInt(holderArr[i].getAttribute('data'));
+                 let targetIndex = parseInt(mover.placing_at.getAttribute('data'));
+                 if(sourceIndex < targetIndex) qu('.sub-list').insertBefore( holderArr[i], placing_at_next_sibling);
+                 else                          qu('.sub-list').insertBefore( holderArr[i], mover.placing_at);
+           break;
+           case 'planner-field': mover.placing_at.appendChild(holderArr[i]);  $$.addDateToTask(holderArr[i], mover.placing_at); break;
+           default:              mover.placing_at.appendChild(holderArr[i]);  break;
+         }
+         holderArr[i].removeAttribute('holded');
+     }
+     $$.condensePlannerFields();
+ },
+ moverBunchOperations : function(action){
+       let mover = $$.vars.mover;
+       let holderArr = mover.holding;
 
-      if(mover.placing_at.classList[0] == 'planner-field'){
-        mover.placing_at.appendChild(mover.holding);
-        $$.addDateToTask(mover.placing_at, mover.holding);
-        $$.condensePlannerField(mover.placing_at);
-
-      }else if(mover.placing_at.classList[0] == 'sub-list'){
-        plannerField = mover.holding.parentElement;
-        mover.placing_at.appendChild(mover.holding);
-        $$.condensePlannerField(plannerField);
-      }else if(mover.placing_at.classList[0] == 'sub-li'){
-        let sourceIndex = parseInt(mover.holding.getAttribute('data'));
-        let targetIndex = parseInt(mover.placing_at.getAttribute('data'));;
-        if(sourceIndex < targetIndex) qu('.sub-list').insertBefore(mover.holding, mover.placing_at.nextSibling);
-        else                          qu('.sub-list').insertBefore(mover.holding, mover.placing_at);
-      }
-      // log(mover.placing_at, mover.holding);
+       for(let i=0; i<holderArr.length; i++){
+           switch(action){
+             case 'delete':    holderArr[i].querySelector('.delete-task').click();   break;
+             case 'de-extend': $$.extendGridTableColumn(holderArr[i], -1);  break;
+             case 'extend':    $$.extendGridTableColumn(holderArr[i]);      break;
+           }
+       }
  },
  underMovingWindow : function(mode){
      let all = quAll('.sub-li');
@@ -1621,12 +1676,22 @@ const $$ = {
      let m_win_rect = moving_window.getBoundingClientRect();
      let output = null;
      switch(mode){
+       case 'select':
+             for(let i = 0; i<all.length; i++){
+                 let rect = all[i].getBoundingClientRect();
+                 if(m_win_rect.x > rect.x - 10 && m_win_rect.x < rect.x + rect.width - 10 &&
+                    m_win_rect.y > rect.y - 10 && m_win_rect.y < rect.y + rect.height - 10){
+                    $$.vars.mover.selecting = all[i];
+                    break;
+                 }
+             }
+       break;
        case 'pick-up':
              for(let i = 0; i<all.length; i++){
                  let rect = all[i].getBoundingClientRect();
                  if(m_win_rect.x > rect.x - 10 && m_win_rect.x < rect.x + rect.width - 10 &&
                     m_win_rect.y > rect.y - 10 && m_win_rect.y < rect.y + rect.height - 10){
-                    $$.vars.mover.holding = all[i];
+                    if($$.vars.mover.holding.includes(all[i]) == false ) $$.vars.mover.holding.push(all[i]);
                     break;
                  }
              }
@@ -1729,7 +1794,8 @@ const main = function(){
               case 'delete-task':  //DELETE TASK
                     inc = parentElement.getAttribute('data');
                     parentElement.style.backgroundColor = 'indianred';
-                    $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);
+                    parentElement.removeAttribute('holded'); //if existing
+                    $$.animate(parentElement, 'deletedFromRight linear forwards', .5, true);
                     delete $$.vars.LISTE[$$.vars.activeListName][ inc ];
               break;
               case 'is-done':  //SET DONE
@@ -1743,11 +1809,7 @@ const main = function(){
                     if(the_list) the_list.status = status;
               break;
               case 'copy-task':
-                    $$.copyEvent(e.target, EditField.textContent);
-              break;
-              case 'duplicate-task':
-                    $$.addTask($$.vars.LISTE[$$.vars.activeListName][grandParent.getAttribute('data')]);
-                    $$.fullListUpdate();
+                    $$.copyEvent(JSON.stringify($$.vars.LISTE[$$.vars.activeListName][grandParent.getAttribute('data')]) );       //EditField.textContent);
               break;
               case 'cal-task': e.target.style.opacity = (e.target.style.opacity === '0') ? '1' : '0'; break; //HIDE CAL if not needed by user
               case 'pre-task':
@@ -1773,7 +1835,7 @@ const main = function(){
               case 'bullet-selection': $$.bulletTextSelection();  break;
               case 'delete-sub-list':   //DELETE LIST
                     parentElement.style.backgroundColor = 'indianred';
-                    $$.animate(parentElement, 'deletedFromRight linear forwards', .66, true);  //true is remove();
+                    $$.animate(parentElement, 'deletedFromRight linear forwards', .5, true);  //true is remove();
                     delete $$.vars.LISTE[ parentElement.getAttribute('data') ]; //NEWLY FORMED TASK OBJECT
               break;
               case 'color-div': $$.changeTaskColor(e); break;
@@ -1792,6 +1854,7 @@ const main = function(){
           case 'marker-yellow': case 'marker-pink': case 'marker-green': case 'marker-orange':
                $$.stripMarked(e);
           break;
+          case 'sub-list':  $$.addTask();  $$.scrollIntoView(quAll('.sub-li')[quAll('.sub-li').length-1] );  break;
           case 'body': ; break;
         }
     });
@@ -1820,14 +1883,12 @@ const main = function(){
                case 'undo-history': $$.loadPreservedHistory(); break;
 
                case 'sub-li': case 'editable-wrapper': case 'to-edit': case 'task-menu':
-
                      switch(the_class){
                        case 'sub-li':            $$.setActiveTask(e.target); break;
                        case 'editable-wrapper':  $$.setActiveTask(e.target.parentElement); break;
                        case 'to-edit':           $$.setActiveTask(e.target.parentElement.parentElement); break;
                        case 'task-menu':         $$.setActiveTask(e.target.parentElement); break;
                      }
-                         // log('active', $$.vars.activeTask);
                break;
                case 'list-name': //OPEN LIST
                      $$.vars.activeListName = e.target.parentNode.getAttribute('data');
@@ -1853,8 +1914,8 @@ const main = function(){
            case 'columns-selector':
                  let val = e.target.value;
                  switch(val){
-                   case '1':  subLi.classList.remove('book-pager'); $$.spreadContentToColumns(toEdit, 0);  $$.notification(`🧡: No columns`);     subLi.removeAttribute('columns-counter');   break;
-                   default:   subLi.classList.add('book-pager');    $$.spreadContentToColumns(toEdit, val-1);  $$.notification(`🧡: ${val} columns`); subLi.setAttribute('columns-counter', val); break;
+                   case '1':  subLi.classList.remove('book-pager'); $$.spreadContentToColumns(toEdit, 0);      $$.notification(`🧡: No columns`);      break;
+                   default:   subLi.classList.add('book-pager');    $$.spreadContentToColumns(toEdit, val-1);  $$.notification(`🧡: ${val} columns`);  break;
                  }
            break;
            case 'preset-selector': $$.insertTextAtCursor(e.target.value); break;
@@ -1916,6 +1977,16 @@ const main = function(){
                $$.addPlanner(space.total);
             });
 
+     });
+     window.addEventListener('paste', e=>{
+            let format = 'text/plain';
+            const text = (e.clipboardData || window.clipboardData).getData(format);
+            let cleaned = text.replace(/[\x00-\x1F\x7F]/g, "");
+            let possibleTask = JSON.parse(cleaned);
+            if(typeof possibleTask == 'object' && possibleTask.content && possibleTask.markers){
+               $$.addTask(possibleTask);
+               $$.fullListUpdate();
+            }
      });
 
      // Trigger this on mouseup or a button click

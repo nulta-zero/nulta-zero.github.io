@@ -21,7 +21,7 @@
          </div>
          <div class="tools-holder">
               <div><input type="button" class="view minimal-btn matrix"  value="◫◰"  title="CHANGE VIEW&#10;[LIST|GRID|TABLE]" /></div>
-              <div class="marker-mode-holder"><label>m</label><input type="checkbox" class="marker-mode minimal-btn matrix" title="MARKER ON/OFF" /></div>
+              <div class="marker-mode-holder"><label for="marker-switch">m</label><input type="checkbox" id="marker-switch" class="marker-mode minimal-btn matrix" title="MARKER ON/OFF" /></div>
          </div>
          <!-- TO BE FILLED -->
          <div class="tasks-colors-holder"></div>
@@ -29,7 +29,7 @@
          <div class="columns-holder"></div>
 
          <div class="theme-holder">
-           <select class="theme-changer matrix">
+           <select class="theme-changer matrix" name="themes">
              <option value="atom" selected>Atom</option>
              <option value="gentle-rose">Rose</option>
            </select>
@@ -69,8 +69,8 @@
          </ul>
        </div>
        <div class="replacer">
-          <div class="replacer-input"><input class="r-input" type="text" placeholder="swap this" value=""/> <input class="undo-history btn" type="button" value="ⓤ" title="UNDO CHANGE" /></div>
-          <div class="replacer-output"><input class="r-output" type="text" placeholder="with that" value=""/> </div>
+          <div class="replacer-input"><input class="r-input" type="text" name="r-input" placeholder="swap this" value=""/> <input class="undo-history btn" type="button" value="ⓤ" title="UNDO CHANGE" /></div>
+          <div class="replacer-output"><input class="r-output" type="text" name="r-output" placeholder="with that" value=""/> </div>
        </div>
        <div class="sub-list-adjuster">
             <legend>Select back pattern:</legend>

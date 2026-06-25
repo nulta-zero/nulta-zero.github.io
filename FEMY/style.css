@@ -59,7 +59,7 @@
   box-sizing: border-box;
   font-family: Menlo;
   caret-shape: block;
-  caret-color: orangered;
+  caret-color: #ffccbb;
   caret-animation: manual;
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' stroke='%233886e5' stroke-width='1' fill='%233886e5' fill-opacity='0.2'/%3E%3C/svg%3E") 16 16, none !important;
 }
@@ -385,6 +385,15 @@ input[type="radio"]:hover {
   justify-content: space-between;
   gap : 4px;
 }
+.super-condense > .sub-li:not(.full-screen) > .editable-wrapper{
+  width: 120%;
+  margin-left: -9px;
+  z-index: 2;
+  background: inherit;
+}
+.super-condense > .sub-li:not(.full-screen) > .editable-wrapper > .to-edit{
+  font-size: 15px !important;
+}
 .planner-field > .sub-li:not(.full-screen):after{
   content: "";
   width: 17px;
@@ -666,7 +675,7 @@ input[type="radio"]:hover {
   bottom: -15px;
   gap: 10px;
   margin: 1%;
-  background: #282c32;
+  background: #383d4570;
   padding: 9px 9px;
   outline: 2px solid #21252c4a;
   border-top-left-radius: 10px;
@@ -682,7 +691,7 @@ input[type="radio"]:hover {
   padding: 4px;
   color: var(--apricot);
 }
-.r-input { outline: 3px solid #ff6900; background: #ff690029; }
+.r-input { outline: 3px solid #98fbcb; background: #ff690029; }
 .r-output{ outline: 3px solid var(--apricot);  background: #ffdab938;}
 
 .r-input:not(:focus), .r-output:not(:focus){
@@ -692,7 +701,7 @@ input[type="radio"]:hover {
 .undo-history{
   position: absolute;
   right: 15px;
-  color: #ff660d;
+  color: lightpink;
 }
 
 /* FULL-SCREEN MODE */
@@ -726,7 +735,7 @@ input[type="radio"]:hover {
 }
 
 /* BOOK PAGER ALLOWS YOU TO SPLIT TEXT INTO MULTIPLE .to-edits */
-.book-pager > .editable-wrapper{
+.book-pager.full-screen > .editable-wrapper{
   display: flex;
   flex-direction: row;
   overflow-x: auto;
