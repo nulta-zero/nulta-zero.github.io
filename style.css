@@ -28,6 +28,7 @@ body{
    background: var(--dark);
    margin: 0;
    font-size: 95%;
+   transition: .25s;
    /* position: fixed; */    /* Breakes the app */
 
    /* background-image: url(stocks.png);
@@ -169,7 +170,7 @@ hr{
   height: 1pc;
 }
 .projects-list{
-  background: #24222254;
+  /* background: #24222254; */
   border-radius: 10px;
   table-layout: fixed;
 }
@@ -313,10 +314,10 @@ hr{
   right: 0;
   top : 0;
   width: 20px;
-  height: 200%;
+  height: 100vh;
   display: grid;
   font-size: 10px;
-  gap: 2vh;
+  gap: 10px;
   margin-top: 2vh;
   color: #53555d;
   z-index: -1;
@@ -469,7 +470,6 @@ pre{
 }
 
 /* HUGE SCREEN */
-
 @media screen and (min-width: 900px) {
   .super-container{
     width: 70vw;
@@ -478,7 +478,7 @@ pre{
 }
 @media screen and (min-width: 1200px) {
   .super-container{
-    width: 50vw;
+    width: 60vw;
     margin: 0 auto;
   }
 }

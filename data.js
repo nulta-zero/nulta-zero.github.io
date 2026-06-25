@@ -157,6 +157,7 @@ const DATA = [
     name : 'PLAN_3D',
     link : 'https://www.facebook.com/share/v/1CcFKqWifn/',
     desc : `3D planning space for investors | real-estate-market`,
+    power : true,
   },
   {
     name : 'BUILDER',

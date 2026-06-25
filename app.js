@@ -34,10 +34,13 @@ const $$ = {
                     return $$.vars.synth.speak(u);
     },
     darkMode : function(){
-        qu('html').style.mixBlendMode = 'darken';
+        qu('body').style.background = 'var(--dark)';
+        qu('body').style.color = '';
+
     },
     lightMode : function(){
-        qu('html').style.mixBlendMode = 'difference';
+        qu('body').style.background = '#e3e5e8';
+        qu('body').style.color = 'black';
     },
     matrix : function(bool){
          if(bool) qu('.super-container').classList.add('matrix');
@@ -322,6 +325,7 @@ const main = function(){
       $$.calculateLargestTitlePos();
       $$.createTRS();
       $$.createPoints( (new Date().getFullYear()-1987) , 'points-holder' );
+      doc.body.style.filter = "opacity(1)";
       // $$.createPoints( $$.vars.abc.length-1, 'abc-holder', true );
   });
 
