@@ -75,6 +75,9 @@ hr{
 .grid-split-window > .program{
   /* height: 100vh; */
 }
+.fixed{
+  position: fixed;
+}
 .grid-split-window > .super-container{
   height: 100vh;
   overflow-y: scroll;
