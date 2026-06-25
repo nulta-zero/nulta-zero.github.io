@@ -9,7 +9,7 @@ const DATA = [
   },
   {
     name : 'AKONKAGAYA',
-    link : 'https://fb.watch/u1L8TJZSt1/',
+    link : '',
     desc : 'Space-shooter game',
   },
   {
@@ -59,12 +59,12 @@ const DATA = [
   },
   {
     name : 'KOMBATORS',
-    link : 'https://docs.google.com/presentation/d/e/2PACX-1vT_i1wsqD-84uHTGeGx9at-cMGlZ4XZdmr2VM0T_HIRLVvuFuTj6qiUDuwVFTT6k5CwurqVxm3WNybq/pub?start=false&loop=false&delayms=10000',
+    link : '',
     desc : `Fighting retro game`,
   },
   {
     name : 'PINBALL',
-    link : 'https://docs.google.com/presentation/d/e/2PACX-1vTsVdOkX-hc7zuHZojxgRxc19tcs2KE_XHnDSmRmDgBdGPV0P1wRew59eeA5tsj6z5UBkEUk7VHOlqD/pub?start=false&loop=false&delayms=3000',
+    link : '',
     desc : `Pinball machine`,
   },
   {
@@ -89,12 +89,12 @@ const DATA = [
   },
   {
     name : 'TETRIS',
-    link : 'https://fb.watch/u1K-P2Rfte/',
+    link : '',
     desc : `Tetris | with new shapes`,
   },
   {
     name : 'WHACK-A-JAR',
-    link : 'https://www.facebook.com/reel/1530997947629427',
+    link : '',
     desc : `Business product gamification example. [Advanced marketing]`,
   },
   {
@@ -208,7 +208,7 @@ const DATA = [
   },
   {
     name : 'PCELAR',
-    link : 'https://www.linkedin.com/pulse/p%2525C4%25258Delar-program-za-vo%2525C4%252591enje-evidencije-ko%2525C5%2525A1nica-kao-i-istih-petar/?trackingId=j6TMeHjDhJAIi2DqTrcJKQ%3D%3D',
+    link : '',
     desc : `Beekeping | digital hives organization tool`,
   },
   {
@@ -246,17 +246,17 @@ const DATA = [
   },
   {
     name : 'AI_DOK',
-    link : 'https://fb.watch/u1KKJtZxzC/',
+    link : '',
     desc : 'Algorithmic doctor',
   },
   {
     name : 'CAMERA',
-    link : 'https://fb.watch/u1L5hxe5Rj/',
+    link : '',
     desc : `Camera movement tracking program`,
   },
   {
     name : 'CUBE',
-    link : 'https://fb.watch/u1KVvXu8WL/',
+    link : '',
     desc : `Manipulate 3D cube`,
   },
   {

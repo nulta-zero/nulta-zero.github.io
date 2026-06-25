@@ -2,6 +2,7 @@ const doc = document,
       log = (x)=> console.log(x),
       dce = (x)=> doc.createElement(x),
       qu = (x)=> doc.querySelector(x),
+      show_this = (x, state)=> x.style.display = state,
       quAll = (x)=> doc.querySelectorAll(x);
 
 const $$ = {
@@ -66,10 +67,15 @@ const $$ = {
           if(DATA[i].link.length > 0){
              let a = dce('a');
                  a.setAttribute('target', '_blank');
-                 a.title = 'Open link in a new tab';
+                 a.title = 'OPEN LINK';
                  a.innerText = '⌗';
                  a.href = DATA[i].link;
                  td1.appendChild(a);
+              let span = dce('span');
+                  span.textContent = '◱';
+                  span.classList.add('embeded-video', 'simple-btn');
+                  span.title="VIEW EMBEDED VIDEO";
+                  td1.appendChild(span);
           }
 
           if(DATA[i].break){
@@ -219,7 +225,35 @@ const $$ = {
          let from =  qu('.container') || qu('body');
          let keywords = from.innerText.replaceAll(/\t|\n|\W+/gi, ' ');
              qu('[name="keywords"]').setAttribute('content', keywords);
-    }
+    },
+    openEmbeded : function(e){
+         let name = e.target.parentElement.getAttribute('program-name');
+         let iframe = qu('.i-frame');
+         if(name == null || e.target.parentElement.querySelector('a') == null) return;  //safe exit
+
+         let facebook = 'https://www.facebook.com/plugins/video.php';
+
+         switch(name){
+            case 'FEMY': iframe.src = facebook + "?height=460&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F2130544091227184%2F&show_text=false&width=560&t=0"; break;
+            case 'CHESS': iframe.src = facebook + "?height=476&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F733573402203970%2F&show_text=false&width=343&t=0"; break;
+            case 'DOROTEJA': iframe.src=facebook + "?height=314&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F224555588569922%2F&show_text=false&width=560&t=0"; break;
+            case 'FROGGY_LEAP': iframe.src= facebook + "?height=314&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F710233299384031%2F&show_text=false&width=560&t=0"; break;
+            case 'HUNT':  iframe.src = facebook + "?height=526&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F185311370221164%2F&show_text=false&width=560&t=0"; break;
+            case 'NINJA_ESCAPE': iframe.src = facebook + "?height=314&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F579801112426482%2F&show_text=false&width=560&t=0"; break;
+            case 'ANIMIX':  iframe.src = facebook + "?height=476&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F502833019171008%2F&show_text=false&width=397&t=0"; break;
+            case 'ART': iframe.src = facebook + "?height=476&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F299171132206369%2F&show_text=false&width=475&t=0"; break;
+            case 'CHIP_TUNE': iframe.src = facebook + "?height=422&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F566372738410609%2F&show_text=false&width=560&t=0"; break;
+            case 'PLAN_3D': iframe.src = facebook + "?height=437&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F934657085648586%2F&show_text=false&width=560&t=0"; break;
+            case 'GRAPH': iframe.src = facebook + "?height=476&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F343597011953439%2F&show_text=false&width=392&t=0"; break;
+            case 'FEMY': iframe.src = facebook + "?height=460&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F2130544091227184%2F&show_text=false&width=560&t=0"; break;
+            case 'NULTA': iframe.src = facebook + "?height=476&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F1852154845277172%2F&show_text=false&width=446&t=0"; break;
+            case 'PAPER': iframe.src = facebook + "?height=476&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F2335019296681246%2F&show_text=false&width=422&t=0"; break;
+            case 'ROS': iframe.src = facebook + "?height=314&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F444419753883243%2F&show_text=false&width=560&t=0"; break;
+         }
+         iframe.style.display = 'block';
+         iframe.style.left   = 5 + 'px';
+         iframe.style.bottom = 5 + 'px';
+    },
 }
 
 const main = function(){
@@ -277,13 +311,17 @@ const main = function(){
                    $$.calculateLargestTitlePos();
              }
        break;
+       case 'embeded-video':  $$.openEmbeded(e); break;
+       case 'window-holder': case 'body': case 'super-container':
+             if(qu('.i-frame').style.display == 'block') show_this(qu('.i-frame'), 'none');
+       break;
      }
   });
 
   window.addEventListener('DOMContentLoaded', e=>{
       $$.calculateLargestTitlePos();
       $$.createTRS();
-      $$.createPoints( 38, 'points-holder' );
+      $$.createPoints( (new Date().getFullYear()-1987) , 'points-holder' );
       // $$.createPoints( $$.vars.abc.length-1, 'abc-holder', true );
   });
 

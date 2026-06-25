@@ -175,6 +175,12 @@ hr{
 }
 .lister{
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.embeded-video{
+  color: darkorange !important;
 }
 .explainer{
   padding-left: 5%;
@@ -307,7 +313,7 @@ hr{
   right: 0;
   top : 0;
   width: 20px;
-  height: 100%;
+  height: 200%;
   display: grid;
   font-size: 10px;
   gap: 2vh;
@@ -316,6 +322,7 @@ hr{
   z-index: -1;
   overflow: hidden;
 }
+.points{}
 .abc-holder{   /*not used*/
   position: absolute;
   top: 2vh;
@@ -329,7 +336,19 @@ hr{
   gap: 7vh;
   z-index: -1;
 }
-
+/* ACTING AS EMBEDED VIDEO PLAYER */
+.i-frame{
+  display: none;
+  border: none;
+  overflow: hidden;
+  position: fixed;
+  width: 40%;
+  height: 37vh;
+  outline: 2px solid;
+  border-radius: 10px;
+  filter: opacity(0.75);
+  backdrop-filter: blur(25px);
+}
 .research-area{
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -387,6 +406,7 @@ hr{
 }
 .simple-btn:hover{
   color: snow;
+  cursor: pointer;
 }
 .file-hash{
   font-size: 11px;
