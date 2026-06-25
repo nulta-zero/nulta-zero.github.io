@@ -191,7 +191,7 @@ const DATA = [
   },
   {
     name : 'FEMY',
-    link : 'https://www.facebook.com/reel/1333330282091223',
+    link : 'https://www.facebook.com/share/v/1aJWJ3tfUe/',
     desc : `Feminine Life Organizer | To-Do | Lists`,
   },
   {

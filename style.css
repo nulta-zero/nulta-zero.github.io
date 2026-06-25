@@ -28,6 +28,7 @@ body{
    background: var(--dark);
    margin: 0;
    font-size: 95%;
+   /* position: fixed; */    /* Breakes the app */
 
    /* background-image: url(stocks.png);
    background-repeat: no-repeat;
