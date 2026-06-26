@@ -491,13 +491,13 @@ pre{
 /* HUGE SCREEN */
 @media screen and (min-width: 900px) {
   .super-container{
-    width: 70vw;
+    width: 60vw;
     margin: 0 auto;
   }
 }
 @media screen and (min-width: 1200px) {
   .super-container{
-    width: 60vw;
+    width: 800px;
     margin: 0 auto;
   }
 }
