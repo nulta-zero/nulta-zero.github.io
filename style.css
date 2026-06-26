@@ -390,7 +390,7 @@ hr{
   transition: 1s;
 }
 .pad-notes{
-  height: calc(100% - 30px);
+  height: calc(100% - 40px);
   outline: none;
   padding: 10px;
   background: transparent;
@@ -403,13 +403,20 @@ hr{
 .pad::before{
   content: "Pad";
   height: 20px;
-  color: #3a3b40;
+  color: #515255;
   width: 100%;
   position: absolute;
   left: 0;
   top: 0;
   text-align: center;
   background: #494a4d17;
+}
+.pad-bar{
+  gap: 15px;
+  display: flex;
+}
+.pad-bar > input{
+  font-size: 20px;
 }
 .simple-btn{
   background: transparent;

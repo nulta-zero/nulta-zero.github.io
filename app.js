@@ -10,6 +10,7 @@ const $$ = {
       availables : ['CALCULATOR', 'VIEWPORT', 'SOUNDPORT', 'FEMY'],
       active_program : '',
       abc   : ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'],
+      timer : 0,
     },
     query : {},
     loadQuery : function(){
@@ -169,12 +170,12 @@ const $$ = {
          let pad = dce('div');
              pad.classList.add('pad');
          let pad_notes = dce('textarea');
+             pad_notes.value = "//Ready to take notes...";
              pad_notes.classList.add('pad-notes');
              pad_notes.setAttribute('contenteditable', true);
              pad.appendChild(pad_notes);
          let bar = dce('div');
              bar.classList.add('pad-bar');
-
 
          //PAD INPUTS
          let full_width = dce('input');
@@ -184,18 +185,9 @@ const $$ = {
              full_width.title = "FULL-SCREEN";
 
              full_width.addEventListener('click', e=>{
-               if(navigator.userAgent.search('iPhone') > -1){
-                 pad.scrollIntoView();
-               //    // MOBILE PHONES
-               //    if(pad.clientWidth > window.innerWidth / 3 ){
-               //      pad.style.width = '20vw';
-               //      pad.style.height = '45%';
-               //    }else{
-               //      pad.style.width =  '95%';
-               //      pad.style.height = '45%';
-               //    }
-               //    return true;
-               }
+                if(navigator.userAgent.search('iPhone') > -1){
+                   pad.scrollIntoView();
+                }
 
                 // USUAL DESKTOP BEHAVIOR
                 if(pad.clientWidth > window.innerWidth / 3 ){
@@ -203,7 +195,7 @@ const $$ = {
                   pad.style.height = '45vh';
                 }else{
                   pad.style.width =  (qu('.program').clientWidth < 1) ? '99%' : (window.innerWidth - qu('.program').clientWidth) - 22.5 + 'px';
-                  pad.style.height = 'calc(100% - 40px)';
+                  pad.style.height = 'calc(100% - 35px)';
                 }
              });
           let export_btn = dce('input');
@@ -234,6 +226,7 @@ const $$ = {
          let iframe = qu('.i-frame');
          if(name == null || e.target.parentElement.querySelector('a') == null) return;  //safe exit
 
+         iframe.removeAttribute('sandbox');  //de-freeze
          let facebook = 'https://www.facebook.com/plugins/video.php';
 
          switch(name){
@@ -259,6 +252,30 @@ const $$ = {
          iframe.style.bottom  = 5 + 'px';
          iframe.style.height  = height + 'px';
     },
+
+   startTimer : function(time, func, step=1){
+        $$.vars.timer = 0;
+        let inter = setInterval( x=>{
+            $$.vars.timer += step;
+
+           if($$.vars.timer >= time){
+              if(typeof func == 'function'){
+                 func();
+                 clearInterval(inter);
+              }
+           }
+           if(qu('.i-frame').style.display != 'none') clearInterval(inter);
+        }, (step || 1) * 1000);
+   },
+   clearIframeContent : function(frame){
+        // 1. Point to about:blank to kill the frames processes
+        frame.src = 'about:blank';
+        // 2. Remove the 'src' attribute entirely to prevent accidental reloads
+        frame.removeAttribute('src');
+        // 3. Remove sandbox/allow permissions temporarily to completely freeze it
+        frame.removeAttribute('sandbox');
+        frame.setAttribute('sandbox', ''); // Keeps it locked down while idle
+   },
 }
 
 const main = function(){
@@ -318,7 +335,11 @@ const main = function(){
        break;
        case 'embeded-video':  $$.openEmbeded(e); break;
        case 'window-holder': case 'body': case 'super-container':
-             if(qu('.i-frame').style.display == 'block') show_this(qu('.i-frame'), 'none');
+             let i_frame = qu('.i-frame');
+             if(i_frame.style.display == 'block') {
+                show_this(i_frame, 'none');
+                $$.startTimer(30, a=> { if(i_frame.style.display == 'none') $$.clearIframeContent(i_frame);  });  //clear idle frame
+             }
        break;
      }
   });
