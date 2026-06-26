@@ -34,13 +34,12 @@ const $$ = {
                     return $$.vars.synth.speak(u);
     },
     darkMode : function(){
-        qu('body').style.background = 'var(--dark)';
-        qu('body').style.color = '';
-
+         doc.body.style.background = 'var(--dark)';
+         doc.body.style.color = '';
     },
     lightMode : function(){
-        qu('body').style.background = '#e3e5e8';
-        qu('body').style.color = 'black';
+         doc.body.style.background = '#e3e5e8';
+         doc.body.style.color = 'black';
     },
     matrix : function(bool){
          if(bool) qu('.super-container').classList.add('matrix');
@@ -75,7 +74,7 @@ const $$ = {
                  a.href = DATA[i].link;
                  td1.appendChild(a);
               let span = dce('span');
-                  span.textContent = '◱';
+                  span.textContent = '◲';
                   span.classList.add('embeded-video', 'simple-btn');
                   span.title="VIEW EMBEDED VIDEO";
                   td1.appendChild(span);
@@ -253,9 +252,11 @@ const $$ = {
             case 'PAPER': iframe.src = facebook + "?height=476&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F2335019296681246%2F&show_text=false&width=422&t=0"; break;
             case 'ROS': iframe.src = facebook + "?height=314&href=https%3A%2F%2Fwww.facebook.com%2Fnulta.io%2Fvideos%2F444419753883243%2F&show_text=false&width=560&t=0"; break;
          }
+         let height = iframe.src.split('&').filter( x=> x.includes('height'))[0].replaceAll(/[^\d]/gi, '');
          iframe.style.display = 'block';
-         iframe.style.left   = 5 + 'px';
-         iframe.style.bottom = 5 + 'px';
+         iframe.style.right   = '-32%';
+         iframe.style.bottom  = 5 + 'px';
+         iframe.style.height  = height + 'px';
     },
 }
 
@@ -325,7 +326,7 @@ const main = function(){
       $$.calculateLargestTitlePos();
       $$.createTRS();
       $$.createPoints( (new Date().getFullYear()-1987) , 'points-holder' );
-      doc.body.style.filter = "opacity(1)";
+      setTimeout( t=> doc.body.style.filter = "opacity(1)", 1*1000);
       // $$.createPoints( $$.vars.abc.length-1, 'abc-holder', true );
   });
 

@@ -13,7 +13,7 @@
     /* #1d1f22; */
 }
 *   { cursor: default;  }
-html{ height: 100%; mix-blend-mode: darken; }
+html{ height: 100%; mix-blend-mode: darken; background: var(--dark);}
 /* DEFAULTS CHANGES */
 frame{ transition: 0.6s; }
 button{background-color: transparent; color: #555;}
@@ -342,13 +342,19 @@ hr{
   display: none;
   border: none;
   overflow: hidden;
-  position: fixed;
-  width: 40%;
+  position: absolute;
+  width: 60%;
   height: 37vh;
   outline: 2px solid;
   border-radius: 10px;
   filter: opacity(0.75);
   backdrop-filter: blur(25px);
+}
+.restovi{
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  height: fit-content;
 }
 .research-area{
   display: grid;
