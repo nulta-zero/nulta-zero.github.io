@@ -185,15 +185,16 @@ const $$ = {
 
              full_width.addEventListener('click', e=>{
                if(navigator.userAgent.search('iPhone') > -1){
-                  // MOBILE PHONES
-                  if(pad.clientWidth > window.innerWidth / 3 ){
-                    pad.style.width = '20vw';
-                    pad.style.height = '45%';
-                  }else{
-                    pad.style.width =  '95%';
-                    pad.style.height = '45%';
-                  }
-                  return true;
+                 pad.scrollIntoView();
+               //    // MOBILE PHONES
+               //    if(pad.clientWidth > window.innerWidth / 3 ){
+               //      pad.style.width = '20vw';
+               //      pad.style.height = '45%';
+               //    }else{
+               //      pad.style.width =  '95%';
+               //      pad.style.height = '45%';
+               //    }
+               //    return true;
                }
 
                 // USUAL DESKTOP BEHAVIOR

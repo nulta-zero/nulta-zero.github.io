@@ -119,6 +119,8 @@ hr{
   text-align: center;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  justify-self: anchor-center;
 }
 .settings > div > label{
   color: #545859;
@@ -224,6 +226,9 @@ hr{
 .grid-box{
   display: grid;
 }
+.grid-legend-box{
+  justify-self: anchor-center;
+}
 .grid-legend-box > p{
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -232,6 +237,7 @@ hr{
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 2vh;
+  justify-self: anchor-center;
 }
 .rainbow{
   background: repeating-linear-gradient(1deg, rgba(255, 154, 0, 1) 5%, #9C27B0 50%,
@@ -524,5 +530,6 @@ pre{
   }
   .pad{
     width: 95%;
+    position: relative;
   }
 }
