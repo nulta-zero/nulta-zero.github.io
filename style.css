@@ -29,7 +29,6 @@ body{
    margin: 0;
    font-size: 95%;
    transition: .25s;
-   /* position: fixed; */    /* Breakes the app */
 
    /* background-image: url(stocks.png);
    background-repeat: no-repeat;
@@ -60,7 +59,8 @@ hr{
   border: 1.1px solid #7572711f;
 }
 ::selection{
-  background: #0000007d;
+  background: rgb(28 127 238 / 85%);
+  color: black;
 }
 .program{
   transform: translate3d(0,0,0);     /*SAFARI FIX*/
@@ -288,7 +288,6 @@ hr{
   width: 100%;
   height: 2px;
   background: linear-gradient(38deg, #2b2b2d -36%, transparent);
-  mix-blend-mode: color-dodge;
 }
 .container-intro{
   padding: 5vh;
@@ -388,6 +387,7 @@ hr{
   padding: 25px 10px 10px 10px;
   background: #202124;
   transition: 1s;
+  color: var(--pastText);
 }
 .pad-notes{
   height: calc(100% - 40px);

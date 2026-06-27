@@ -130,8 +130,8 @@ const $$ = {
        let horizontalLine = qu('.horizontal-line');
        let banderY = qu('.bander-y');
       switch(state){
-        case true :  windowHolder.classList.add('grid-split-window');   qu('body').classList.add('fixed');   window.scrollTo(0, 0); horizontalLine.style.position = 'relative';  banderY.style.position = 'relative';  break;
-        case false : windowHolder.classList.remove('grid-split-window');qu('body').classList.remove('fixed'); horizontalLine.style.position = 'absolute'; banderY.style.position = 'absolute'; break;
+        case true :  windowHolder.classList.add('grid-split-window');     window.scrollTo(0, 0); horizontalLine.style.position = 'relative';  banderY.style.position = 'relative';  break;
+        case false : windowHolder.classList.remove('grid-split-window');  horizontalLine.style.position = 'absolute'; banderY.style.position = 'absolute'; break;
       }
     },
     createPoints : function(max, className, abc){
@@ -186,7 +186,7 @@ const $$ = {
 
              full_width.addEventListener('click', e=>{
                 if(navigator.userAgent.search('iPhone') > -1){
-                   pad.scrollIntoView();
+                   pad_notes.scrollIntoView(true);
                 }
 
                 // USUAL DESKTOP BEHAVIOR
