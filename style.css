@@ -68,6 +68,7 @@ hr{
 .super-container{
    padding: 5% 0 0 0;
    margin: 1%;
+   overflow-x: hidden;
 }
 .grid-split-window{
   display: grid;

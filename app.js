@@ -130,8 +130,8 @@ const $$ = {
        let horizontalLine = qu('.horizontal-line');
        let banderY = qu('.bander-y');
       switch(state){
-        case true :  windowHolder.classList.add('grid-split-window');     window.scrollTo(0, 0); horizontalLine.style.position = 'relative';  banderY.style.position = 'relative';  break;
-        case false : windowHolder.classList.remove('grid-split-window');  horizontalLine.style.position = 'absolute'; banderY.style.position = 'absolute'; break;
+        case true :  windowHolder.classList.add('grid-split-window');     window.scrollTo(0, 0); horizontalLine.style.position = 'none';  banderY.style.position = 'relative';  break;
+        case false : windowHolder.classList.remove('grid-split-window');  horizontalLine.style.position = 'absolute'; banderY.style.position = 'absolute'; $$.calculateLargestTitlePos(); break;
       }
     },
     createPoints : function(max, className, abc){
