@@ -10,10 +10,11 @@
     --purple    : #ad92e5;
     --goldish   : #ffdb81c4;
     --facebook-text-color : #e4e6ea;
+    --mascBlue : rgb(28 127 238 / 85%);
     /* #1d1f22; */
 }
 *   { cursor: default;  }
-html{ height: 100%; mix-blend-mode: darken; background: var(--dark);}
+html{ height: 100%; mix-blend-mode: darken; background: var(--dark); overscroll-behavior: none;}
 /* DEFAULTS CHANGES */
 frame{ transition: 0.6s; }
 button{background-color: transparent; color: #555;}
@@ -59,7 +60,7 @@ hr{
   border: 1.1px solid #7572711f;
 }
 ::selection{
-  background: rgb(28 127 238 / 85%);
+  background: var(--mascBlue);
   color: black;
 }
 .program{
@@ -246,15 +247,6 @@ hr{
                                               rgba(63, 218, 216, 1) 12%,
                                               rgba(47, 201, 226, 1) 10%,
                                               rgba(28, 127, 238, 1) 16%, #9C27B0 34%, #00BCD4 90%);
-        /* background: repeating-linear-gradient(1deg, rgba(255, 154, 0, 1) 5%,
-                                                    rgba(208, 222, 33, 1) 50px, transparent 20px,
-                                                    rgba(79, 220, 74, 1) 50px,  transparent 100px,
-                                                    rgba(63, 218, 216, 1) 50px, transparent 20px,
-                                                    rgba(47, 201, 226, 1) 50px, transparent 20px,
-                                                    rgba(28, 127, 238, 1) 50px, transparent 20%,
-                                                    rgba(95, 21, 242, 1) 20%,   transparent 20px, #9C27B0 71%, transparent 20px, #00BCD4 97%, transparent 32px,
-                                                    rgba(255, 0, 0, 1) 123%,    transparent 40px
-                                              ); */
 }
 /* BACKGROUND ELEMENTS X,Y ,axis */
 .bander-y{
@@ -264,6 +256,9 @@ hr{
   color: #545859;
   padding: 2px 0;
   border-radius: 3px;
+  /* fem */
+  /* color: #baa5e67d;
+  font-weight: 900; */
 }
 .bander-x{
   position: absolute;
@@ -272,6 +267,9 @@ hr{
   color: #545859;
   padding: 2px 0;
   border-radius: 3px;
+  /* masc */
+  /* color: rgb(105 164 229 / 59%);
+  font-weight: 900; */
 }
 .vertical-line{
   position: absolute;
@@ -539,5 +537,8 @@ pre{
   .pad{
     width: 95%;
     position: relative;
+  }
+  .bander-x{
+    right: 10%;
   }
 }
