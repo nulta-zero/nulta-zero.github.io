@@ -2,8 +2,10 @@ const doc = document,
       log = (x)=> console.log(x),
       dce = (x)=> doc.createElement(x),
       qu = (x)=> doc.querySelector(x),
+      quAll = (x)=> doc.querySelectorAll(x),
       show_this = (x, state)=> x.style.display = state,
-      quAll = (x)=> doc.querySelectorAll(x);
+      outlineAll = ()=> quAll('*').forEach(el => el.classList.add('outlined')),
+      deOutlineAll = ()=>quAll('*').forEach(el => el.classList.remove('outlined'));
 
 const $$ = {
     vars : {
