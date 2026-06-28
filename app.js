@@ -250,7 +250,7 @@ const $$ = {
          }
          let height = iframe.src.split('&').filter( x=> x.includes('height'))[0].replaceAll(/[^\d]/gi, '');
          iframe.style.display = 'block';
-         iframe.style.right   = '-32%';
+         iframe.style.right   = 5 + 'px';
          iframe.style.bottom  = 5 + 'px';
          iframe.style.height  = height + 'px';
     },

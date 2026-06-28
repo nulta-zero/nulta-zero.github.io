@@ -155,7 +155,8 @@ hr{
   background: #e4e5e887;
   color: #202124;
   border-radius: 6px;
-  padding: 0 5px;
+  text-align: center;
+  padding: 0 25px;
 }
 /* TABLE */
 .table-holder, .specific-algorithms-dev{
@@ -349,7 +350,7 @@ hr{
   border: none;
   overflow: hidden;
   position: absolute;
-  width: 60%;
+  width: 40%;
   height: 37vh;
   outline: 2px solid;
   border-radius: 10px;
