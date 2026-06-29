@@ -48,12 +48,13 @@ const $$ = {
          if(bool) qu('.super-container').classList.add('matrix');
          else     qu('.super-container').classList.remove('matrix');
     },
-    calculateLargestTitlePos : function(){
-         let ltr = qu('.largest-title').getBoundingClientRect();
+    calculateHorizontalLinePos : function(){
+         let ltr_top = qu('.largest-title').offsetTop;
+         let ltr_height = qu('.largest-title').clientHeight;
          let horizontalLine = qu('.horizontal-line');
          let banderX = qu('.bander-x');
-         horizontalLine.style.top = ltr.top + ltr.height + ltr.height / 5 + 'px';
-         banderX.style.top = ltr.top + ltr.height + 20 + 'px';
+         horizontalLine.style.top = ltr_top + ltr_height + ltr_height / 5 + 'px';
+         banderX.style.top = ltr_top + ltr_height + 20 + 'px';
          // if(qu('.abc-holder') != null) qu('.abc-holder').style.top = ltr.top + ltr.height - 10 + 'px';
     },
     createTRS : function(){
@@ -132,8 +133,8 @@ const $$ = {
        let horizontalLine = qu('.horizontal-line');
        let banderY = qu('.bander-y');
       switch(state){
-        case true :  windowHolder.classList.add('grid-split-window');     window.scrollTo(0, 0); horizontalLine.style.position = 'none';  banderY.style.position = 'relative';  break;
-        case false : windowHolder.classList.remove('grid-split-window');  horizontalLine.style.position = 'absolute'; banderY.style.position = 'absolute'; $$.calculateLargestTitlePos(); break;
+        case true :  windowHolder.classList.add('grid-split-window');     window.scrollTo(0, 0); horizontalLine.style.display = 'none';  banderY.style.position = 'relative';  break;
+        case false : windowHolder.classList.remove('grid-split-window');  horizontalLine.style.position = 'absolute'; banderY.style.position = 'absolute'; $$.calculateHorizontalLinePos(); break;
       }
     },
     createPoints : function(max, className, abc){
@@ -303,7 +304,7 @@ const main = function(){
           case 'mat-mode':   onStateAct(e.target.checked, f=> $$.matrix(true), f=> $$.matrix(false) );  break;
           case 'wr-mode':
                            onStateAct(e.target.checked, $$.createPad, f=> qu('.pad').remove() );
-                           setTimeout( $$.calculateLargestTitlePos, 0.1 * 1000);
+                           setTimeout( $$.calculateHorizontalLinePos, 0.1 * 1000);
           break;
           case 'rev-mode':
                       if(qu('.window-holder').classList.contains('grid-split-window') == false) return false; //NO need to change
@@ -332,7 +333,7 @@ const main = function(){
                      $$.vars.active_program = '';
                   }
                break;
-                   $$.calculateLargestTitlePos();
+                   $$.calculateHorizontalLinePos();
              }
        break;
        case 'embeded-video':  $$.openEmbeded(e); break;
@@ -347,7 +348,7 @@ const main = function(){
   });
 
   window.addEventListener('DOMContentLoaded', e=>{
-      $$.calculateLargestTitlePos();
+      $$.calculateHorizontalLinePos();
       $$.createTRS();
       $$.createPoints( (new Date().getFullYear()-1987) , 'points-holder' );
       setTimeout( t=> doc.body.style.filter = "opacity(1)", 1*1000);
@@ -355,11 +356,11 @@ const main = function(){
   });
 
   window.addEventListener('resize', e=>{
-      $$.calculateLargestTitlePos();
+      $$.calculateHorizontalLinePos();
   });
 
   window.addEventListener('focus', e=>{
-    (doc.visibilityState == 'visible') ? $$.calculateLargestTitlePos() : '';
+    (doc.visibilityState == 'visible') ? $$.calculateHorizontalLinePos() : '';
   });
 }
 
