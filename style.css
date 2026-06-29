@@ -69,7 +69,6 @@ hr{
 .super-container{
    padding: 5% 0 0 0;
    margin: 1%;
-   overflow-x: hidden;
 }
 .grid-split-window{
   display: grid;
@@ -284,10 +283,16 @@ hr{
   z-index: -1;
 }
 .horizontal-line{
-  position: absolute;
+  /* position: absolute;
   top: 12pc;
   left: 0;
-  width: 100%;
+  width: 100%; */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   height: 2px;
   background: linear-gradient(38deg, #2b2b2d -36%, transparent);
 }
@@ -528,6 +533,7 @@ pre{
   }
   .super-container{
     padding: 0;
+    overflow-x: hidden;
   }
   .settings{
     margin-top: 10%;
