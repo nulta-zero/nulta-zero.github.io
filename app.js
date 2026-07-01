@@ -8,6 +8,7 @@ const doc = document,
       deOutlineAll = ()=>quAll('*').forEach(el => el.classList.remove('outlined'));
 
 const $$ = {
+    print : console.log,
     vars : {
       availables : ['CALCULATOR', 'VIEWPORT', 'SOUNDPORT', 'FEMY'],
       active_program : '',
@@ -160,51 +161,62 @@ const $$ = {
 
                    init_link_download(content);
      },
+     safeEval: function(jsCommand) {
+           // list of words blocked completely
+           const blacklistRegex = /\b(alert|confirm|prompt|window|document|fetch|XMLHttpRequest|location|localStorage|sessionStorage|cookie|top|parent)\b/i;
+
+           if (blacklistRegex.test(jsCommand)) {
+             return "Operation blocked: Unauthorized command.";
+           }
+
+           try {
+             const safeCompute = new Function(`return (${jsCommand});`);
+             const result = safeCompute();
+             return result;
+           } catch (e) {
+             return "Invalid operation";
+           }
+    },
     createPad : function(){
          let pad = dce('div');
              pad.classList.add('pad');
          let pad_notes = dce('textarea');
-             pad_notes.value = "//Ready to take notes...";
+             pad_notes.value = "//Ready to take notes...\n//Start line with $ to run JS";
              pad_notes.classList.add('pad-notes');
              pad_notes.setAttribute('contenteditable', true);
              pad.appendChild(pad_notes);
          let bar = dce('div');
              bar.classList.add('pad-bar');
 
-         //PAD INPUTS
-         let full_width = dce('input');
-             full_width.value = '⤢';
-             full_width.classList.add('simple-btn');
-             full_width.type = 'button';
-             full_width.title = "FULL-SCREEN";
+             pad_notes.addEventListener('keyup', e=>{
+                 switch(e.key){
+                   case 'Enter':
+                         const text = event.target.value;
+                         const lines = text.split('\n');
+                         const lastWrittenLine = lines[lines.length - 2];
+                         let lastLine = lines[lines.length - 1];
 
-             full_width.addEventListener('click', e=>{
-                if(navigator.userAgent.search('iPhone') > -1){
-                   pad_notes.scrollIntoView(true);
-                }
-
-                // USUAL DESKTOP BEHAVIOR
-                if(pad.clientWidth > window.innerWidth / 3 ){
-                  pad.style.width = '20vw';
-                  pad.style.height = '45vh';
-                }else{
-                  pad.style.width =  (qu('.program').clientWidth < 1) ? '99%' : (window.innerWidth - qu('.program').clientWidth) - 22.5 + 'px';
-                  pad.style.height = 'calc(100% - 35px)';
-                }
+                         if(lastWrittenLine.trim()[0] ==='$' ){
+                            e.preventDefault();
+                            let inputed = (lastWrittenLine.replace('$', '').trim());
+                            pad_notes.value += '' + $$.safeEval(inputed);
+                         }
+                   break;
+                 }
              });
+
+             // full_width.addEventListener('click', e=>{
+             //    if(navigator.userAgent.search('iPhone') > -1){
+             //       pad_notes.scrollIntoView(true);
+             //    }
+             // });
           let export_btn = dce('input');
               export_btn.value = '⏍';
-              export_btn.classList.add('simple-btn');
+              export_btn.classList.add('pad-export','simple-btn');
               export_btn.type = 'button';
               export_btn.title = "EXPORT AS TXT";
 
-              export_btn.addEventListener('click', e=>{
-                  $$.exporter(qu('.pad-notes').innerText);
-              });
-
               pad.appendChild(pad_notes);
-
-              bar.appendChild(full_width);
               bar.appendChild(export_btn);
               pad.appendChild(bar);
 
@@ -333,6 +345,7 @@ const main = function(){
                 $$.startTimer(30, a=> { if(i_frame.style.display == 'none') $$.clearIframeContent(i_frame);  });  //clear idle frame
              }
        break;
+       case 'pad-export':   $$.exporter(qu('.pad-notes').innerText);  break;
      }
   });
 
